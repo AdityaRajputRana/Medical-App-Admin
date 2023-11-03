@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.medicalappadmin.databinding.ActivityDashboardBinding;
+import com.example.medicalappadmin.fragments.HomeFragment;
+import com.example.medicalappadmin.fragments.NotepadFragment;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -20,15 +22,16 @@ public class DashboardActivity extends AppCompatActivity {
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         binding.bottomNavigationView.setItemIconTintList(null);
+        changeFragment(new HomeFragment());
         binding.bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
                 if(item.getItemId() == R.id.home){
-
+                    changeFragment(new HomeFragment());
                 }
                 else if(item.getItemId() == R.id.notepad){
-
+                    changeFragment(new NotepadFragment());
                 }
                 else if(item.getItemId() == R.id.tab3){
 
