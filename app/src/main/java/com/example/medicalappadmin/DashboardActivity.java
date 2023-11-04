@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -28,16 +30,19 @@ public class DashboardActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
                 if(item.getItemId() == R.id.home){
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
                     changeFragment(new HomeFragment());
                 }
                 else if(item.getItemId() == R.id.notepad){
+
                     changeFragment(new NotepadFragment());
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 }
                 else if(item.getItemId() == R.id.tab3){
-
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
                 }
                 else if(item.getItemId() == R.id.profile){
-
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
                 }
                 return true;
             }
@@ -49,4 +54,5 @@ public class DashboardActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.mainFrameLayout, fragment);
         fragmentTransaction.commit();
     }
+
 }

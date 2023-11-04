@@ -1,15 +1,14 @@
 package com.example.medicalappadmin;
 
+import static com.example.medicalappadmin.Tools.Methods.showToast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PatternMatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.Toast;
-
-import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.databinding.ActivityLoginBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -36,12 +35,15 @@ public class LoginActivity extends AppCompatActivity {
                     APIMethods.loginWithEmailAndPassword(LoginActivity.this, email, password, new APIResponseListener<LoginRP>() {
                         @Override
                         public void success(LoginRP response) {
-
+                            showToast(LoginActivity.this,"Login Successful");
+                            Intent i = new Intent(LoginActivity.this, DashboardActivity.class);
+                            startActivity(i);
                         }
 
                         @Override
                         public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-
+                            showToast(LoginActivity.this,message);
+                            Log.i("ADI", "fail: "+ message);
                         }
                     });
 
@@ -74,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
 
         }
         else if(!isValidEmail(binding.etEmailLogin.getText().toString())){
-            showToast("Please enter valid email");
+            showToast(this,"Please enter valid email");
             return false;
         }
         else{
@@ -96,7 +98,5 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    private void showToast(String message){
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
+
 }

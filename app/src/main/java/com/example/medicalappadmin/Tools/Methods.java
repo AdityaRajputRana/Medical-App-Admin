@@ -2,6 +2,7 @@ package com.example.medicalappadmin.Tools;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
@@ -112,5 +113,10 @@ public class Methods {
         } else {
             Log.e("NoActivityError", message);
         }
+    }
+
+
+    public static void showToast(Context context,String message){
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 }
