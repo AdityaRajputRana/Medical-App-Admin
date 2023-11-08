@@ -8,12 +8,12 @@ import java.util.ArrayList;
 
 public class UploadPointsReq {
 
-    String pageId;
+    int pageNumber;
     ArrayList<Point> pointsToAdd;
 
-    public UploadPointsReq(String pageId, ArrayList<Point> pointsToAdd) {
+    public UploadPointsReq(int pageNumber, ArrayList<Point> pointsToAdd) {
 
-        this.pageId = pageId;
+        this.pageNumber = pageNumber;
         this.pointsToAdd = pointsToAdd;
     }
 }

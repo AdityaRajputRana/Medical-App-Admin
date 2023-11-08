@@ -13,12 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.medicalappadmin.ActivityCaseHistory;
 import com.example.medicalappadmin.PrescriptionActivity;
 import com.example.medicalappadmin.R;
 
 
 public class HomeFragment extends Fragment {
     AppCompatButton btnAddNewPatient;
+    AppCompatButton btnCaseHistory;
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -29,6 +31,7 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         btnAddNewPatient  = view.findViewById(R.id.btnAddNewPatient);
+        btnCaseHistory  = view.findViewById(R.id.btnCaseHistory);
         return  view;
     }
 
@@ -40,6 +43,14 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
 
                 Intent i = new Intent(getContext(), PrescriptionActivity.class);
+                startActivity(i);
+            }
+        });
+
+        btnCaseHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i =new Intent(getContext(), ActivityCaseHistory.class);
                 startActivity(i);
             }
         });

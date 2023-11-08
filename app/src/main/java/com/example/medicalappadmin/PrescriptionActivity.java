@@ -1,19 +1,25 @@
 package com.example.medicalappadmin;
 
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.medicalappadmin.Models.Page;
@@ -22,12 +28,14 @@ import com.example.medicalappadmin.PenDriver.ConnectionsHandler;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
+import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.databinding.ActivityPrescriptionBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
+import com.example.medicalappadmin.rest.requests.AddDetailsReq;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
-import com.example.medicalappadmin.rest.response.UploadPointsRP;
+import com.example.medicalappadmin.rest.response.EmptyRP;
 
 import java.util.ArrayList;
 
@@ -51,6 +59,15 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     ArrayList<Point> pendingPoints = new ArrayList<>();
     Page currentPage;
 
+    ActionBarDrawerToggle actionBarDrawerToggle;
+    EditText etFullName;
+    EditText etMobileNumber;
+    EditText etEmail;
+    TextView tvMale;
+    TextView tvFemale;
+
+    String gender = "M";
+
 
 
     SmartPenDriver driver = SmartPenDriver.getInstance(this); //driverStep1
@@ -63,8 +80,115 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         super.onCreate(savedInstanceState);
         binding = ActivityPrescriptionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbar);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this,binding.drawerLayout,binding.toolbar,R.string.drawer_open,R.string.drawer_close);
+        binding.drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+
+        etFullName = binding.navView.getHeaderView(0).findViewById(R.id.etFullName);
+        etEmail = binding.navView.getHeaderView(0).findViewById(R.id.etEmail);
+        etMobileNumber = binding.navView.getHeaderView(0).findViewById(R.id.etMobile);
+        tvMale = binding.navView.getHeaderView(0).findViewById(R.id.tvMale);
+        tvFemale = binding.navView.getHeaderView(0).findViewById(R.id.tvFemale);
+
+        handleGender();
+
+        binding.navView.getHeaderView(0).findViewById(R.id.btnSave).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("Adi", "onClick: btn save clicked ");
+
+                if(currentPageNumber == -1){
+                    Toast.makeText(PrescriptionActivity.this, "Please touch your page with pen", Toast.LENGTH_SHORT).show();
+                    binding.drawerLayout.close();
+                    return;
+                }
+                AddDetailsReq req = new AddDetailsReq();
+                req.setPageNumber(currentPageNumber);
+                if(etFullName.getText() != null && !etFullName.getText().toString().isEmpty()){
+                    req.setFullName(etFullName.getText().toString());
+                }
+                if(etEmail.getText() != null && !etEmail.getText().toString().isEmpty()){
+                    req.setEmail(etEmail.getText().toString());
+                }
+                if(etMobileNumber.getText() != null && !etMobileNumber.getText().toString().isEmpty()){
+                    req.setMobileNumber(Long.valueOf(etMobileNumber.getText().toString()));
+                }
+
+                req.setGender(gender);
+
+                Log.i("Adi", "req" + req.toString());
+
+                binding.drawerLayout.close();
+                showPB();
+                binding.toolbar.setSubtitle("Saving details");
+                APIMethods.addDetails(PrescriptionActivity.this, req, new APIResponseListener<EmptyRP>() {
+                            @Override
+                            public void success(EmptyRP response) {
+                                hidePB();
+                                binding.toolbar.setSubtitle("Details Saved");
+                                Toast.makeText(PrescriptionActivity.this, "Saved details successfully", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                                showError(message,null);
+                            }
+                        }
+
+                );
+            }
+        });
+
+//        binding.btnOpenDrawer.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                binding.drawerLayout.openDrawer(GravityCompat.END);
+//            }
+//        });
         intialiseControls();
 
+    }
+
+    private void handleGender() {
+        tvMale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gender = "M";
+                tvMale.setBackgroundColor(getColor(R.color.blue_bg));
+                tvFemale.setBackgroundColor(getColor(R.color.white));
+                tvMale.setTextColor(getColor(R.color.white));
+                tvFemale.setTextColor(getColor(R.color.black));
+            }
+        });
+        tvFemale.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                gender = "F";
+                tvFemale.setBackgroundColor(getColor(R.color.blue_bg));
+                tvMale.setBackgroundColor(getColor(R.color.white));
+                tvFemale.setTextColor(getColor(R.color.white));
+                tvMale.setTextColor(getColor(R.color.black));
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (driver != null){
+            driver.destroyConnection();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if(actionBarDrawerToggle.onOptionsItemSelected(item)){
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void intialiseControls() {
@@ -219,30 +343,72 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     @Override
     public void drawEvent(float x, float y, int pageId) {
         if(pageId != currentPageNumber){
+            uploadPoints();
+            if (handler != null){
+                handler.removeCallbacks(runnable);
+                handler = null;
+                runnable = null;
+            }
+            binding.canvasView.clearDrawing();
             currentPageNumber = pageId;
+            binding.toolbar.setTitle("Page : " + currentPageNumber);
+            binding.toolbar.setSubtitle("Initialising Page");
+            showPB();
+
+            Log.i("Adi", "drawEvent: " + pageId);
+            Log.i("Adi", "drawEvent: currentpage " + currentPageNumber);
             APIMethods.initialisePage(this, currentPageNumber, new APIResponseListener<InitialisePageRP>() {
                 @Override
                 public void success(InitialisePageRP response) {
                     if(!response.isNewPage()){
+
+                        if(response.getPage().getEmail() != null && !response.getPage().getGender().isEmpty()){
+                            if(response.getPage().getGender().equals("M")){
+                                gender = "M";
+                                tvMale.setBackgroundColor(getColor(R.color.blue_bg));
+                                tvFemale.setBackgroundColor(getColor(R.color.white));
+                                tvMale.setTextColor(getColor(R.color.white));
+                                tvFemale.setTextColor(getColor(R.color.black));
+                            }
+                            else{
+                                gender = "F";
+                                tvFemale.setBackgroundColor(getColor(R.color.blue_bg));
+                                tvMale.setBackgroundColor(getColor(R.color.white));
+                                tvFemale.setTextColor(getColor(R.color.white));
+                                tvMale.setTextColor(getColor(R.color.black));
+                            }
+                        }
+
+                        if(response.getPage().getEmail() != null && !response.getPage().getEmail().isEmpty() && !response.getPage().getEmail().equals("")){
+                            etEmail.setText(response.getPage().getEmail().toString());
+                        }
+                        if(response.getPage().getEmail() != null &&!response.getPage().getFullName().isEmpty() && !response.getPage().getFullName().equals("")){
+                            etFullName.setText(response.getPage().getFullName().toString());
+                        }
+                        if(response.getPage().getMobileNumber() != null &&response.getPage().getMobileNumber() != 0){
+                            etMobileNumber.setText(String.valueOf(response.getPage().getMobileNumber()));
+                        }
+
                         Log.i("ADI", "success: points received " + response.getPage().getPoints().toString());
                         for(Point p:response.getPage().getPoints()){
                             binding.canvasView.addCoordinate(p.getX(),p.getY());
                         }
+                        hidePB();
                     }
                     currentPage = response.getPage();
                     setTimelyUploads();
-                    Toast.makeText(PrescriptionActivity.this, "Page initialised", Toast.LENGTH_LONG).show();
+                    binding.toolbar.setSubtitle("Page initialised successfully");
                 }
 
                 @Override
                 public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                    Toast.makeText(PrescriptionActivity.this, "Page initialised failed" + message, Toast.LENGTH_LONG).show();
+                    hidePB();
+                    Methods.showError(PrescriptionActivity.this,message,true);
                 }
             });
         }
         binding.canvasView.addCoordinate(x, y);
         pendingPoints.add(new Point(x, y));
-//        Log.i("Adi", x +" y->"+ y);
     }
 
 
@@ -257,33 +423,38 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         runnable = new Runnable() {
             @Override
             public void run() {
-                if (pendingPoints.size() > 0) {
-                    ArrayList<Point> uploadPoints = new ArrayList<>();
-                    uploadPoints.addAll(pendingPoints);
-
-                    pendingPoints = new ArrayList<>();
-
-                    //call upload points
-
-                    Log.i("ADI ", "page id " + currentPage.get_id());
-
-                    APIMethods.uploadPoints(PrescriptionActivity.this, currentPage.get_id(), uploadPoints, new APIResponseListener<UploadPointsRP>() {
-                        @Override
-                        public void success(UploadPointsRP response) {
-                            
-                        }
-
-                        @Override
-                        public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                            Toast.makeText(PrescriptionActivity.this, "Some error occurred while uploading points" + message, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+                uploadPoints();
                 handler.postDelayed(runnable, 15000);
             }
         };
 
+
         handler.postDelayed(runnable, 15000);
+    }
+
+    private void uploadPoints(){
+        if (pendingPoints.size() > 0) {
+            ArrayList<Point> uploadPoints = new ArrayList<>();
+            uploadPoints.addAll(pendingPoints);
+
+            pendingPoints = new ArrayList<>();
+
+            //call upload points
+
+
+            APIMethods.uploadPoints(PrescriptionActivity.this, currentPageNumber, uploadPoints, new APIResponseListener<EmptyRP>() {
+                @Override
+                public void success(EmptyRP response) {
+
+                }
+
+                @Override
+                public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                    Methods.showError(PrescriptionActivity.this,message,true);
+
+                }
+            });
+        }
     }
 
 
@@ -346,5 +517,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         dialogPenBinding.actionBtn.setText("Okay");
         dialogPenBinding.imageView.setImageDrawable(AppCompatResources.getDrawable(this,R.drawable.ic_error_bg));
         dialogPenBinding.actionBtn.setOnClickListener(view->dialog.dismiss());
+    }
+
+    private void showPB(){
+        binding.pbPrescription.setVisibility(View.VISIBLE);
+    }
+    private void hidePB(){
+        binding.pbPrescription.setVisibility(View.GONE);
     }
 }

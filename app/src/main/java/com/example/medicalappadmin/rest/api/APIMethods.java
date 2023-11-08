@@ -2,20 +2,20 @@ package com.example.medicalappadmin.rest.api;
 
 import android.content.Context;
 
-import com.example.medicalappadmin.Models.Hospital;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
-import com.example.medicalappadmin.rest.requests.HomeReq;
+import com.example.medicalappadmin.rest.requests.AddDetailsReq;
+import com.example.medicalappadmin.rest.requests.CaseHistoryReq;
 import com.example.medicalappadmin.rest.requests.InitialisePageReq;
 import com.example.medicalappadmin.rest.requests.LoginReq;
 import com.example.medicalappadmin.rest.requests.SignupReq;
 import com.example.medicalappadmin.rest.requests.UploadPointsReq;
-import com.example.medicalappadmin.rest.response.DashboardRP;
+import com.example.medicalappadmin.rest.response.CaseHistoryRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LoginRP;
 import com.example.medicalappadmin.rest.response.SignupRP;
-import com.example.medicalappadmin.rest.response.UploadPointsRP;
+import com.example.medicalappadmin.rest.response.EmptyRP;
 
 import java.util.ArrayList;
 
@@ -41,11 +41,27 @@ public class APIMethods {
     }
 
 
-    public static void uploadPoints(Context context, String pageID, ArrayList<Point> points, APIResponseListener<UploadPointsRP> listener){
-        UploadPointsReq req = new UploadPointsReq(pageID,points);
-         API.postData(listener,req,EndPoints.uploadPoints, UploadPointsReq.class,context);
+    public static void uploadPoints(Context context, int pageNumber, ArrayList<Point> points, APIResponseListener<EmptyRP> listener){
+        UploadPointsReq req = new UploadPointsReq(pageNumber,points);
+         API.postData(listener,req,EndPoints.uploadPoints, EmptyRP.class,context);
 
     }
+
+    //Upload details
+
+    public  static  void addDetails(Context context, AddDetailsReq req,
+                                    APIResponseListener<EmptyRP> listener){
+        API.postData(listener,req,EndPoints.addDetails, EmptyRP.class,context);
+    }
+
+
+    //Load history
+    public  static  void loadCaseHistory(Context context, int pageNumber,
+                                    APIResponseListener<EmptyRP> listener){
+        CaseHistoryReq req = new CaseHistoryReq(pageNumber);
+        API.postData(listener,req,EndPoints.caseHistory, CaseHistoryRP.class,context);
+    }
+
 
 
 

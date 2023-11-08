@@ -71,6 +71,8 @@ public class Methods {
 
             dialogBinding = DialogPenBinding.inflate(context.getLayoutInflater(), null, false);
 
+            dialogBinding.titleTxt.setVisibility(View.VISIBLE);
+            dialogBinding.bodyTxt.setVisibility(View.VISIBLE);
 
             dialogBinding.imageView.setVisibility(View.VISIBLE);
             dialogBinding.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_error_bg));

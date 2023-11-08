@@ -3,9 +3,9 @@ package com.example.medicalappadmin.rest.requests;
 
 
 public class InitialisePageReq {
-    int pageNo;
+    int pageNumber;
 
-    public InitialisePageReq(int pageNo) {
-        this.pageNo = pageNo;
+    public InitialisePageReq(int pageNumber) {
+        this.pageNumber = pageNumber;
     }
 }
