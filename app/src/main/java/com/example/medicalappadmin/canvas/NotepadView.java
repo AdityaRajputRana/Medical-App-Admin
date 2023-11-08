@@ -1,15 +1,14 @@
 package com.example.medicalappadmin.canvas;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PointF;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
+import android.util.Log;
 import android.view.View;
+
+import com.example.medicalappadmin.Models.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +16,9 @@ import java.util.List;
 
 public class NotepadView extends View {
     private Paint paint;
+    double scaleFactor = 15.0;
 
-    private List<PointF> coordinates;
+    private List<Point> coordinates;
 
     public NotepadView(Context context) {
         super(context);
@@ -43,14 +43,19 @@ public class NotepadView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        for (PointF point : coordinates) {
-            canvas.drawPoint(point.x, point.y, paint);
+        for (Point point : coordinates) {
+            float x = (float) (point.getX() * scaleFactor);
+            float y = (float) (point.getY() * scaleFactor);
+
+            Log.d("adi", "Draw Point: x" + x + ", y=" + y);
+            canvas.drawPoint(x, y, paint);
         }
+
+
     }
 
-    public void addCoordinate(float x, float y) {
-        PointF point = new PointF(x,y);
-        coordinates.add(point);
+    public void addCoordinate(double x, double y) {
+        coordinates.add(new Point(x, y));
         invalidate(); // Request a redraw of the View
     }
 

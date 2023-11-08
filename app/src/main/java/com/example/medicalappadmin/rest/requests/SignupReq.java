@@ -5,10 +5,8 @@ import com.example.medicalappadmin.Models.User;
 
 public class SignupReq {
     User user;
-    Hospital hospital;
 
-    public SignupReq(User user, Hospital hospital) {
+    public SignupReq(User user) {
         this.user = user;
-        this.hospital = hospital;
     }
 }

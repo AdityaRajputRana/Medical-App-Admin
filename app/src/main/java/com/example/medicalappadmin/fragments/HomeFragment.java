@@ -1,6 +1,7 @@
 package com.example.medicalappadmin.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.medicalappadmin.PrescriptionActivity;
 import com.example.medicalappadmin.R;
 
 
@@ -37,6 +39,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
+                Intent i = new Intent(getContext(), PrescriptionActivity.class);
+                startActivity(i);
             }
         });
     }

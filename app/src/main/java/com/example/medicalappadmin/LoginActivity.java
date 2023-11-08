@@ -5,6 +5,7 @@ import static com.example.medicalappadmin.Tools.Methods.showToast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
+    SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,19 +31,23 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(initialChecks()){
+                    showPB();
                     String email = binding.etEmailLogin.getText().toString();
                     String password = binding.etPasswordLogin.getText().toString();
 
                     APIMethods.loginWithEmailAndPassword(LoginActivity.this, email, password, new APIResponseListener<LoginRP>() {
                         @Override
                         public void success(LoginRP response) {
+                            hidePB();
                             showToast(LoginActivity.this,"Login Successful");
+                            LoginActivity.this.getSharedPreferences("MY_PREF", MODE_PRIVATE).edit().putString("JWT_TOKEN", response.getJwt()).commit();
                             Intent i = new Intent(LoginActivity.this, DashboardActivity.class);
                             startActivity(i);
                         }
 
                         @Override
                         public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                            hidePB();
                             showToast(LoginActivity.this,message);
                             Log.i("ADI", "fail: "+ message);
                         }
@@ -96,6 +102,13 @@ public class LoginActivity extends AppCompatActivity {
     private void launchSignupScreen() {
         Intent i = new Intent(this, SignupActivity.class);
         startActivity(i);
+    }
+
+    private void showPB(){
+        binding.pbLogin.setVisibility(View.VISIBLE);
+    }
+    private void hidePB(){
+        binding.pbLogin.setVisibility(View.GONE);
     }
 
 

@@ -2,6 +2,7 @@ package com.example.medicalappadmin.rest.api;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -164,6 +165,10 @@ public class API {
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Map<String, String> params = new HashMap<String, String>();
                     params.put("Content-Type", "application/json");
+                    SharedPreferences preferences = context.getSharedPreferences("MY_PREF", Context.MODE_PRIVATE);
+                    if (preferences.contains("JWT_TOKEN") && !preferences.getString("JWT_TOKEN", "").isEmpty()){
+                        params.put("x-access-token",preferences.getString("JWT_TOKEN",""));
+                    }
                     return params;
                 }
 

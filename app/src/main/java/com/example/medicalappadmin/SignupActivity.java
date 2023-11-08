@@ -34,22 +34,9 @@ public class SignupActivity extends AppCompatActivity {
                     String fullName = binding.etFNameSignup.getText().toString()+" "+ binding.etLNameSignup.getText().toString();
                     Hospital hospital = new Hospital();
                     User user = new User(
-                            fullName,
-                            binding.etFNameSignup.getText().toString(),
-                            binding.etLNameSignup.getText().toString(),
-                            binding.etMobileSignup.getText().toString(),
-                            binding.etEmailSignup.getText().toString(),
-                            binding.etPasswordSignup.getText().toString(),
-                            //dp
-                            binding.etFNameSignup.getText().toString(),
-                            //type
-                            binding.etFNameSignup.getText().toString(),
-                            //title
-                            binding.etFNameSignup.getText().toString(),
-                            hospital
+
                     );
 
-                    //signup
 
 //                    APIMethods.signUpStaff(SignupActivity.this, user, hospital, new APIResponseListener<SignupRP>() {
 //                        @Override
