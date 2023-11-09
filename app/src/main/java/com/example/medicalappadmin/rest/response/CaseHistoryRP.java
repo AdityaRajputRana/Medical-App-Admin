@@ -7,6 +7,8 @@ import java.util.ArrayList;
 public class CaseHistoryRP {
 
     ArrayList<Case> cases;
+    int currentPage;
+    int totalPages;
 
     public CaseHistoryRP() {
     }
@@ -35,7 +37,7 @@ public class CaseHistoryRP {
         this.totalPages = totalPages;
     }
 
-    int currentPage;
-    int totalPages;
+
+
 
 }

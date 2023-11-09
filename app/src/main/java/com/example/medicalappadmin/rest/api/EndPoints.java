@@ -8,6 +8,7 @@ public class EndPoints {
    public static String initialisePage = "api/page/initialize";
    public static String caseHistory = "api/case/history";
    public static String addDetails = "api/page/addDetails";
+   public static String mergeCases = "api/case/merge";
 
 
 

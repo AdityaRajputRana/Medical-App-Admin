@@ -2,6 +2,7 @@ package com.example.medicalappadmin.rest.api;
 
 import android.content.Context;
 
+import com.example.medicalappadmin.Models.Case;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -9,6 +10,7 @@ import com.example.medicalappadmin.rest.requests.AddDetailsReq;
 import com.example.medicalappadmin.rest.requests.CaseHistoryReq;
 import com.example.medicalappadmin.rest.requests.InitialisePageReq;
 import com.example.medicalappadmin.rest.requests.LoginReq;
+import com.example.medicalappadmin.rest.requests.MergeCasesReq;
 import com.example.medicalappadmin.rest.requests.SignupReq;
 import com.example.medicalappadmin.rest.requests.UploadPointsReq;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
@@ -55,12 +57,13 @@ public class APIMethods {
     }
 
 
-    //Load history
+    //Load cases history
     public  static  void loadCaseHistory(Context context, int pageNumber,
-                                    APIResponseListener<EmptyRP> listener){
+                                    APIResponseListener<CaseHistoryRP> listener){
         CaseHistoryReq req = new CaseHistoryReq(pageNumber);
         API.postData(listener,req,EndPoints.caseHistory, CaseHistoryRP.class,context);
     }
+
 
 
 
