@@ -65,7 +65,11 @@ public class APIMethods {
     }
 
 
-
+    //merge cases
+    public static void mergeCasesHistory(Context context, String fromCaseId, String toCaseId, APIResponseListener<EmptyRP> listener){
+        MergeCasesReq req = new MergeCasesReq(fromCaseId,toCaseId);
+        API.postData(listener,req,EndPoints.mergeCases, EmptyRP.class,context);
+    }
 
 
 

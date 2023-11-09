@@ -119,6 +119,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/toolbar"
+                app:navigationIcon="@drawable/hamburger_icon"
                 app:title="Page Number"
                 app:subtitle="current process"
                 app:subtitleTextColor="@color/white"

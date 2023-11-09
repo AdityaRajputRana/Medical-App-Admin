@@ -10,6 +10,8 @@ public class CaseHistoryRP {
     int currentPage;
     int totalPages;
 
+
+
     public CaseHistoryRP() {
     }
 

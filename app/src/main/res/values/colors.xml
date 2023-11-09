@@ -9,4 +9,6 @@
     <color name="gray">#383838</color>
     <color name="lightBlue">#EDEDED</color>
     <color name="lightBlue2">#DCEDF9</color>
+    <color name="color_secondary_text">#464A4C</color>
+
 </resources>

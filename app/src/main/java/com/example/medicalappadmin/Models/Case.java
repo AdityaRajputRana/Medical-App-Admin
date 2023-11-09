@@ -1,11 +1,31 @@
 package com.example.medicalappadmin.Models;
 
+import android.util.Log;
+
 public class Case {
     String _id;
     String updatedAt;
     String hospitalId;
     int pageCount;
     Long createdAt;
+    String fullName;
+    long mobileNumber;
+    String gender;
+    String email;
+
+    public String getFullName() {
+        if(fullName == null || fullName.isEmpty()){
+            return "Untitled Case";
+        }
+        return fullName;
+    }
+
+    public String getMobileNumber() {
+        if(mobileNumber == 0 ){
+            return  "Case Id: " + get_id();
+        }
+        return "Mobile Number: " + mobileNumber;
+    }
 
     public Case() {
     }

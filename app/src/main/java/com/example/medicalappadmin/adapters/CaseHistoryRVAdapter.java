@@ -43,15 +43,9 @@ public class CaseHistoryRVAdapter extends RecyclerView.Adapter<CaseHistoryRVAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String TAG = "ADi rcv";
-            for(int i=0; i<caseHistoryRP.getCases().size(); i++){
-                Log.i(TAG, "id " + caseHistoryRP.getCases().get(i).get_id());
-                Log.i(TAG, "pages "+caseHistoryRP.getCases().get(i).getPageCount());
-                Log.i(TAG, "updated at "+ caseHistoryRP.getCases().get(i).getUpdatedAt());
-                tvPages.setText(String.valueOf(caseHistoryRP.getCases().get(i).getPageCount()));
-                tvName.setText(caseHistoryRP.getCases().get(i).get_id());
-                tvMobileNumber.setText(caseHistoryRP.getCases().get(i).getUpdatedAt());
-            }
+                tvPages.setText(String.valueOf(caseHistoryRP.getCases().get(position).getPageCount()));
+                tvName.setText(caseHistoryRP.getCases().get(position).getFullName());
+                tvMobileNumber.setText(caseHistoryRP.getCases().get(position).getMobileNumber());
     }
 
     @Override
