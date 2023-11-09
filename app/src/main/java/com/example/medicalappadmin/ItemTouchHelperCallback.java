@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.medicalappadmin.Models.Case;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -115,27 +116,31 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
         String fromId = response.getCases().get(fromPosition).get_id();
         String toId = response.getCases().get(toPosition).get_id();
 
+
+        int beforeCount = response.getCases().get(toPosition).getPageCount();
+        Case removedCase = response.getCases().get(fromPosition);
+        response.getCases().get(toPosition).setPageCount(response.getCases().get(toPosition).getPageCount()
+                + response.getCases().get(fromPosition).getPageCount());
+        recyclerView.getAdapter().notifyItemChanged(toPosition);
+        response.getCases().remove(fromPosition);
+        recyclerView.getAdapter().notifyItemRemoved(fromPosition);
+
         isMerging = true;
 
         APIMethods.mergeCasesHistory(context, fromId, toId, new APIResponseListener<EmptyRP>() {
             @Override
             public void success(EmptyRP res) {
-                Log.i(TAG, "merge successful");
-
-                response.getCases().get(toPosition).setPageCount(response.getCases().get(toPosition).getPageCount()
-                        + response.getCases().get(fromPosition).getPageCount());
-                recyclerView.getAdapter().notifyItemChanged(toPosition);
                 Toast.makeText(context, "Merge successful", Toast.LENGTH_SHORT).show();
-
-//                response.getCases().remove(fromPosition);
-//                recyclerView.getAdapter().notifyItemRemoved(fromPosition);
-
                 isMerging = false;
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 Toast.makeText(context, "Some error occurred", Toast.LENGTH_SHORT).show();
+                response.getCases().add(fromPosition,removedCase);
+                recyclerView.getAdapter().notifyItemInserted(fromPosition);
+                response.getCases().get(toPosition).setPageCount(beforeCount);
+                recyclerView.getAdapter().notifyItemChanged(toPosition);
                 Methods.showError((Activity) context,message,true);
                 isMerging = false;
             }
