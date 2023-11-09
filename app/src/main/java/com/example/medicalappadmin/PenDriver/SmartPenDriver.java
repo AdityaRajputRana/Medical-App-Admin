@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import kr.neolab.sdk.ink.structure.Dot;
+import kr.neolab.sdk.ink.structure.DotType;
 import kr.neolab.sdk.pen.IPenCtrl;
 import kr.neolab.sdk.pen.PenCtrl;
 import kr.neolab.sdk.pen.bluetooth.BTLEAdt;
@@ -259,7 +260,14 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
 
     @Override
     public void onReceiveDot(String s, Dot dot) {
-        smartPenListener.drawEvent(dot.x, dot.y, dot.pageId);
+        int actionType = -1;
+        if (DotType.isPenActionDown(dot.dotType))
+            actionType = 1;
+        else if (DotType.isPenActionUp(dot.dotType))
+            actionType = 2;
+        else if (DotType.isPenActionMove(dot.dotType))
+            actionType = 3;
+        smartPenListener.drawEvent(dot.x, dot.y, dot.pageId, actionType);
     }
 
     public enum CONNECT_MESSAGE{

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -21,13 +22,15 @@ import java.util.List;
 
 public class NotepadView extends View {
     private Paint paint;
-    double scaleFactor = 15.0;
+    float scaleFactor = 15f;
     ScaleGestureDetector scaleGestureDetector;
     GestureDetector gestureDetector;
     private float translateX = 0;
     private float translateY = 0;
 
-    private List<Point> coordinates;
+    ArrayList<Path> strokesList;
+    Path prePath;
+
 
     public NotepadView(Context context) {
         super(context);
@@ -44,7 +47,7 @@ public class NotepadView extends View {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
-        coordinates = new ArrayList<>();
+        strokesList = new ArrayList<>();
         scaleGestureDetector = new ScaleGestureDetector(getContext(),new ScaleListener());
         gestureDetector = new GestureDetector(getContext(), new ScrollListener());
     }
@@ -54,36 +57,17 @@ public class NotepadView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        for (Point point : coordinates) {
-            float x = (float) (point.getX() * scaleFactor);
-            float y = (float) (point.getY() * scaleFactor);
-
-            Log.d("adi", "Draw Point: x" + x + ", y=" + y);
-            canvas.drawPoint(x, y, paint);
+        for (Path path : strokesList) {
+            canvas.drawPath(path,paint);
         }
+        if(prePath != null){
 
+            canvas.drawPath(prePath,paint);
+        }
         canvas.scale((float)scaleFactor,(float)scaleFactor);
         canvas.translate(translateX, translateY);
 
-//        for (int i = 0; i < coordinates.size() - 1; i++) {
-//            Point startPoint = coordinates.get(i);
-//            Point endPoint = coordinates.get(i + 1);
-//
-//            float startX = (float) startPoint.getX();
-//            float startY = (float) startPoint.getY();
-//            float endX = (float) endPoint.getX();
-//            float endY = (float) endPoint.getY();
-//
-//            canvas.drawLine(startX, startY, endX, endY, paint);
-//        }
-
     }
-
-//    public void drawLineBetweenPoints(Point startPoint, Point endPoint) {
-//        coordinates.add(startPoint);
-//        coordinates.add(endPoint);
-//        invalidate();
-//    }
 
 
     @Override
@@ -93,15 +77,64 @@ public class NotepadView extends View {
         return true;
     }
 
-    public void addCoordinate(double x, double y) {
-        coordinates.add(new Point(x, y));
+    public void addCoordinate(float x, float y, int actionType) {
+        x = x*scaleFactor;
+        y = y*scaleFactor;
+        if(actionType == 1){
+          if(prePath != null){
+              strokesList.add(prePath);
+          }
+          prePath = new Path();
+          prePath.moveTo(x,y);
+        } else if(actionType == 2) {
+            if(prePath != null){
+                strokesList.add(prePath);
+                prePath = null;
+            }
+        } else if(actionType == 3){
+            if(prePath == null){
+                prePath = new Path();
+                prePath.moveTo(x,y);
+            }
+            prePath.lineTo(x,y);
+        }
         invalidate();
     }
 
 
 
     public void clearDrawing() {
-        coordinates.clear();
+        strokesList.clear();
+        prePath = null;
+        invalidate();
+    }
+
+    public void addCoordinates(ArrayList<Point> points) {
+        for(Point p:points){
+            float x = p.getX();
+            float y = p.getY();
+            int actionType = p.getActionType();
+            x = x*scaleFactor;
+            y = y*scaleFactor;
+            if(actionType == 1){
+                if(prePath != null){
+                    strokesList.add(prePath);
+                }
+                prePath = new Path();
+                prePath.moveTo(x,y);
+            } else if(actionType == 2) {
+                if(prePath != null){
+                    strokesList.add(prePath);
+                    prePath = null;
+                }
+            } else if(actionType == 3){
+                if(prePath == null){
+                    prePath = new Path();
+                    prePath.moveTo(x,y);
+                }
+                prePath.lineTo(x,y);
+            }
+        }
         invalidate();
     }
 

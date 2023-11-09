@@ -341,7 +341,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
     @Override
-    public void drawEvent(float x, float y, int pageId) {
+    public void drawEvent(float x, float y, int pageId, int actionType) {
         if(pageId != currentPageNumber){
             uploadPoints();
             if (handler != null){
@@ -361,7 +361,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 @Override
                 public void success(InitialisePageRP response) {
                     if(!response.isNewPage()){
-
                         if(response.getPage().getEmail() != null && !response.getPage().getGender().isEmpty()){
                             if(response.getPage().getGender().equals("M")){
                                 gender = "M";
@@ -390,11 +389,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                         }
 
                         Log.i("ADI", "success: points received " + response.getPage().getPoints().toString());
-                        for(Point p:response.getPage().getPoints()){
-                            binding.canvasView.addCoordinate(p.getX(),p.getY());
-                        }
-                        hidePB();
+
+                        binding.canvasView.addCoordinates(response.getPage().getPoints());
                     }
+                    hidePB();
                     currentPage = response.getPage();
                     setTimelyUploads();
                     binding.toolbar.setSubtitle("Page initialised successfully");
@@ -407,8 +405,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             });
         }
-        binding.canvasView.addCoordinate(x, y);
-        pendingPoints.add(new Point(x, y));
+        binding.canvasView.addCoordinate(x, y,actionType);
+        pendingPoints.add(new Point(x, y,actionType));
     }
 
 
@@ -440,12 +438,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             pendingPoints = new ArrayList<>();
 
             //call upload points
-
+            binding.toolbar.setSubtitle("Synchronising page");
 
             APIMethods.uploadPoints(PrescriptionActivity.this, currentPageNumber, uploadPoints, new APIResponseListener<EmptyRP>() {
                 @Override
                 public void success(EmptyRP response) {
-
+                    binding.toolbar.setSubtitle("Page synchronised");
                 }
 
                 @Override

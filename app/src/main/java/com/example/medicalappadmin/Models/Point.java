@@ -1,29 +1,35 @@
 package com.example.medicalappadmin.Models;
 
 public class Point {
-    double x;
-    double y;
+    float x;
+    float y;
     int pageNo;
+    int actionType = -1;  // 1=pendown 2=penup 3=move -1=other
+
+
+    public int getActionType() {
+        return actionType;
+    }
 
     public Point() {
     }
 
-    public Point(double x, double y, int pageNo) {
+    public Point(float x, float y, int actionType) {
         this.x = x;
         this.y = y;
-        this.pageNo = pageNo;
+        this.actionType = actionType;
     }
 
-    public Point(double x, double y) {
+    public Point(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    public double getX() {
+    public float getX() {
         return x;
     }
 
-    public double getY() {
+    public float getY() {
         return y;
     }
 

@@ -149,6 +149,7 @@
         <com.example.medicalappadmin.canvas.NotepadView
             android:translationZ="1dp"
             android:id="@+id/canvasView"
+            android:layout_marginTop="65dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="visible"
