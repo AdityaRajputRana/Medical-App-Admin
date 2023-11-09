@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.example.medicalappadmin.ActivityCaseHistory;
 import com.example.medicalappadmin.PrescriptionActivity;
@@ -19,8 +20,8 @@ import com.example.medicalappadmin.R;
 
 
 public class HomeFragment extends Fragment {
-    AppCompatButton btnAddNewPatient;
-    AppCompatButton btnCaseHistory;
+    LinearLayout btnAddNewPatient;
+    LinearLayout btnCaseHistory;
     public HomeFragment() {
         // Required empty public constructor
     }

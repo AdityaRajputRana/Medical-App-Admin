@@ -1,10 +1,13 @@
 package com.example.medicalappadmin;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +28,8 @@ public class ActivityCaseHistory extends AppCompatActivity {
     LinearLayoutManager manager;
 
     private CaseHistoryRP caseHistoryRP;
+    private ItemTouchHelper.Callback callback;
+    private ItemTouchHelper itemTouchHelper;
 
 
 
@@ -91,6 +96,25 @@ public class ActivityCaseHistory extends AppCompatActivity {
 
 
 
+
+
+
+
+
+
+    }
+
+
+    private boolean shouldMergeItems(int fromPosition, int toPosition) {
+        // Get the bounds of the items being moved
+        Rect fromBounds = new Rect();
+        binding.rcvCaseHistory.getLayoutManager().findViewByPosition(fromPosition).getGlobalVisibleRect(fromBounds);
+
+        Rect toBounds = new Rect();
+        binding.rcvCaseHistory.getLayoutManager().findViewByPosition(toPosition).getGlobalVisibleRect(toBounds);
+
+        // Check if the bounds overlap vertically
+        return Rect.intersects(fromBounds, toBounds);
     }
 
     private int loadedCases = -1;
@@ -130,11 +154,14 @@ public class ActivityCaseHistory extends AppCompatActivity {
                     adapter = new CaseHistoryRVAdapter(response, ActivityCaseHistory.this);
                     binding.rcvCaseHistory.setLayoutManager(manager);
                     binding.rcvCaseHistory.setAdapter(adapter);
+                    callback = new ItemTouchHelperCallback(binding.rcvCaseHistory, response, ActivityCaseHistory.this);
+                    itemTouchHelper = new ItemTouchHelper(callback);
+                    itemTouchHelper.attachToRecyclerView(binding.rcvCaseHistory);
                 } else {
                     adapter.notifyItemRangeInserted(caseHistoryRP.getCases().size() - response.getCases().size() + 1, response.getCases().size());
+                    itemTouchHelper.attachToRecyclerView(binding.rcvCaseHistory);
                 }
                 binding.pbCaseHistory.setVisibility(View.GONE);
-
             }
 
             @Override

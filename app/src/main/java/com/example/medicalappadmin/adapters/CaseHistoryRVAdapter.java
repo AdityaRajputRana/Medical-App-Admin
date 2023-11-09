@@ -14,7 +14,6 @@ import com.example.medicalappadmin.Models.Case;
 import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
 
-import org.w3c.dom.Text;
 
 public class CaseHistoryRVAdapter extends RecyclerView.Adapter<CaseHistoryRVAdapter.ViewHolder>{
 
@@ -53,9 +52,12 @@ public class CaseHistoryRVAdapter extends RecyclerView.Adapter<CaseHistoryRVAdap
         return caseHistoryRP.getCases().size();
     }
 
+
     public class ViewHolder extends RecyclerView.ViewHolder{
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
         }
     }
+
+
 }
