@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import com.example.medicalappadmin.databinding.ActivityDashboardBinding;
 import com.example.medicalappadmin.fragments.HomeFragment;
 import com.example.medicalappadmin.fragments.NotepadFragment;
+import com.example.medicalappadmin.fragments.ProfileFragment;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -24,31 +25,32 @@ public class DashboardActivity extends AppCompatActivity {
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         binding.bottomNavigationView.setItemIconTintList(null);
-        changeFragment(new HomeFragment());
+        changeFragment(0);
         binding.bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
                 if(item.getItemId() == R.id.home){
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-                    changeFragment(new HomeFragment());
-                }
-                else if(item.getItemId() == R.id.notepad){
-
-                    changeFragment(new NotepadFragment());
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                }
-                else if(item.getItemId() == R.id.tab3){
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                    changeFragment(0);
                 }
                 else if(item.getItemId() == R.id.profile){
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                    changeFragment(1);
                 }
                 return true;
             }
         });
     }
-    private void changeFragment(Fragment fragment){
+
+    private final HomeFragment homeFragment = new HomeFragment();
+    private final  ProfileFragment profileFragment = new ProfileFragment();
+    private void changeFragment(int i){
+        Fragment fragment = homeFragment;
+        switch (i){
+            case 1:
+                fragment = profileFragment;
+                break;
+        }
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.mainFrameLayout, fragment);

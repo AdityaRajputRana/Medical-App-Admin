@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.ProfileFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:background="@color/colorBackground"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:background="@color/colorForeground"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="16sp"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimTxt"
+                android:text="Profile" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:layout_margin="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="84dp"
+                    android:layout_height="84dp"
+                    android:src="@mipmap/ic_launcher_round"
+                    android:id="@+id/profileDPImg" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/nameTxt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="20sp"
+                        android:textColor="@color/colorPrimTxt"
+                        android:text="Name here" />
+
+                    <TextView
+                        android:id="@+id/staffTypeTxt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_medium"
+                        android:textSize="16sp"
+                        android:textColor="@color/colorSecTxt"
+                        android:text="Staff" />
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/penActionBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:backgroundTint="@color/colorForeground"
+                app:cornerRadius="0dp"
+                android:textSize="18sp"
+                android:textColor="@color/colorPrimTxt"
+                android:text="Add Pen | Disconnect Pen"
+                android:padding="16dp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+            </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="16dp"
+                android:text="Settings"
+                android:fontFamily="@font/poppins_medium"
+                android:textColor="@color/colorSecTxt"
+                android:textSize="14sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editProfileBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:backgroundTint="@color/colorForeground"
+                app:cornerRadius="0dp"
+                android:fontFamily="@font/poppins_medium"
+                android:textSize="16sp"
+                android:textAlignment="viewStart"
+                android:drawableRight="@drawable/baseline_navigate_next_24"
+                android:drawableTint="@color/colorPrimTxt"
+                android:layout_marginBottom="0dp"
+                android:textColor="@color/colorPrimTxt"
+                android:text="Edit Profile" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/penSettingsBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:backgroundTint="@color/colorForeground"
+                app:cornerRadius="0dp"
+                android:fontFamily="@font/poppins_medium"
+                android:textSize="16sp"
+                android:layout_marginTop="-4dp"
+                android:textAlignment="viewStart"
+                android:drawableRight="@drawable/baseline_navigate_next_24"
+                android:drawableTint="@color/colorPrimTxt"
+                android:textColor="@color/colorPrimTxt"
+                android:text="Pen Settings" />
+
+
+
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logOutBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                app:cornerRadius="0dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_marginTop="16dp"
+                app:strokeColor="@color/colorDanger"
+                android:layout_margin="32dp"
+                android:fontFamily="@font/poppins_medium"
+                android:textSize="16sp"
+                android:drawableRight="@drawable/baseline_navigate_next_24"
+                android:drawableTint="@color/colorDanger"
+                android:textColor="@color/colorDanger"
+                android:text="Log Out" />
+
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

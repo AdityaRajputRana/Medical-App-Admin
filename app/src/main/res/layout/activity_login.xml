@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue_bg"
+    android:background="@color/colorCta"
     tools:context=".LoginActivity">
 
     <LinearLayout
@@ -26,7 +26,7 @@
             android:layout_marginBottom="10dp"
             android:fontFamily="@font/poppins_semibold"
             android:text="Login"
-            android:textColor="@color/black"
+            android:textColor="@color/colorPrimTxt"
             android:textSize="30sp" />
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etEmailLogin"
@@ -36,8 +36,9 @@
             android:background="@drawable/rounded_white_bg"
             android:hint="Email"
             android:drawableRight="@drawable/email"
-            android:textColor="@color/gray"
-            android:textColorHint="@color/gray"
+            android:drawableTint="@color/colorPrimTxt"
+            android:textColor="@color/colorPrimTxt"
+            android:textColorHint="@color/colorSecTxt"
             android:inputType="textEmailAddress"
             android:padding="15dp"
             android:textSize="18sp" />
@@ -52,9 +53,10 @@
             android:hint="Password"
             android:drawableRight="@drawable/password"
             android:inputType="textPassword"
+            android:drawableTint="@color/colorPrimTxt"
             android:padding="15dp"
-            android:textColor="@color/gray"
-            android:textColorHint="@color/gray"
+            android:textColor="@color/colorPrimTxt"
+            android:textColorHint="@color/colorSecTxt"
             android:textSize="18sp" />
 
         <LinearLayout
@@ -68,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Remember me"
-                android:textColor="@color/gray"
+                android:textColor="@color/colorSecTxt"
                 android:textSize="12sp"
                 android:paddingStart="4dp"
                 android:fontFamily="@font/poppins_semibold"
@@ -82,7 +84,7 @@
                 android:layout_weight="1"
                 android:gravity="end"
                 android:fontFamily="@font/poppins_semibold"
-                android:textColor="@color/gray"
+                android:textColor="@color/colorSecTxt"
                 android:textSize="12sp"
                 android:layout_margin="3dp"/>
 
@@ -96,7 +98,7 @@
             android:background="@drawable/blue_rounded_bg"
             android:text="Login"
             android:layout_marginVertical="10dp"
-            android:textColor="@color/white"
+            android:textColor="@color/colorCtaTxt"
             android:paddingHorizontal="40dp"/>
 
         <TextView
@@ -107,7 +109,7 @@
             android:layout_marginTop="10dp"
             android:fontFamily="@font/poppins_medium"
             android:text="Don’t have an account? Sign Up"
-            android:textColor="@color/blue" />
+            android:textColor="@color/colorCta" />
 
         <ProgressBar
             android:visibility="gone"

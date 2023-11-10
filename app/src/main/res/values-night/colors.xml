@@ -11,14 +11,11 @@
     <color name="lightBlue2">#DCEDF9</color>
     <color name="color_secondary_text">#464A4C</color>
 
-
-    <color name="colorStatusBar">#FFFFFF</color>
-    <color name="colorPrimTxt">#383838</color>
-    <color name="colorSecTxt">#5D5D5D</color>
-    <color name="colorCta">#1C6BA4</color>
-    <color name="colorCtaTxt">#FFFFFF</color>
-    <color name="colorBackground">#EEF6FC</color>
-    <color name="colorForeground">#FFFFFF</color>
-    <color name="colorDanger">#FF4E4E</color>
-
+    <color name="colorStatusBar">#121212</color>
+    <color name="colorPrimTxt">#F6F6F6</color>
+    <color name="colorSecTxt">#CBCBCB</color>
+    <color name="colorCta">#16476A</color>
+    <color name="colorCtaTxt">#D4D4D4</color>
+    <color name="colorBackground">#000000</color>
+    <color name="colorForeground">#121212</color>
 </resources>

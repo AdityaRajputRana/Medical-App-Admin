@@ -2,6 +2,11 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.MedicalAppAdmin" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.MedicalAppAdmin" parent="Base.Theme.MedicalAppAdmin" >
+        <item name="android:statusBarColor">@color/colorStatusBar</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>
