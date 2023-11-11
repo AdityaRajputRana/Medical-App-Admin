@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.example.medicalappadmin.LoginActivity;
 import com.example.medicalappadmin.Models.User;
+import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Transformations.CircleTransformation;
 import com.example.medicalappadmin.databinding.FragmentProfileBinding;
@@ -29,10 +30,18 @@ public class ProfileFragment extends Fragment {
 
     User user;
     FragmentProfileBinding binding;
+    Boolean isPenConnected = false;
+
+    public interface CallBacksListener{
+        void startConnectionRoutine();
+        void disconnectFromPen();
+    }
+
+    private CallBacksListener listener;
 
 
-    public ProfileFragment() {
-
+    public ProfileFragment(CallBacksListener listener) {
+        this.listener = listener;
     }
 
 
@@ -57,6 +66,24 @@ public class ProfileFragment extends Fragment {
 
     private void setListeners() {
         binding.logOutBtn.setOnClickListener(view -> confirmLogout());
+        PenStatusLiveData.getPenStatusLiveData().getIsConnected()
+                .observe(getViewLifecycleOwner(), isConnected->{
+                    isPenConnected = isConnected;
+                    updatePenConnectionStatus();
+                });
+
+        binding.penActionBtn.setOnClickListener(view->{
+            if (isPenConnected)
+                listener.disconnectFromPen();
+            else
+                listener.startConnectionRoutine();
+        });
+    }
+
+    private void updatePenConnectionStatus() {
+        isPenConnected = PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue();
+        String message = isPenConnected?"Disconnect Pen" : "Connect To Smart Pen";
+        binding.penActionBtn.setText(message);
     }
 
     private void loadUI() {
@@ -66,6 +93,8 @@ public class ProfileFragment extends Fragment {
                 .load(user.getDisplayPicture())
                 .transform(new CircleTransformation())
                 .into(binding.profileDPImg);
+
+        updatePenConnectionStatus();
     }
 
     private void confirmLogout(){

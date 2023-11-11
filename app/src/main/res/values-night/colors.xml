@@ -18,4 +18,7 @@
     <color name="colorCtaTxt">#D4D4D4</color>
     <color name="colorBackground">#000000</color>
     <color name="colorForeground">#121212</color>
+
+    <color name="colorInactiveGray">#707070</color>
+    <color name="colorActiveGreen">#64DD17</color>
 </resources>

@@ -21,4 +21,7 @@
     <color name="colorForeground">#FFFFFF</color>
     <color name="colorDanger">#FF4E4E</color>
 
+    <color name="colorInactiveGray">#B0B0B0</color>
+    <color name="colorActiveGreen">#4CAF50</color>
+
 </resources>

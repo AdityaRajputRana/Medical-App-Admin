@@ -1,6 +1,7 @@
 package com.example.medicalappadmin.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -12,18 +13,30 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import com.example.medicalappadmin.ActivityCaseHistory;
+import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PrescriptionActivity;
 import com.example.medicalappadmin.R;
 
 
 public class HomeFragment extends Fragment {
+
+    public interface CallBacksListener{
+        void onPenIconClicked();
+    }
+
+    private CallBacksListener listener;
     LinearLayout btnAddNewPatient;
     LinearLayout btnCaseHistory;
-    public HomeFragment() {
-        // Required empty public constructor
+    ImageButton penButton;
+
+    public HomeFragment(Context context) {
+        if (context instanceof  CallBacksListener){
+            listener = (CallBacksListener) context;
+        }
     }
 
     @Override
@@ -33,6 +46,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         btnAddNewPatient  = view.findViewById(R.id.btnAddNewPatient);
         btnCaseHistory  = view.findViewById(R.id.btnCaseHistory);
+        penButton = view.findViewById(R.id.penStatusBtn);
         return  view;
     }
 
@@ -55,5 +69,19 @@ public class HomeFragment extends Fragment {
                 startActivity(i);
             }
         });
+
+        penButton.setOnClickListener(v->{
+            if (listener != null){
+                listener.onPenIconClicked();
+            }
+        });
+
+        PenStatusLiveData.getPenStatusLiveData().getIsConnected()
+                .observe(getViewLifecycleOwner(), isConnected->{
+                    int colorCodeID = isConnected?R.color.colorActiveGreen:R.color.colorInactiveGray;
+                    penButton.setColorFilter(getActivity().getColor(colorCodeID));
+                });
+
+
     }
 }

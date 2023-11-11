@@ -59,6 +59,11 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
         {
             case PenMsgType.PEN_CONNECTION_SUCCESS:
                 smartPenListener.message("Smart Pen", "Connected - "+iPenCtrl.getConnectingDevice() );
+                activity.getSharedPreferences("PEN_CONFIG", Context.MODE_PRIVATE)
+                        .edit()
+                        .putString("SavePenMac", selectedSmartPen.getId())
+                        .putBoolean("isPenSaved", true)
+                        .apply();
                 selectedSmartPen.setConnected(true);
                 break;
 
@@ -307,6 +312,7 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
         connectionsHandler = new ConnectionsHandler();
 
 
+
         //NEOCODE - Start
         iPenCtrl = PenCtrl.getInstance();
         iPenCtrl.setContext(activity.getApplicationContext());
@@ -334,8 +340,7 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
 
     public void destroyConnection(){
         iPenCtrl.unregisterBroadcastBTDuplicate();
-        smartPenListener = null;
-        smartPenDriver = null;
+        iPenCtrl.disconnect();
     }
 
     boolean connectToPenAfterPermission = false;
@@ -359,7 +364,6 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
 
         //NEO Code
         String mac_address = smartPen.getId().toLowerCase();
-        Log.i("SmartPenDriverLog", mac_address);
         try {
                 boolean leResult = iPenCtrl.setLeMode( smartPen.isLe() );
                 if( leResult )

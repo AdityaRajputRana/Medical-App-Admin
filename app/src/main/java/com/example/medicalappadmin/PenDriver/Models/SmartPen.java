@@ -1,5 +1,7 @@
 package com.example.medicalappadmin.PenDriver.Models;
 
+import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
+
 import kr.neolab.sdk.pen.bluetooth.BTLEAdt;
 
 public class SmartPen {
@@ -26,6 +28,7 @@ public class SmartPen {
     }
 
     public void setConnected(boolean connected) {
+        PenStatusLiveData.getPenStatusLiveData().setIsConnected(connected);
         this.connected = connected;
     }
 
@@ -51,6 +54,7 @@ public class SmartPen {
 
     public void setId(String id) {
         this.id = id;
+        this.macAddress = id;
     }
 
     public void setName(String name) {
@@ -61,9 +65,6 @@ public class SmartPen {
         return macAddress;
     }
 
-    public void setMacAddress(String macAddress) {
-        this.macAddress = macAddress;
-    }
 
     public String getSppAddress() {
         return sppAddress;

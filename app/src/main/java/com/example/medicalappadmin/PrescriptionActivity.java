@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.PenDriver.ConnectionsHandler;
+import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
@@ -176,9 +177,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     @Override
     protected void onDestroy() {
-        if (driver != null){
-            driver.destroyConnection();
-        }
         super.onDestroy();
     }
 
@@ -192,28 +190,33 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
     private void intialiseControls() {
-        dialogPenBinding = DialogPenBinding.inflate(getLayoutInflater());
-        dialog = new AlertDialog.Builder(this)
-                .setView(dialogPenBinding.getRoot())
-                .create();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.setCancelable(false);
-        dialog.show();
-
-        dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
-        dialogPenBinding.titleTxt.setVisibility(View.VISIBLE);
-        dialogPenBinding.titleTxt.setText("Intialising Pen Driver");
 
         driver.setListener(this);
-        SmartPenDriver.CONNECT_MESSAGE message = driver.initialize();//driverStep3
 
-        if(message == SmartPenDriver.CONNECT_MESSAGE.CONFIG_SUCCESS)
-            searchPens();
-        else if(message == SmartPenDriver.CONNECT_MESSAGE.REQUESTING_PERMS){
+        if (PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue() != null
+            && PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue()){
+            showDrawView();
+        } else {
+            dialogPenBinding = DialogPenBinding.inflate(getLayoutInflater());
+            dialog = new AlertDialog.Builder(this)
+                    .setView(dialogPenBinding.getRoot())
+                    .create();
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.setCancelable(false);
+            dialog.show();
+
             dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
-            dialogPenBinding.bodyTxt.setText("Searching");
-        } else
-            showError(String.valueOf(message), null);
+            dialogPenBinding.titleTxt.setVisibility(View.VISIBLE);
+            dialogPenBinding.titleTxt.setText("Intialising Pen Driver");
+            SmartPenDriver.CONNECT_MESSAGE message = driver.initialize();//driverStep3
+            if (message == SmartPenDriver.CONNECT_MESSAGE.CONFIG_SUCCESS)
+                searchPens();
+            else if (message == SmartPenDriver.CONNECT_MESSAGE.REQUESTING_PERMS) {
+                dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
+                dialogPenBinding.bodyTxt.setText("Searching");
+            } else
+                showError(String.valueOf(message), null);
+        }
     }
 
     private void searchPens() {
