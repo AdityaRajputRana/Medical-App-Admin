@@ -14,6 +14,7 @@ import com.example.medicalappadmin.databinding.ActivityLoginBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.LoginRP;
+import com.google.gson.Gson;
 
 import java.util.regex.Pattern;
 
@@ -40,7 +41,12 @@ public class LoginActivity extends AppCompatActivity {
                         public void success(LoginRP response) {
                             hidePB();
                             showToast(LoginActivity.this,"Login Successful");
-                            LoginActivity.this.getSharedPreferences("MY_PREF", MODE_PRIVATE).edit().putString("JWT_TOKEN", response.getJwt()).commit();
+                            SharedPreferences.Editor editor = LoginActivity.this.
+                                    getSharedPreferences("MY_PREF", MODE_PRIVATE)
+                                    .edit();
+                            editor.putString("JWT_TOKEN", response.getJwt());
+                            editor.putString("MY_USER", new Gson().toJson(response.getUser()));
+                            editor.commit();
                             Intent i = new Intent(LoginActivity.this, DashboardActivity.class);
                             startActivity(i);
                         }
