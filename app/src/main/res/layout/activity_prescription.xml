@@ -8,7 +8,10 @@
     android:fitsSystemWindows="true"
     tools:context=".PrescriptionActivity">
 
-
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:visibility="gone"
         android:id="@+id/llTop"
@@ -110,8 +113,7 @@
 
         </LinearLayout>
     </LinearLayout>
-
-        <LinearLayout
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -142,21 +144,18 @@
 
 
         </LinearLayout>
-
-
-
-
-        <com.example.medicalappadmin.canvas.NotepadView
+    <com.example.medicalappadmin.canvas.NotepadView
             android:translationZ="1dp"
             android:id="@+id/canvasView"
-            android:layout_marginTop="65dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/llTop" />
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    </LinearLayout>
     
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"
@@ -165,6 +164,8 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_drawer_body"
         />
+
+
 
 
 

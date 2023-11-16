@@ -35,8 +35,7 @@
         </activity>
         <activity
             android:name=".PrescriptionActivity"
-            android:exported="false"
-            android:screenOrientation="landscape" />
+            android:exported="false" />
         <activity
             android:name=".SignupActivity"
             android:exported="false" />

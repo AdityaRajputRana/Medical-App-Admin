@@ -1,8 +1,10 @@
 package com.example.medicalappadmin.Models;
 
 public class Point {
-    float x;
-    float y;
+    public  float x;
+    public float y;
+    public float dx = 0;
+    public float dy = 0;
     int pageNo;
     int actionType = -1;  // 1=pendown 2=penup 3=move -1=other
 

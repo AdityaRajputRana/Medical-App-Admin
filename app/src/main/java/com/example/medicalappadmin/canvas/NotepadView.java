@@ -1,10 +1,14 @@
 package com.example.medicalappadmin.canvas;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -13,12 +17,12 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.example.medicalappadmin.Models.Point;
+import com.example.medicalappadmin.R;
 
 import java.util.ArrayList;
-import java.util.List;
-
 
 public class NotepadView extends View {
     private Paint paint;
@@ -27,10 +31,10 @@ public class NotepadView extends View {
     GestureDetector gestureDetector;
     private float translateX = 0;
     private float translateY = 0;
+    private Bitmap prescriptionBg;
 
-    ArrayList<Path> strokesList;
-    Path prePath;
 
+    ArrayList<ArrayList<Point>> mStrokes;
 
     public NotepadView(Context context) {
         super(context);
@@ -47,9 +51,17 @@ public class NotepadView extends View {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
-        strokesList = new ArrayList<>();
         scaleGestureDetector = new ScaleGestureDetector(getContext(),new ScaleListener());
         gestureDetector = new GestureDetector(getContext(), new ScrollListener());
+
+        mStrokes = new ArrayList<>();
+        prescriptionBg = getPrescriptionBMP();
+    }
+
+    private Bitmap getPrescriptionBMP(){
+        Drawable d = getContext().getDrawable(R.drawable.bg_prescription);
+        Bitmap bitmap = ((BitmapDrawable)d).getBitmap();
+        return bitmap;
     }
 
 
@@ -57,15 +69,28 @@ public class NotepadView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        for (Path path : strokesList) {
-            canvas.drawPath(path,paint);
-        }
-        if(prePath != null){
+        Path path = new Path();
+        Paint bgPaint = new Paint();
+        bgPaint.setColor(Color.LTGRAY);
+        bgPaint.setStyle(Paint.Style.FILL);
+        canvas.drawRect(getLeft() + 25, getTop() + 5, 65*scaleFactor, 100* scaleFactor, bgPaint);
 
-            canvas.drawPath(prePath,paint);
+        for (ArrayList<Point> points: mStrokes) {
+
+            boolean first = true;
+            for (int i = 0; i < points.size(); i++) {
+                Point point = points.get(i);
+                if (first) {
+                    first = false;
+                    path.moveTo(point.x, point.y);
+                } else {
+                    Point prev = points.get(i - 1);
+                    path.quadTo(prev.x, prev.y, (prev.x + point.x)/2, (prev.y + point.y)/2);
+                }
+            }
+            canvas.drawPath(path, paint);
+            path.reset();
         }
-        canvas.scale((float)scaleFactor,(float)scaleFactor);
-        canvas.translate(translateX, translateY);
 
     }
 
@@ -78,25 +103,13 @@ public class NotepadView extends View {
     }
 
     public void addCoordinate(float x, float y, int actionType) {
-        x = x*scaleFactor;
-        y = y*scaleFactor;
+        x = x*scaleFactor + getLeft();
+        y = y*scaleFactor + getTop();
         if(actionType == 1){
-          if(prePath != null){
-              strokesList.add(prePath);
-          }
-          prePath = new Path();
-          prePath.moveTo(x,y);
-        } else if(actionType == 2) {
-            if(prePath != null){
-                strokesList.add(prePath);
-                prePath = null;
-            }
+          mStrokes.add(new ArrayList<>());
+
         } else if(actionType == 3){
-            if(prePath == null){
-                prePath = new Path();
-                prePath.moveTo(x,y);
-            }
-            prePath.lineTo(x,y);
+            mStrokes.get(mStrokes.size()-1).add(new Point(x,y));
         }
         invalidate();
     }
@@ -104,8 +117,7 @@ public class NotepadView extends View {
 
 
     public void clearDrawing() {
-        strokesList.clear();
-        prePath = null;
+        mStrokes.clear();
         invalidate();
     }
 
@@ -114,25 +126,13 @@ public class NotepadView extends View {
             float x = p.getX();
             float y = p.getY();
             int actionType = p.getActionType();
-            x = x*scaleFactor;
-            y = y*scaleFactor;
+            x = x*scaleFactor + getLeft();
+            y = y*scaleFactor + getTop();
             if(actionType == 1){
-                if(prePath != null){
-                    strokesList.add(prePath);
-                }
-                prePath = new Path();
-                prePath.moveTo(x,y);
-            } else if(actionType == 2) {
-                if(prePath != null){
-                    strokesList.add(prePath);
-                    prePath = null;
-                }
+                mStrokes.add(new ArrayList<>());
             } else if(actionType == 3){
-                if(prePath == null){
-                    prePath = new Path();
-                    prePath.moveTo(x,y);
-                }
-                prePath.lineTo(x,y);
+
+                mStrokes.get(mStrokes.size()-1).add(new Point(x, y));
             }
         }
         invalidate();
@@ -142,8 +142,8 @@ public class NotepadView extends View {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            scaleFactor *= detector.getScaleFactor();
-            scaleFactor = Math.max(1f, Math.min(scaleFactor, 10.0f));
+//            scaleFactor *= detector.getScaleFactor();
+//            scaleFactor = Math.max(1f, Math.min(scaleFactor, 10.0f));
             invalidate();
             return true;
         }
