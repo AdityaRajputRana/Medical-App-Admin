@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_margin="5dp"
+    android:padding="5dp"
+    android:gravity="center"
+    android:background="@drawable/rounded_white_bg_item">
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dp_placeholder"
+            android:padding="16dp"/>
+   <LinearLayout
+       android:layout_width="0dp"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"
+       android:layout_marginStart="10dp"
+       android:layout_weight="1"
+    >
+       <TextView
+           android:id="@+id/tvPatientsName"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:text="Patient Name"
+           android:gravity="center_vertical"
+           android:fontFamily="@font/poppins_semibold"
+           android:textSize="18sp"
+           />
+       <TextView
+           android:id="@+id/tvPatientsMobileNumber"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:text="8927192122"
+           android:gravity="center_vertical"
+           android:fontFamily="@font/poppins_medium"
+           android:textSize="16sp"
+           android:textColor="@color/color_secondary_text"
+           />
+
+   </LinearLayout>
+
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/ivSharePatient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_share_24"
+        android:padding="16dp"
+        />
+
+
+</LinearLayout>

@@ -17,9 +17,11 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import com.example.medicalappadmin.ActivityCaseHistory;
+import com.example.medicalappadmin.PatientHistoryActivity;
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PrescriptionActivity;
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.databinding.ActivityPatientHistoryBinding;
 
 
 public class HomeFragment extends Fragment {
@@ -31,7 +33,10 @@ public class HomeFragment extends Fragment {
     private CallBacksListener listener;
     LinearLayout btnAddNewPatient;
     LinearLayout btnCaseHistory;
+    LinearLayout btnPatientHistory;
     ImageButton penButton;
+
+
 
     public HomeFragment(Context context) {
         if (context instanceof  CallBacksListener){
@@ -46,7 +51,9 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         btnAddNewPatient  = view.findViewById(R.id.btnAddNewPatient);
         btnCaseHistory  = view.findViewById(R.id.btnCaseHistory);
+        btnPatientHistory  = view.findViewById(R.id.btnPatientHistory);
         penButton = view.findViewById(R.id.penStatusBtn);
+
         return  view;
     }
 
@@ -66,6 +73,14 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent i =new Intent(getContext(), ActivityCaseHistory.class);
+                startActivity(i);
+            }
+        });
+
+        btnPatientHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i =new Intent(getContext(), PatientHistoryActivity.class);
                 startActivity(i);
             }
         });
