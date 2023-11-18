@@ -67,5 +67,13 @@
 
    </LinearLayout>
 
+    <ImageView
+        android:id="@+id/ivShareCase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_share_24"
+        android:padding="16dp"
+        />
+
 
 </LinearLayout>

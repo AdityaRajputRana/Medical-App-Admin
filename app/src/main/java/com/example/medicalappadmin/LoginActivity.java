@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -27,6 +28,13 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        binding.etPasswordLogin.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                binding.passInputLayout.setHint("");
+            } else {
+                binding.passInputLayout.setHint("Password");
+            }
+        });
 
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +124,7 @@ public class LoginActivity extends AppCompatActivity {
     private void hidePB(){
         binding.pbLogin.setVisibility(View.GONE);
     }
+
 
 
 }

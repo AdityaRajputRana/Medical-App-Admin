@@ -8,12 +8,14 @@ import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.requests.AddDetailsReq;
 import com.example.medicalappadmin.rest.requests.CaseHistoryReq;
+import com.example.medicalappadmin.rest.requests.CaseSubmitReq;
 import com.example.medicalappadmin.rest.requests.InitialisePageReq;
 import com.example.medicalappadmin.rest.requests.LoginReq;
 import com.example.medicalappadmin.rest.requests.MergeCasesReq;
 import com.example.medicalappadmin.rest.requests.SignupReq;
 import com.example.medicalappadmin.rest.requests.UploadPointsReq;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
+import com.example.medicalappadmin.rest.response.CaseSubmitRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LoginRP;
 import com.example.medicalappadmin.rest.response.SignupRP;
@@ -69,6 +71,13 @@ public class APIMethods {
     public static void mergeCasesHistory(Context context, String fromCaseId, String toCaseId, APIResponseListener<EmptyRP> listener){
         MergeCasesReq req = new MergeCasesReq(fromCaseId,toCaseId);
         API.postData(listener,req,EndPoints.mergeCases, EmptyRP.class,context);
+    }
+
+    //submit case
+
+    public static void submitCase(Context context, String caseId, APIResponseListener<CaseSubmitRP> listener){
+        CaseSubmitReq req = new CaseSubmitReq(caseId);
+        API.postData(listener,req,EndPoints.submitCase, CaseSubmitRP.class,context);
     }
 
 

@@ -47,7 +47,7 @@
         android:padding="8dp"
         app:tint="@color/colorInactiveGray"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_pen"
+        android:src="@drawable/search"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

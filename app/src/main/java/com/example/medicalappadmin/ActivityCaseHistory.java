@@ -7,6 +7,10 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +22,7 @@ import com.example.medicalappadmin.databinding.ActivityCaseHistoryBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
+import com.example.medicalappadmin.rest.response.CaseSubmitRP;
 
 public class ActivityCaseHistory extends AppCompatActivity {
 
@@ -30,6 +35,8 @@ public class ActivityCaseHistory extends AppCompatActivity {
     private CaseHistoryRP caseHistoryRP;
     private ItemTouchHelper.Callback callback;
     private ItemTouchHelper itemTouchHelper;
+
+
 
 
 
@@ -51,16 +58,6 @@ public class ActivityCaseHistory extends AppCompatActivity {
             finish();
         });
 
-//        binding.nestedSV.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-//            @Override
-//            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-//                if (scrollY == v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight()) {
-//                    currentPage++;
-//                    binding.pbCaseHistory.setVisibility(View.VISIBLE);
-//                    loadCases(currentPage, totalPages);
-//                }
-//            }
-//        });
 
         binding.rcvCaseHistory.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
@@ -118,11 +115,17 @@ public class ActivityCaseHistory extends AppCompatActivity {
     }
 
     private int loadedCases = -1;
+    
+    private void saveToClipBoard(Context context, String text){
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("CASE LINK",text);
+        clipboard.setPrimaryClip(clip);
+    }
 
     private void loadCases(int cPage, int tPages) {
         if(cPage > tPages){
             binding.pbCaseHistory.setVisibility(View.GONE);
-            Toast.makeText(this, "That's all", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "That's all", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -151,7 +154,33 @@ public class ActivityCaseHistory extends AppCompatActivity {
                 totalPages = response.getTotalPages();
 
                 if (adapter == null) {
-                    adapter = new CaseHistoryRVAdapter(response, ActivityCaseHistory.this);
+                    adapter = new CaseHistoryRVAdapter(response, ActivityCaseHistory.this, new CaseHistoryRVAdapter.Listener() {
+
+                        //TODO: share feature
+                        @Override
+                        public void onShareClicked(String caseId) {
+//                            Intent shareIntent =new Intent();
+//                            shareIntent.setAction(Intent.ACTION_SEND);
+//                            shareIntent.setType("text/plain");
+//                            shareIntent.putExtra(Intent.EXTRA_TEXT, "" );
+//                            startActivity(Intent.createChooser(shareIntent,"Share via"));
+//                            CaseHistoryRVAdapter.Listener.super.onShareClicked(caseId);
+
+                            APIMethods.submitCase(ActivityCaseHistory.this, caseId, new APIResponseListener<CaseSubmitRP>() {
+                                @Override
+                                public void success(CaseSubmitRP response) {
+                                    saveToClipBoard(ActivityCaseHistory.this,response.getPdfUrl());
+                                    Toast.makeText(ActivityCaseHistory.this, "Copied link to clipboard", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                                    Toast.makeText(ActivityCaseHistory.this, "Some error occurred while fetching case, Try again", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                        }
+                    });
                     binding.rcvCaseHistory.setLayoutManager(manager);
                     binding.rcvCaseHistory.setAdapter(adapter);
                     callback = new ItemTouchHelperCallback(binding.rcvCaseHistory, response, ActivityCaseHistory.this);
@@ -169,6 +198,9 @@ public class ActivityCaseHistory extends AppCompatActivity {
 
             }
         });
+        
+        
+        
     }
 
 }

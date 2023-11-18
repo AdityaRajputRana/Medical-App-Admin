@@ -43,22 +43,30 @@
             android:padding="15dp"
             android:textSize="18sp" />
 
+            <com.google.android.material.textfield.TextInputLayout
+                app:passwordToggleEnabled="true"
+                android:id="@+id/passInputLayout"
+                app:passwordToggleTint="@color/colorPrimTxt"
+                android:layout_width="match_parent"
+                android:drawableTint="@color/colorPrimTxt"
+                app:boxStrokeWidth="0dp"
+                android:hint="Password"
+                android:textColor="@color/colorPrimTxt"
+                android:textColorHint="@color/colorSecTxt"
+                app:boxStrokeWidthFocused="0dp"
+                android:background="@drawable/rounded_white_bg"
+                android:layout_height="wrap_content">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPasswordLogin"
+                    android:layout_width="match_parent"
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etPasswordLogin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/rounded_white_bg"
-            android:hint="Password"
-            android:drawableRight="@drawable/password"
-            android:inputType="textPassword"
-            android:drawableTint="@color/colorPrimTxt"
-            android:padding="15dp"
-            android:textColor="@color/colorPrimTxt"
-            android:textColorHint="@color/colorSecTxt"
-            android:textSize="18sp" />
-
+                    android:layout_height="match_parent"
+                    android:textColor="@color/colorPrimTxt"
+                    android:textColorHint="@color/colorSecTxt"
+                    android:inputType="textPassword"
+                    android:padding="15dp"
+                    android:textSize="18sp" />
+            </com.google.android.material.textfield.TextInputLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
