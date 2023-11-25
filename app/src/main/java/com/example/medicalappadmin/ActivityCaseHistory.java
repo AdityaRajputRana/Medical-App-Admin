@@ -156,15 +156,8 @@ public class ActivityCaseHistory extends AppCompatActivity {
                 if (adapter == null) {
                     adapter = new CaseHistoryRVAdapter(response, ActivityCaseHistory.this, new CaseHistoryRVAdapter.Listener() {
 
-                        //TODO: share feature
                         @Override
                         public void onShareClicked(String caseId) {
-//                            Intent shareIntent =new Intent();
-//                            shareIntent.setAction(Intent.ACTION_SEND);
-//                            shareIntent.setType("text/plain");
-//                            shareIntent.putExtra(Intent.EXTRA_TEXT, "" );
-//                            startActivity(Intent.createChooser(shareIntent,"Share via"));
-//                            CaseHistoryRVAdapter.Listener.super.onShareClicked(caseId);
 
                             APIMethods.submitCase(ActivityCaseHistory.this, caseId, new APIResponseListener<CaseSubmitRP>() {
                                 @Override

@@ -57,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
                             editor.commit();
                             Intent i = new Intent(LoginActivity.this, DashboardActivity.class);
                             startActivity(i);
+                            finish();
                         }
 
                         @Override
