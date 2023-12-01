@@ -18,10 +18,6 @@ public class PatientHistoryActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         binding.pbPatientHistory.setVisibility(View.GONE);
 
-
-        //TODO : Create Adapter for rcv and integrate apis
-
-
         binding.ibPatientBackBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

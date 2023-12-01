@@ -1,21 +1,17 @@
 package com.example.medicalappadmin;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.widget.NestedScrollView;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.medicalappadmin.adapters.CaseHistoryRVAdapter;
 import com.example.medicalappadmin.databinding.ActivityCaseHistoryBinding;
@@ -23,11 +19,12 @@ import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
 import com.example.medicalappadmin.rest.response.CaseSubmitRP;
+import com.example.medicalappadmin.rest.response.ViewCaseRP;
 
 public class ActivityCaseHistory extends AppCompatActivity {
 
     int currentPage = 1;
-    int totalPages=Integer.MAX_VALUE;
+    int totalPages = Integer.MAX_VALUE;
     ActivityCaseHistoryBinding binding;
     private CaseHistoryRVAdapter adapter;
     LinearLayoutManager manager;
@@ -37,21 +34,16 @@ public class ActivityCaseHistory extends AppCompatActivity {
     private ItemTouchHelper itemTouchHelper;
 
 
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding  = ActivityCaseHistoryBinding.inflate(getLayoutInflater());
+        binding = ActivityCaseHistoryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         manager = new LinearLayoutManager(ActivityCaseHistory.this);
         binding.rcvCaseHistory.setVisibility(View.GONE);
 
-        loadCases(currentPage,totalPages);
-
+        loadCases(currentPage, totalPages);
 
 
         binding.ivBackBtn.setOnClickListener(view -> {
@@ -62,41 +54,29 @@ public class ActivityCaseHistory extends AppCompatActivity {
         binding.rcvCaseHistory.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-                        if (manager.findFirstCompletelyVisibleItemPosition() == 0){
-                            if (binding.llTopStrip.getVisibility() == View.VISIBLE){
-                                binding.llTopStrip.setVisibility(View.INVISIBLE);
-                            }
-                        }
+                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
+                    if (binding.llTopStrip.getVisibility() == View.VISIBLE) {
+                        binding.llTopStrip.setVisibility(View.INVISIBLE);
+                    }
+                }
 
-                        if (manager.findFirstCompletelyVisibleItemPosition() == 1){
-                            if (binding.llTopStrip.getVisibility() != View.VISIBLE){
-                                binding.llTopStrip.setVisibility(View.VISIBLE);
-                            }
-                        }
+                if (manager.findFirstCompletelyVisibleItemPosition() == 1) {
+                    if (binding.llTopStrip.getVisibility() != View.VISIBLE) {
+                        binding.llTopStrip.setVisibility(View.VISIBLE);
+                    }
+                }
 
-                        if (manager.findLastCompletelyVisibleItemPosition() == loadedCases-1){
-                            if (binding.pbCaseHistory.getVisibility() != View.VISIBLE) {
-                                currentPage++;
-                                loadCases(currentPage, totalPages);
-                            }
-                        }
+                if (manager.findLastCompletelyVisibleItemPosition() == loadedCases - 1) {
+                    if (binding.pbCaseHistory.getVisibility() != View.VISIBLE) {
+                        currentPage++;
+                        loadCases(currentPage, totalPages);
+                    }
+                }
             }
         });
 
 
         //TODO: implement merge cases
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     }
@@ -115,15 +95,15 @@ public class ActivityCaseHistory extends AppCompatActivity {
     }
 
     private int loadedCases = -1;
-    
-    private void saveToClipBoard(Context context, String text){
+
+    private void saveToClipBoard(Context context, String text) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("CASE LINK",text);
+        ClipData clip = ClipData.newPlainText("CASE LINK", text);
         clipboard.setPrimaryClip(clip);
     }
 
     private void loadCases(int cPage, int tPages) {
-        if(cPage > tPages){
+        if (cPage > tPages) {
             binding.pbCaseHistory.setVisibility(View.GONE);
 //            Toast.makeText(this, "That's all", Toast.LENGTH_SHORT).show();
             return;
@@ -131,13 +111,13 @@ public class ActivityCaseHistory extends AppCompatActivity {
 
         binding.pbCaseHistory.setVisibility(View.VISIBLE);
         if (caseHistoryRP != null)
-            binding.rcvCaseHistory.smoothScrollToPosition(caseHistoryRP.getCases().size() -1);
+            binding.rcvCaseHistory.smoothScrollToPosition(caseHistoryRP.getCases().size() - 1);
         APIMethods.loadCaseHistory(this, cPage, new APIResponseListener<CaseHistoryRP>() {
             @Override
             public void success(CaseHistoryRP response) {
 
 
-                if (caseHistoryRP == null){
+                if (caseHistoryRP == null) {
                     caseHistoryRP = response;
                 } else {
                     caseHistoryRP.getCases().addAll(response.getCases());
@@ -145,7 +125,7 @@ public class ActivityCaseHistory extends AppCompatActivity {
                     caseHistoryRP.setCurrentPage(response.getCurrentPage());
                 }
 
-                if (loadedCases == -1){
+                if (loadedCases == -1) {
                     loadedCases = 0;
                 }
                 loadedCases += response.getCases().size();
@@ -154,24 +134,17 @@ public class ActivityCaseHistory extends AppCompatActivity {
                 totalPages = response.getTotalPages();
 
                 if (adapter == null) {
-                    adapter = new CaseHistoryRVAdapter(response, ActivityCaseHistory.this, new CaseHistoryRVAdapter.Listener() {
-
+                    adapter = new CaseHistoryRVAdapter(response, ActivityCaseHistory.this, new CaseHistoryRVAdapter.CaseListener() {
                         @Override
                         public void onShareClicked(String caseId) {
+                            generateShareLink(caseId);
+                        }
 
-                            APIMethods.submitCase(ActivityCaseHistory.this, caseId, new APIResponseListener<CaseSubmitRP>() {
-                                @Override
-                                public void success(CaseSubmitRP response) {
-                                    saveToClipBoard(ActivityCaseHistory.this,response.getPdfUrl());
-                                    Toast.makeText(ActivityCaseHistory.this, "Copied link to clipboard", Toast.LENGTH_SHORT).show();
-                                }
-
-                                @Override
-                                public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                                    Toast.makeText(ActivityCaseHistory.this, "Some error occurred while fetching case, Try again", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
+                        @Override
+                        public void onCaseClicked(String caseId) {
+                            Intent i = new Intent(ActivityCaseHistory.this, PatientDetailedHistoryActivity.class);
+                            i.putExtra("CASE_ID", caseId);
+                            startActivity(i);
                         }
                     });
                     binding.rcvCaseHistory.setLayoutManager(manager);
@@ -191,9 +164,26 @@ public class ActivityCaseHistory extends AppCompatActivity {
 
             }
         });
-        
-        
-        
+
+
+    }
+
+
+
+    private void generateShareLink(String caseId) {
+        //TODO progress of generating link
+        APIMethods.submitCase(ActivityCaseHistory.this, caseId, new APIResponseListener<CaseSubmitRP>() {
+            @Override
+            public void success(CaseSubmitRP response) {
+                saveToClipBoard(ActivityCaseHistory.this, response.getPdfUrl());
+                Toast.makeText(ActivityCaseHistory.this, "Copied link to clipboard", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                Toast.makeText(ActivityCaseHistory.this, "Some error occurred while fetching case, Try again", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

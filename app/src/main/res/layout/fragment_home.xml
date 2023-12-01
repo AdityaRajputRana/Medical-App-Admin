@@ -285,7 +285,7 @@
                         android:layout_height="wrap_content"
                         android:text="Case History"
                         android:textColor="@color/white"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
 
