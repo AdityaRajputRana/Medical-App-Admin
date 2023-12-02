@@ -1,6 +1,7 @@
 package com.example.medicalappadmin;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Tools.Methods;
+import com.example.medicalappadmin.adapters.PageAdapter;
 import com.example.medicalappadmin.databinding.ActivityDetailedPageViewBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -25,6 +27,8 @@ public class DetailedPageViewActivity extends AppCompatActivity {
     ArrayList<Page> pages;
 
     ViewCaseRP viewCaseRP;
+
+    PageAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +51,7 @@ public class DetailedPageViewActivity extends AppCompatActivity {
                 viewCaseRP = response;
                 page = response.getPages().get(finalCurrPageNo);
                 updateUI(page);
-                setListeners();
+//                setListeners();
             }
 
             @Override
@@ -67,7 +71,7 @@ public class DetailedPageViewActivity extends AppCompatActivity {
                 Log.i("lol", "setListeners: next " + finalCurrPageNo );
                 Page nextPage = viewCaseRP.getPages().get(finalCurrPageNo);
                 Log.i("lol", "setListeners:next  page " + nextPage.toString());
-                updateUI(nextPage);
+                binding.viewPager.setCurrentItem(finalCurrPageNo);
             }
             else{
                 Toast.makeText(this, "End of pages", Toast.LENGTH_SHORT).show();
@@ -77,7 +81,8 @@ public class DetailedPageViewActivity extends AppCompatActivity {
             finalCurrPageNo --;
             if(finalCurrPageNo >=0){
                 Page prevPage = viewCaseRP.getPages().get(finalCurrPageNo);
-                updateUI(prevPage);
+                binding.viewPager.setCurrentItem(finalCurrPageNo);
+
             }
             else{
                 Toast.makeText(this, "First Page", Toast.LENGTH_SHORT).show();
@@ -87,10 +92,35 @@ public class DetailedPageViewActivity extends AppCompatActivity {
     }
 
     private void updateUI(Page page) {
-        binding.detailedPage.clearDrawing();
-        binding.detailedPage.addCoordinates(page.getPoints());
-        binding.tvPageNumber.setText("Page No: "+page.getPageNumber());
-        binding.pbPage.setVisibility(View.GONE);
+//        binding.detailedPage.clearDrawing();
+//        binding.detailedPage.addCoordinates(page.getPoints());
+//        binding.tvPageNumber.setText("Page No: "+page.getPageNumber());
+//        binding.pbPage.setVisibility(View.GONE);
 
+        if(adapter == null){
+            adapter = new PageAdapter(DetailedPageViewActivity.this, viewCaseRP, finalCurrPageNo);
+        }
+        binding.viewPager.setAdapter(adapter);
+        binding.viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                finalCurrPageNo = position;
+                setListeners();
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        binding.pbPage.setVisibility(View.GONE);
     }
+
+
 }
