@@ -4,22 +4,26 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.medicalappadmin.adapters.CaseHistoryRVAdapter;
 import com.example.medicalappadmin.databinding.ActivityCaseHistoryBinding;
+import com.example.medicalappadmin.databinding.DialogPenBinding;
+import com.example.medicalappadmin.databinding.LoadingDialogBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
 import com.example.medicalappadmin.rest.response.CaseSubmitRP;
-import com.example.medicalappadmin.rest.response.ViewCaseRP;
 
 public class ActivityCaseHistory extends AppCompatActivity {
 
@@ -169,21 +173,34 @@ public class ActivityCaseHistory extends AppCompatActivity {
     }
 
 
-
     private void generateShareLink(String caseId) {
-        //TODO progress of generating link
+        AlertDialog dialog;
+        LoadingDialogBinding loadingDialogBinding;
+        loadingDialogBinding = LoadingDialogBinding.inflate(getLayoutInflater(), null, false);
+        loadingDialogBinding.tvTitleAD.setText("Generating link. Please wait");
+        dialog = new AlertDialog.Builder(this)
+                .setView(loadingDialogBinding.getRoot())
+                .show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
         APIMethods.submitCase(ActivityCaseHistory.this, caseId, new APIResponseListener<CaseSubmitRP>() {
             @Override
             public void success(CaseSubmitRP response) {
+                dialog.dismiss();
                 saveToClipBoard(ActivityCaseHistory.this, response.getPdfUrl());
                 Toast.makeText(ActivityCaseHistory.this, "Copied link to clipboard", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                dialog.dismiss();
                 Toast.makeText(ActivityCaseHistory.this, "Some error occurred while fetching case, Try again", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void showLoading() {
+
     }
 
 }
