@@ -2,6 +2,7 @@ package com.example.medicalappadmin;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,8 @@ import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 public class PatientDetailedHistoryActivity extends AppCompatActivity {
 
@@ -109,10 +112,13 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
         if (adapter == null) {
             adapter = new PagesHistoryAdapter(response, PatientDetailedHistoryActivity.this, new PagesHistoryAdapter.PageListener() {
                 @Override
-                public void onPageClicked(Page page) {
+                public void onPageClicked(ArrayList<Page> pages, int currentPosition) {
                     Intent i = new Intent(PatientDetailedHistoryActivity.this,DetailedPageViewActivity.class);
-                    String response = new Gson().toJson(page);
-                    i.putExtra("OPEN_PAGE", response );
+                    String response = new Gson().toJson(pages);
+//                    i.putExtra("PAGES_LIST", response );
+                    i.putExtra("CASE_ID", caseId);
+                    i.putExtra("CURRENT_PAGE_NUMBER", String.valueOf(currentPosition) );
+                    Log.i("lol", "sent: " + currentPosition);
                     startActivity(i);
 //                    Toast.makeText(PatientDetailedHistoryActivity.this, "Clicked " + pageNumber, Toast.LENGTH_SHORT).show();
                 }

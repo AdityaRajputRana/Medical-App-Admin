@@ -17,6 +17,8 @@ import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.canvas.PageViewRV;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 
+import java.util.ArrayList;
+
 public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapter.ViewHolder> {
     ViewCaseRP viewCaseRP;
     Context context;
@@ -48,12 +50,13 @@ public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         notepadView.addCoordinates(viewCaseRP.getPages().get(position).getPoints());
-        pageCount.setText("Page number: " + viewCaseRP.getPages().get(position).getPageNumber());
+        pageCount.setText("Page no: " + viewCaseRP.getPages().get(position).getPageNumber());
         llPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.i("lol", "onClick: " + viewCaseRP.getPages().get(holder.getAdapterPosition()).getPageNumber());
-                listener.onPageClicked(viewCaseRP.getPages().get(holder.getAdapterPosition()));
+                Log.i("lol", "onClick pos: " + holder.getAdapterPosition());
+                listener.onPageClicked(viewCaseRP.getPages(),holder.getAdapterPosition());
             }
         });
     }
@@ -64,7 +67,7 @@ public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapte
     }
 
     public interface PageListener {
-        default void onPageClicked(Page page) {
+        default void onPageClicked(ArrayList<Page> pages, int currentposition) {
 
 
         }
