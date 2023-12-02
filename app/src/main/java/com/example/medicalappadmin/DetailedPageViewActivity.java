@@ -1,6 +1,7 @@
 package com.example.medicalappadmin;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Tools.Methods;
+import com.example.medicalappadmin.adapters.PageAdapter;
 import com.example.medicalappadmin.databinding.ActivityDetailedPageViewBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -26,6 +28,8 @@ public class DetailedPageViewActivity extends AppCompatActivity {
 
     ViewCaseRP viewCaseRP;
 
+    PageAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +37,7 @@ public class DetailedPageViewActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         String caseID = getIntent().getStringExtra("CASE_ID");
         String pageNumber = getIntent().getStringExtra("CURRENT_PAGE_NUMBER");
+        Log.i("lol", "onCreate: received page number " + pageNumber);
         finalCurrPageNo = Integer.parseInt(pageNumber);
         loadPage(finalCurrPageNo,caseID);
 
@@ -46,8 +51,8 @@ public class DetailedPageViewActivity extends AppCompatActivity {
             public void success(ViewCaseRP response) {
                 viewCaseRP = response;
                 page = response.getPages().get(finalCurrPageNo);
-                updateUI(page);
-                setListeners();
+                updateUI(finalCurrPageNo);
+//                setListeners();
             }
 
             @Override
@@ -67,7 +72,7 @@ public class DetailedPageViewActivity extends AppCompatActivity {
                 Log.i("lol", "setListeners: next " + finalCurrPageNo );
                 Page nextPage = viewCaseRP.getPages().get(finalCurrPageNo);
                 Log.i("lol", "setListeners:next  page " + nextPage.toString());
-                updateUI(nextPage);
+                binding.viewPager.setCurrentItem(finalCurrPageNo);
             }
             else{
                 Toast.makeText(this, "End of pages", Toast.LENGTH_SHORT).show();
@@ -77,7 +82,8 @@ public class DetailedPageViewActivity extends AppCompatActivity {
             finalCurrPageNo --;
             if(finalCurrPageNo >=0){
                 Page prevPage = viewCaseRP.getPages().get(finalCurrPageNo);
-                updateUI(prevPage);
+                binding.viewPager.setCurrentItem(finalCurrPageNo);
+
             }
             else{
                 Toast.makeText(this, "First Page", Toast.LENGTH_SHORT).show();
@@ -86,11 +92,46 @@ public class DetailedPageViewActivity extends AppCompatActivity {
 
     }
 
-    private void updateUI(Page page) {
-        binding.detailedPage.clearDrawing();
-        binding.detailedPage.addCoordinates(page.getPoints());
-        binding.tvPageNumber.setText("Page No: "+page.getPageNumber());
-        binding.pbPage.setVisibility(View.GONE);
+    private void updateUI(int currPageNo) {
+//        binding.detailedPage.clearDrawing();
+//        binding.detailedPage.addCoordinates(page.getPoints());
+//        binding.tvPageNumber.setText("Page No: "+page.getPageNumber());
+//        binding.pbPage.setVisibility(View.GONE);
+        Log.i("lol", "updateUI: page number "+currPageNo);
 
+        if(currPageNo!=0){
+            binding.viewPager.setCurrentItem(currPageNo);
+        }
+
+        //TODO wrong page opened if clicked page!=1
+
+        if(adapter == null){
+            adapter = new PageAdapter(DetailedPageViewActivity.this, viewCaseRP, currPageNo);
+        }
+
+        binding.viewPager.setAdapter(adapter);
+        binding.viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                finalCurrPageNo = position;
+                setListeners();
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        binding.viewPager.setCurrentItem(currPageNo);
+
+        binding.pbPage.setVisibility(View.GONE);
     }
+
+
 }
