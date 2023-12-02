@@ -188,7 +188,7 @@ public class ActivityCaseHistory extends AppCompatActivity {
             public void success(CaseSubmitRP response) {
                 dialog.dismiss();
                 saveToClipBoard(ActivityCaseHistory.this, response.getPdfUrl());
-                Toast.makeText(ActivityCaseHistory.this, "Copied link to clipboard", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ActivityCaseHistory.this, "Link copied to clipboard", Toast.LENGTH_SHORT).show();
             }
 
             @Override

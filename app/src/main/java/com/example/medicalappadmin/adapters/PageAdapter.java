@@ -44,7 +44,6 @@ public class PageAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
 
-
         View view = LayoutInflater.from(context).inflate(R.layout.detailed_page_item, null);
         notepadView = view.findViewById(R.id.detailedPage);
         tvPageNumber = view.findViewById(R.id.tvPageNumber);

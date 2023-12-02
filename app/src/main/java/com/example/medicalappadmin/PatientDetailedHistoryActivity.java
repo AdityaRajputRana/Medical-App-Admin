@@ -3,6 +3,7 @@ package com.example.medicalappadmin;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +24,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     private ActivityPatientDetailedHistoryBinding binding;
     String caseId;
     PagesHistoryAdapter adapter;
+    GridLayoutManager manager;
 
 
     @Override
@@ -36,6 +38,29 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
         if (caseId != null) {
             downloadCase(caseId);
         }
+        manager = new GridLayoutManager(PatientDetailedHistoryActivity.this, 2);
+
+
+
+        binding.rcvPages.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View view, int i, int i1, int i2, int i3) {
+                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
+                    if (binding.llStrip.getVisibility() == View.VISIBLE) {
+                        binding.llStrip.setVisibility(View.INVISIBLE);
+                    }
+                }
+
+                if (manager.findFirstCompletelyVisibleItemPosition() == 1) {
+                    if (binding.llStrip.getVisibility() != View.VISIBLE) {
+                        binding.llStrip.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
+
+
+
 
 
         binding.ivPatientDetailsBackBtn.setOnClickListener(view -> {
@@ -107,7 +132,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
 
     private void setUpRCV(ViewCaseRP response) {
 
-        binding.rcvPages.setLayoutManager(new GridLayoutManager(PatientDetailedHistoryActivity.this, 2));
+        binding.rcvPages.setLayoutManager(manager);
 //        binding.rcvPages.setLayoutManager(new LinearLayoutManager(PatientDetailedHistoryActivity.this));
         if (adapter == null) {
             adapter = new PagesHistoryAdapter(response, PatientDetailedHistoryActivity.this, new PagesHistoryAdapter.PageListener() {

@@ -37,6 +37,7 @@ public class DetailedPageViewActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         String caseID = getIntent().getStringExtra("CASE_ID");
         String pageNumber = getIntent().getStringExtra("CURRENT_PAGE_NUMBER");
+        Log.i("lol", "onCreate: received page number " + pageNumber);
         finalCurrPageNo = Integer.parseInt(pageNumber);
         loadPage(finalCurrPageNo,caseID);
 
@@ -50,7 +51,7 @@ public class DetailedPageViewActivity extends AppCompatActivity {
             public void success(ViewCaseRP response) {
                 viewCaseRP = response;
                 page = response.getPages().get(finalCurrPageNo);
-                updateUI(page);
+                updateUI(finalCurrPageNo);
 //                setListeners();
             }
 
@@ -91,15 +92,23 @@ public class DetailedPageViewActivity extends AppCompatActivity {
 
     }
 
-    private void updateUI(Page page) {
+    private void updateUI(int currPageNo) {
 //        binding.detailedPage.clearDrawing();
 //        binding.detailedPage.addCoordinates(page.getPoints());
 //        binding.tvPageNumber.setText("Page No: "+page.getPageNumber());
 //        binding.pbPage.setVisibility(View.GONE);
+        Log.i("lol", "updateUI: page number "+currPageNo);
+
+        if(currPageNo!=0){
+            binding.viewPager.setCurrentItem(currPageNo);
+        }
+
+        //TODO wrong page opened if clicked page!=1
 
         if(adapter == null){
-            adapter = new PageAdapter(DetailedPageViewActivity.this, viewCaseRP, finalCurrPageNo);
+            adapter = new PageAdapter(DetailedPageViewActivity.this, viewCaseRP, currPageNo);
         }
+
         binding.viewPager.setAdapter(adapter);
         binding.viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -119,6 +128,8 @@ public class DetailedPageViewActivity extends AppCompatActivity {
 
             }
         });
+        binding.viewPager.setCurrentItem(currPageNo);
+
         binding.pbPage.setVisibility(View.GONE);
     }
 

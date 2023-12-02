@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:background="@drawable/bg_sec"
     android:padding="16dp"
-    android:layout_margin="8dp">
+    android:layout_margin="16dp">
     <TextView
         android:id="@+id/tvTitleAD"
         android:layout_width="wrap_content"
