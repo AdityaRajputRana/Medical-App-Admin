@@ -773,5 +773,4 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 }
 
 
-
 //TODO : Duplicate patient bnre, size of array problem
