@@ -12,6 +12,10 @@ public class EndPoints {
    public static String submitCase = "api/case/submit";
    public static String viewCase = "api/case/view";
 
+   public static String addMobileNo = "api/page/addMobileNumber";
+   public static String linkPage = "api/page/link";
+
+
 
 
 }

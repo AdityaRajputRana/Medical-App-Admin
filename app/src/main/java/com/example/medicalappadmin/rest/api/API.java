@@ -168,6 +168,7 @@ public class API {
                     SharedPreferences preferences = context.getSharedPreferences("MY_PREF", Context.MODE_PRIVATE);
                     if (preferences.contains("JWT_TOKEN") && !preferences.getString("JWT_TOKEN", "").isEmpty()){
                         params.put("x-access-token",preferences.getString("JWT_TOKEN",""));
+                        Log.i("token", "getHeaders:" + preferences.getString("JWT_TOKEN",""));
                     }
                     return params;
                 }
