@@ -442,9 +442,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             SmartPenDriver.CONNECT_MESSAGE message = driver.initialize();//driverStep3
             if (message == SmartPenDriver.CONNECT_MESSAGE.CONFIG_SUCCESS) searchPens();
             else if (message == SmartPenDriver.CONNECT_MESSAGE.REQUESTING_PERMS) {
-                dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
-                dialogPenBinding.bodyTxt.setText("Searching");
-            } else showError(String.valueOf(message), null);
+                dialogPenBinding.bodyTxt.setText("Requesting Permissions");
+            } else
+                showError(String.valueOf(message), null);
         }
     }
 
@@ -526,7 +526,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     public void onPermissionsResult(boolean granted) {
         if (granted) {
             searchPens();
-
         } else {
             showError("Permissions Denied", null);
         }
@@ -534,6 +533,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     @Override
     public void error(String message) {
+        Log.i("MedPA", "onError()");
         showError(message, null);
     }
 
@@ -731,6 +731,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         dialogPenBinding.bodyTxt.setText(message);
         dialogPenBinding.imageView.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.ic_error_bg));
         dialogPenBinding.actionBtn.setText(actionTxt);
+        Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
 
     }
 

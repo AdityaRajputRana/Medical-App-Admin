@@ -3,6 +3,7 @@ package com.example.medicalappadmin.PenDriver;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -16,7 +17,6 @@ public class PermissionsHelper {
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.BLUETOOTH_CONNECT
     };
@@ -50,6 +50,7 @@ public class PermissionsHelper {
         for (String perm: perms){
             if (ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_DENIED){
                 havePerm = false;
+                Log.i("MedPA", "Denied: " + String.valueOf(perm));
             };
         }
         return havePerm;
