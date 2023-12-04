@@ -163,6 +163,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_drawer_body"
+        android:background="@color/colorBackground"
         />
 
 

@@ -6,18 +6,23 @@ import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.requests.AddDetailsReq;
+import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
 import com.example.medicalappadmin.rest.requests.CaseHistoryReq;
 import com.example.medicalappadmin.rest.requests.CaseSubmitReq;
 import com.example.medicalappadmin.rest.requests.InitialisePageReq;
+import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.requests.LoginReq;
 import com.example.medicalappadmin.rest.requests.MergeCasesReq;
 import com.example.medicalappadmin.rest.requests.SignupReq;
 import com.example.medicalappadmin.rest.requests.UploadPointsReq;
 import com.example.medicalappadmin.rest.requests.ViewCaseReq;
+import com.example.medicalappadmin.rest.response.AddDetailsRP;
+import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
 import com.example.medicalappadmin.rest.response.CaseSubmitRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
+import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.LoginRP;
 import com.example.medicalappadmin.rest.response.SignupRP;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
@@ -54,8 +59,8 @@ public class APIMethods {
 
     //Upload details
 
-    public static void addDetails(Context context, AddDetailsReq req, APIResponseListener<EmptyRP> listener) {
-        API.postData(listener, req, EndPoints.addDetails, EmptyRP.class, context);
+    public static void addDetails(Context context, AddDetailsReq req, APIResponseListener<AddDetailsRP> listener) {
+        API.postData(listener, req, EndPoints.addDetails, AddDetailsRP.class, context);
     }
 
 
@@ -84,6 +89,14 @@ public class APIMethods {
         ViewCaseReq req = new ViewCaseReq(caseId);
         API.postData(listener, req, EndPoints.viewCase, ViewCaseRP.class, context);
 
+    }
+
+    public static void addMobileNumber(Context context, AddMobileNoReq req, APIResponseListener<AddMobileNoRP> listener) {
+        API.postData(listener, req, EndPoints.addMobileNo, AddMobileNoRP.class, context);
+    }
+
+    public  static void linkPage(Context context, LinkPageReq req,APIResponseListener<LinkPageRP> listener){
+        API.postData(listener,req,EndPoints.linkPage, LinkPageRP.class,context);
     }
 
 

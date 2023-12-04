@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+<!--        <RadioButton-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Relative 1"-->
+<!--            android:textSize="16sp"-->
+<!--            android:fontFamily="@font/poppins_semibold"-->
+<!--            android:layout_gravity="center_vertical"/>-->
+
+
+    </RadioGroup>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/blue_rounded_bg"
+        android:text="Next"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
+        android:textSize="16sp"/>
+
+
+</LinearLayout>
