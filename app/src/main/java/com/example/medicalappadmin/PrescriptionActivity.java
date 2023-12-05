@@ -664,8 +664,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
 
-    private Handler handler;
-    private Runnable runnable;
 
     private void setTimelyUploads() {
         if (handler != null && runnable != null) {
