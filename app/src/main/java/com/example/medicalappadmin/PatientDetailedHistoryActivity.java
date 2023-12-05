@@ -91,8 +91,8 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     private void updateUI(ViewCaseRP response) {
 
         if (response != null) {
-            if (response.getPatient().getName() != null) {
-                binding.tvPatientsName.setText(response.getPatient().getName());
+            if (response.getPatient().getFullName() != null) {
+                binding.tvPatientsName.setText(response.getPatient().getFullName());
             } else {
                 binding.tvPatientsName.setText("Untitled Case");
 

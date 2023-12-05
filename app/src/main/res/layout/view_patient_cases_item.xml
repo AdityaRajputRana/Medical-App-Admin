@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginHorizontal="8dp"
     android:layout_marginVertical="4dp"
     android:padding="5dp"
     android:gravity="center"
@@ -11,8 +10,8 @@
 
 
     <LinearLayout
-        android:id="@+id/llCaseItem"
-        android:layout_width="match_parent"
+        android:id="@+id/llVPClick"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_weight="1">
@@ -25,7 +24,7 @@
             android:layout_margin="5dp"
             android:background="@drawable/number_rounded_bg">
             <TextView
-                android:id="@+id/tvPages"
+                android:id="@+id/tvVPNoOfCases"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="3"
@@ -46,39 +45,63 @@
 
         </LinearLayout>
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginStart="10dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
             >
             <TextView
-                android:id="@+id/tvPatientName"
+                android:id="@+id/tvVPCaseName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Patient Name"
+                android:text="Case Name"
                 android:textColor="@color/colorPrimTxt"
                 android:gravity="center_vertical"
                 android:fontFamily="@font/poppins_semibold"
                 android:textSize="16sp"
                 />
             <TextView
-                android:id="@+id/tvPatientMobileNumber"
+                android:id="@+id/tvVPDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Details"
                 android:gravity="center_vertical"
                 android:fontFamily="@font/poppins_medium"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textColor="@color/colorSecTxt"
                 />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status:"
+                    android:textColor="@color/colorPrimTxt"
+                    android:gravity="center_vertical"
+                    android:fontFamily="@font/poppins_medium"
+                    android:textSize="14sp"
+                    />
+                <TextView
+                    android:id="@+id/tvVPStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Open"
+                    android:paddingStart="8dp"
+                    android:gravity="center_vertical"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorActiveGreen"
+                    />
+            </LinearLayout>
 
         </LinearLayout>
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/ivShareCase"
+        android:id="@+id/ivVPShareCase"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_share_24"

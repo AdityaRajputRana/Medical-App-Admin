@@ -1,7 +1,5 @@
 package com.example.medicalappadmin.Models;
 
-import android.util.Log;
-
 public class Case {
     String _id;
     String updatedAt;
@@ -13,21 +11,55 @@ public class Case {
     String gender;
     String email;
 
+    boolean isOpen;
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setOpen(boolean open) {
+        isOpen = open;
+    }
+
+    public Case() {
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getFullName() {
-        if(fullName == null || fullName.isEmpty()){
+        if (fullName == null || fullName.isEmpty()) {
             return "Untitled Case";
         }
         return fullName;
     }
 
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     public String getMobileNumber() {
-        if(mobileNumber == 0 ){
-            return  "Case Id: " + get_id();
+        if (mobileNumber == 0) {
+            return "Case Id: " + get_id();
         }
         return "Mobile Number: " + mobileNumber;
     }
 
-    public Case() {
+    public void setMobileNumber(long mobileNumber) {
+        this.mobileNumber = mobileNumber;
     }
 
     public String get_id() {

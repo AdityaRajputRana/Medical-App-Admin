@@ -1,10 +1,22 @@
 package com.example.medicalappadmin.rest.response;
 
+import com.example.medicalappadmin.Models.Patient;
+
 public class AddDetailsRP {
     long mobileNumber;
     String fullName;
     String gender;
     String email;
+
+    Patient patient;
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
 
     long updatedAt;
     long createdAt;
@@ -12,6 +24,9 @@ public class AddDetailsRP {
     String _id;
     String creatorId;
     String hospitalId;
+
+    public AddDetailsRP() {
+    }
 
     public long getMobileNumber() {
         return mobileNumber;
@@ -83,8 +98,5 @@ public class AddDetailsRP {
 
     public void setHospitalId(String hospitalId) {
         this.hospitalId = hospitalId;
-    }
-
-    public AddDetailsRP() {
     }
 }
