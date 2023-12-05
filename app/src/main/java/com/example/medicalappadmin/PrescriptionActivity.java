@@ -26,6 +26,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.Models.LinkedPatient;
 import com.example.medicalappadmin.Models.Page;
@@ -36,6 +38,7 @@ import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
 import com.example.medicalappadmin.Tools.Methods;
+import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
 import com.example.medicalappadmin.databinding.ActivityPrescriptionBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
@@ -48,12 +51,10 @@ import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
+import com.example.medicalappadmin.rest.response.ViewPatientRP;
 
 import java.util.ArrayList;
 import java.util.Objects;
-
-import kr.neolab.sdk.metadata.IMetadataListener;
-import kr.neolab.sdk.metadata.structure.Symbol;
 
 public class PrescriptionActivity extends AppCompatActivity implements SmartPenListener {
 
@@ -88,6 +89,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     LinearLayout llNewPatient;
     LinearLayout llAddMobileNumber;
     LinearLayout llExistingPatientDetails;
+    LinearLayout llRelPrevCases;
     AppCompatButton btnCheckRelatives;
     AppCompatButton btnNext;
     AppCompatButton btnSave;
@@ -101,12 +103,18 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     ProgressBar pbSelectRelative;
     ProgressBar pbSaveNewPatient;
     RadioGroup relativeRadioSelector;
+    RecyclerView rcvRelPrevCases;
+    AppCompatButton btnRelNewCase;
     String gender = "M";
     ArrayList<LinkedPatient> relatives;
     SmartPenDriver driver = SmartPenDriver.getInstance(this); //driverStep1
     long tempMobile = 0;
     private Handler handler;
     private Runnable runnable;
+
+    RelativePreviousCasesAdapter relativePreviousCasesAdapter;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +155,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         relativeRadioSelector = binding.navView.getHeaderView(0).findViewById(R.id.relativeRadioSelector);
         btnNext = binding.navView.getHeaderView(0).findViewById(R.id.btnNext);
         pbSelectRelative = binding.navView.getHeaderView(0).findViewById(R.id.pbSelectRelative);
+
+        //LL previous cases of relative
+        llRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.llRelPrevCases);
+        btnRelNewCase = binding.navView.getHeaderView(0).findViewById(R.id.btnRelNewCase);
+        rcvRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.rcvRelPrevCases);
+
 
         //LL new patient
         llNewPatient = binding.navView.getHeaderView(0).findViewById(R.id.llNewPatient);
@@ -279,6 +293,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llNewPatient.setVisibility(View.GONE);
         llPrevPatientList.setVisibility(View.VISIBLE);
         llExistingPatientDetails.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
     }
 
     private void setBtnSaveListener() {
@@ -298,9 +313,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             setBtnSaveListener();
         } else if (selectedRelativeId < relatives.size()) {
             LinkedPatient selectedRelative = relatives.get(selectedRelativeId);
-
             showRelativePrevCases(selectedRelative);
-            linkPageToPatient(selectedRelative);
         } else {
             Log.i(TAG, "showRelativeDetails: relatives null");
 
@@ -311,9 +324,83 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void showRelativePrevCases(LinkedPatient selectedRelative) {
 
-        //TODO show previous cases rcv and set listeners + new case button
+        pbSelectRelative.setVisibility(View.VISIBLE);
+
+        String relativeId = selectedRelative.get_id();
+        APIMethods.viewPatient(PrescriptionActivity.this, relativeId, new APIResponseListener<ViewPatientRP>() {
+            @Override
+            public void success(ViewPatientRP response) {
+                showRelativesCasesLayout();
+                rcvRelPrevCases.setLayoutManager(new LinearLayoutManager(PrescriptionActivity.this));
+                    relativePreviousCasesAdapter = new RelativePreviousCasesAdapter(response, PrescriptionActivity.this, new RelativePreviousCasesAdapter.SelectCaseListener() {
+                        @Override
+                        public void onCaseSelected(String caseId) {
+                            linkPageToCase(caseId,relativeId,selectedRelative);
+                        }
+                    });
 
 
+                rcvRelPrevCases.setAdapter(relativePreviousCasesAdapter);
+
+                btnRelNewCase.setOnClickListener(view -> {
+                    linkPageToPatient(selectedRelative);
+                });
+                pbSelectRelative.setVisibility(View.GONE);
+
+
+
+
+
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                pbSelectRelative.setVisibility(View.GONE);
+
+                showError(message,null);
+            }
+        });
+
+
+    }
+
+    private void linkPageToCase(String caseId, String relativeId, LinkedPatient selectedRelative) {
+        LinkPageReq req = new LinkPageReq();
+        req.setPageNumber(currentPageNumber);
+        req.setPatientId(relativeId);
+        req.setCaseId(caseId);
+        APIMethods.linkPage(PrescriptionActivity.this, req, new APIResponseListener<LinkPageRP>() {
+            @Override
+            public void success(LinkPageRP response) {
+                Toast.makeText(PrescriptionActivity.this, "Page is linked to " + selectedRelative.getFullName(), Toast.LENGTH_SHORT).show();
+                pbSelectRelative.setVisibility(View.GONE);
+                binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
+                showExistingPatientLayout();
+                Log.i(TAG, "success: linking" + etFullName.getText().toString());
+                tvEPatientName.setText(selectedRelative.getFullName());
+                if (Objects.equals(selectedRelative.getGender(), "M")) {
+                    tvEPGender.setText("Male");
+                } else {
+                    tvEPGender.setText("Female");
+                }
+                tvEPatientsNo.setText(etMobileNumber.getText().toString());
+                clearAllCache();
+                binding.drawerLayout.close();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                showError(message,null);
+            }
+        });
+    }
+
+    private void showRelativesCasesLayout() {
+        llAddMobileNumber.setVisibility(View.GONE);
+        llPrevPatientList.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.GONE);
+        llExistingPatientDetails.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.VISIBLE);
     }
 
     private void showAddNewPatientLayout() {
@@ -321,8 +408,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llPrevPatientList.setVisibility(View.GONE);
         llNewPatient.setVisibility(View.VISIBLE);
         llExistingPatientDetails.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
     }
 
+
+    //Link as new case of relative
     private void linkPageToPatient(LinkedPatient selectedRelative) {
 
         LinkPageReq req = new LinkPageReq();
@@ -342,7 +432,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
                 showExistingPatientLayout();
                 Log.i(TAG, "success: linking" + etFullName.getText().toString());
-                tvEPatientName.setText(etFullName.getText().toString());
+                tvEPatientName.setText(selectedRelative.getFullName());
                 if (Objects.equals(gender, "M")) {
                     tvEPGender.setText("Male");
                 } else {
@@ -428,6 +518,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llNewPatient.setVisibility(View.GONE);
         llAddMobileNumber.setVisibility(View.VISIBLE);
         llNewPatient.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
     }
 
 
@@ -623,6 +714,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     @Override
     public void drawEvent(float x, float y, int pageId, int actionType) {
+
+
         if (pageId != currentPageNumber) {
             uploadPoints();
             if (handler != null) {
@@ -696,6 +789,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llAddMobileNumber.setVisibility(View.GONE);
         llPrevPatientList.setVisibility(View.GONE);
         llNewPatient.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
+
     }
 
 
