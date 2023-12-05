@@ -494,7 +494,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
         //TODO remove it
-        dialog.dismiss();
+//        dialog.dismiss();
         /////
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);

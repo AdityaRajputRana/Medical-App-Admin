@@ -9,8 +9,17 @@
     android:paddingHorizontal="16dp"
     android:paddingVertical="24dp">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Please touch the page with the pen to initialise it."
+        android:textColor="@color/colorPrimTxt"
+        android:textSize="16sp" />
 
     <LinearLayout
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -37,14 +46,7 @@
             android:textColor="@color/colorPrimTxt"
             android:textColorHint="@color/colorSecTxt"
             android:textSize="16sp" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/poppins_semibold"
-            android:text="Touch the page with the pen."
-            android:textColor="@color/colorPrimTxt"
-            android:textSize="16sp" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
