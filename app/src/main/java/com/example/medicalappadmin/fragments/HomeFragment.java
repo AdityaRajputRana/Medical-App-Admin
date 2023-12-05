@@ -43,6 +43,9 @@ public class HomeFragment extends Fragment {
             listener = (CallBacksListener) context;
         }
     }
+    public HomeFragment(){
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

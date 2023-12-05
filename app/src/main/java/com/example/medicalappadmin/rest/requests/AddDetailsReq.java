@@ -5,6 +5,7 @@ public class AddDetailsReq {
     int pageNumber;
     String fullName;
     String gender;
+    //TODO add age
     Long mobileNumber;
 
     public int getPageNumber() {
