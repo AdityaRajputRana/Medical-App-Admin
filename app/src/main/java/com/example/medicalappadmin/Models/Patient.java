@@ -1,24 +1,50 @@
 package com.example.medicalappadmin.Models;
 
 public class Patient {
-    String name;
+    String _id;
+
+    Long mobileNumber;
+    String fullName;
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+
+    String email;
     String gender;
+
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
+    }
 
     public Patient() {
 
     }
 
-    public Patient(String name, String gender) {
-        this.name = name;
-        this.gender = gender;
+    public Long getMobileNumber() {
+        return mobileNumber;
     }
 
-    public String getName() {
-        return name;
+    public void setMobileNumber(Long mobileNumber) {
+        this.mobileNumber = mobileNumber;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getGender() {

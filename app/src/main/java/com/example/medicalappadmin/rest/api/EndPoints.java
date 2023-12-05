@@ -14,6 +14,7 @@ public class EndPoints {
 
     public static String addMobileNo = "api/page/addMobileNumber";
     public static String linkPage = "api/page/link";
+//    public static String patientHistory = "api/patients/list";
 
 
 }

@@ -91,6 +91,7 @@ public class APIMethods {
 
     }
 
+    //link mobile no
     public static void addMobileNumber(Context context, AddMobileNoReq req, APIResponseListener<AddMobileNoRP> listener) {
         API.postData(listener, req, EndPoints.addMobileNo, AddMobileNoRP.class, context);
     }

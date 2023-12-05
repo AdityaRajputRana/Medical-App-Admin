@@ -4,13 +4,8 @@ import java.util.ArrayList;
 
 public class Page {
     String _id;
-
-    public String get_id() {
-        return _id;
-    }
-
     String patientID;
-    String hospitalId ;
+    String hospitalId;
     String caseId;
     String creatorId;
     String doctorId;
@@ -20,38 +15,18 @@ public class Page {
     int width;
     int height;
     String pageType;
+    String hospitalPatientId;
     Long mobileNumber;
-
     String fullName;
     String email;
     String gender;
 
-    public void set_id(String _id) {
-        this._id = _id;
+    public Long getMobileNumber() {
+        return mobileNumber;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getPageType() {
-        return pageType;
-    }
-
-    public void setPageType(String pageType) {
-        this.pageType = pageType;
+    public void setMobileNumber(Long mobileNumber) {
+        this.mobileNumber = mobileNumber;
     }
 
     public String getFullName() {
@@ -82,6 +57,51 @@ public class Page {
 
     public Page() {
     }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
+    }
+
+    public String getHospitalPatientId() {
+        return hospitalPatientId;
+    }
+
+    public void setHospitalPatientId(String hospitalPatientId) {
+        this.hospitalPatientId = hospitalPatientId;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setUpdatedAt(int updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getPageType() {
+        return pageType;
+    }
+
+    public void setPageType(String pageType) {
+        this.pageType = pageType;
+    }
+
 
     public String getPatientID() {
         return patientID;
@@ -123,12 +143,6 @@ public class Page {
         this.doctorId = doctorId;
     }
 
-
-
-    public void setUpdatedAt(int updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public int getPageNumber() {
         return pageNumber;
     }
@@ -153,14 +167,6 @@ public class Page {
         this.height = height;
     }
 
-
-    public Long getMobileNumber() {
-        return mobileNumber;
-    }
-
-    public void setMobileNumber(Long mobileNumber) {
-        this.mobileNumber = mobileNumber;
-    }
 
     public ArrayList<Point> getPoints() {
         return points;

@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:src="@drawable/baseline_share_24"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
 
 </LinearLayout>
