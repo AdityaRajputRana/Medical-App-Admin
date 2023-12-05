@@ -34,6 +34,8 @@ import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
 
+import kr.neolab.sdk.metadata.structure.Symbol;
+
 public class DashboardActivity extends AppCompatActivity implements HomeFragment.CallBacksListener, ProfileFragment.CallBacksListener {
     private ActivityDashboardBinding binding;
 
@@ -93,6 +95,11 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
                 Intent i = new Intent(DashboardActivity.this, PrescriptionActivity.class);
                 DashboardActivity.this.startActivity(i);
             }
+        }
+
+        @Override
+        public void onPaperButtonPress(int id, String name) {
+
         }
     };
 
