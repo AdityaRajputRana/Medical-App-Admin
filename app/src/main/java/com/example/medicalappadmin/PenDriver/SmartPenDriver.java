@@ -7,14 +7,20 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
+import com.example.medicalappadmin.PenDriver.Models.Symbol;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import kr.neolab.sdk.ink.structure.Dot;
 import kr.neolab.sdk.ink.structure.DotType;
+import kr.neolab.sdk.metadata.IMetadataCtrl;
+import kr.neolab.sdk.metadata.IMetadataListener;
+import kr.neolab.sdk.metadata.MetadataCtrl;
 import kr.neolab.sdk.pen.IPenCtrl;
 import kr.neolab.sdk.pen.PenCtrl;
 import kr.neolab.sdk.pen.bluetooth.BTLEAdt;
@@ -31,8 +37,10 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
     private SmartPenListener smartPenListener;
     private AppCompatActivity activity;
     private ConnectionsHandler connectionsHandler;
+    private SymbolController symbolController;
     private SmartPen selectedSmartPen;
     private ArrayList<SmartPen> smartPens;
+
 
     private SharedPreferences mPref;
 
@@ -265,11 +273,19 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
 
     @Override
     public void onReceiveDot(String s, Dot dot) {
+        Log.i("NPROJ- dot", new Gson().toJson(dot));
         int actionType = -1;
         if (DotType.isPenActionDown(dot.dotType))
             actionType = 1;
-        else if (DotType.isPenActionUp(dot.dotType))
+        else if (DotType.isPenActionUp(dot.dotType)) {
             actionType = 2;
+            Symbol sm = symbolController.getApplicableSymbol(dot.x, dot.y);
+            if (sm != null){
+                if (smartPenListener != null){
+                    smartPenListener.onPaperButtonPress(sm.getId(), sm.getName());
+                }
+            }
+        }
         else if (DotType.isPenActionMove(dot.dotType))
             actionType = 3;
         smartPenListener.drawEvent(dot.x, dot.y, dot.pageId, actionType);
@@ -310,6 +326,7 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
         }
 
         connectionsHandler = new ConnectionsHandler();
+        symbolController = new SymbolController();
 
 
 
@@ -335,6 +352,8 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
             });
             return  CONNECT_MESSAGE.REQUESTING_PERMS;
         }
+
+
 
     }
 

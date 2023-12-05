@@ -40,6 +40,9 @@ import com.example.medicalappadmin.rest.response.EmptyRP;
 
 import java.util.ArrayList;
 
+import kr.neolab.sdk.metadata.IMetadataListener;
+import kr.neolab.sdk.metadata.structure.Symbol;
+
 public class PrescriptionActivity extends AppCompatActivity implements SmartPenListener {
 
     boolean isPenSearchRunning = false;
@@ -409,6 +412,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         }
         binding.canvasView.addCoordinate(x, y,actionType);
         pendingPoints.add(new Point(x, y,actionType));
+    }
+
+    @Override
+    public void onPaperButtonPress(int id, String name) {
+        Log.i("eta-symbol", name);
+        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
     }
 
 
