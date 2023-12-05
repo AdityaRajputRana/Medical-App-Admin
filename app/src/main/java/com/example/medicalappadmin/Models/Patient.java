@@ -5,6 +5,13 @@ public class Patient {
 
     Long mobileNumber;
     String fullName;
+    String email;
+    String gender;
+
+
+    public Patient() {
+
+    }
 
     public String getFullName() {
         return fullName;
@@ -14,21 +21,12 @@ public class Patient {
         this.fullName = fullName;
     }
 
-
-    String email;
-    String gender;
-
-
     public String get_id() {
         return _id;
     }
 
     public void set_id(String _id) {
         this._id = _id;
-    }
-
-    public Patient() {
-
     }
 
     public Long getMobileNumber() {

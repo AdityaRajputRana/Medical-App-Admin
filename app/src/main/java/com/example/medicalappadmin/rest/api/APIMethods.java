@@ -17,6 +17,7 @@ import com.example.medicalappadmin.rest.requests.PatientListReq;
 import com.example.medicalappadmin.rest.requests.SignupReq;
 import com.example.medicalappadmin.rest.requests.UploadPointsReq;
 import com.example.medicalappadmin.rest.requests.ViewCaseReq;
+import com.example.medicalappadmin.rest.requests.ViewPatientReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
@@ -28,6 +29,7 @@ import com.example.medicalappadmin.rest.response.LoginRP;
 import com.example.medicalappadmin.rest.response.PatientListRP;
 import com.example.medicalappadmin.rest.response.SignupRP;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
+import com.example.medicalappadmin.rest.response.ViewPatientRP;
 
 import java.util.ArrayList;
 
@@ -107,5 +109,10 @@ public class APIMethods {
         API.postData(listener, req, EndPoints.patientList, PatientListRP.class, context);
     }
 
+    public static void viewPatient(Context context, String patientId, APIResponseListener<ViewPatientRP> listener) {
+         ViewPatientReq req = new ViewPatientReq(patientId);
+        API.postData(listener, req, EndPoints.viewPatient, ViewPatientRP.class, context);
+
+    }
 
 }

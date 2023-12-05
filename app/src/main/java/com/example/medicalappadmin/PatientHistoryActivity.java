@@ -1,22 +1,17 @@
 package com.example.medicalappadmin;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import com.example.medicalappadmin.Tools.Methods;
-import com.example.medicalappadmin.adapters.CaseHistoryRVAdapter;
 import com.example.medicalappadmin.adapters.PatientListAdapter;
 import com.example.medicalappadmin.databinding.ActivityPatientHistoryBinding;
-import com.example.medicalappadmin.rest.api.API;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
-import com.example.medicalappadmin.rest.response.CaseHistoryRP;
 import com.example.medicalappadmin.rest.response.PatientListRP;
 
 public class PatientHistoryActivity extends AppCompatActivity {
@@ -125,9 +120,11 @@ public class PatientHistoryActivity extends AppCompatActivity {
                     if (adapter == null) {
                         adapter = new PatientListAdapter(response, PatientHistoryActivity.this, new PatientListAdapter.PatientListener() {
                             @Override
-                            public void onPatientClicked() {
+                            public void onPatientClicked(String id) {
                                 //TODO open patient details
-                                PatientListAdapter.PatientListener.super.onPatientClicked();
+                                Intent i = new Intent(PatientHistoryActivity.this,ActivityViewPatient.class);
+                                i.putExtra("PATIENT_ID", id);
+                                startActivity(i);
                             }
 
                             @Override

@@ -1,7 +1,6 @@
 package com.example.medicalappadmin.adapters;
 
 import android.content.Context;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.helper.widget.Layer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.R;
@@ -51,7 +49,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
         tvPatientsName.setText(patientListRP.getPatients().get(position).getFullName());
         tvPatientsMobileNumber.setText(String.valueOf(patientListRP.getPatients().get(position).getMobileNumber()));
         llPatientItem.setOnClickListener(view -> {
-            listener.onPatientClicked();
+            listener.onPatientClicked(patientListRP.getPatients().get(holder.getAdapterPosition()).get_id());
         });
 
         ivSharePatient.setOnClickListener(view -> {
@@ -67,7 +65,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
 
 
     public interface PatientListener {
-        default void onPatientClicked() {
+        default void onPatientClicked(String id) {
         }
         default void onShareClicked() {
         }
