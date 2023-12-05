@@ -308,6 +308,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void showRelativePrevCases(LinkedPatient selectedRelative) {
 
+        //TODO show previous cases rcv and set listeners + new case button
+
 
     }
 
@@ -811,6 +813,3 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
-
-
-//TODO : Duplicate patient bnre, size of array problem

@@ -13,6 +13,7 @@ import com.example.medicalappadmin.rest.requests.InitialisePageReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.requests.LoginReq;
 import com.example.medicalappadmin.rest.requests.MergeCasesReq;
+import com.example.medicalappadmin.rest.requests.PatientListReq;
 import com.example.medicalappadmin.rest.requests.SignupReq;
 import com.example.medicalappadmin.rest.requests.UploadPointsReq;
 import com.example.medicalappadmin.rest.requests.ViewCaseReq;
@@ -24,6 +25,7 @@ import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.LoginRP;
+import com.example.medicalappadmin.rest.response.PatientListRP;
 import com.example.medicalappadmin.rest.response.SignupRP;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 
@@ -98,6 +100,11 @@ public class APIMethods {
 
     public  static void linkPage(Context context, LinkPageReq req,APIResponseListener<LinkPageRP> listener){
         API.postData(listener,req,EndPoints.linkPage, LinkPageRP.class,context);
+    }
+
+    public static void loadPatientsList(Context context, int pageNumber, APIResponseListener<PatientListRP> listener) {
+        PatientListReq req = new PatientListReq(pageNumber);
+        API.postData(listener, req, EndPoints.patientList, PatientListRP.class, context);
     }
 
 
