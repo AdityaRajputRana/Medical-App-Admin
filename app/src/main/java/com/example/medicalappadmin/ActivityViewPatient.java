@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -30,17 +31,21 @@ public class ActivityViewPatient extends AppCompatActivity {
         binding.rcvVPCases.setLayoutManager(new LinearLayoutManager(this));
         loadPatientDetails(patientId);
 
-        binding.rcvVPCases.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0) {
-                    // Scrolling up, hide the upper layout
-                    binding.appBarLayout.setExpanded(false, true);
-                } else {
-                    binding.appBarLayout.setExpanded(true, true);
-                }
-            }
-        });
+        binding.ivVPBackBtn.setOnClickListener(view -> finish());
+
+//        binding.rcvVPCases.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                if (dy > 0) {
+//                    // Scrolling up, hide the upper layout
+//                    binding.appBarLayout.setVisibility(View.GONE);
+//                    binding.appBarLayout.setExpanded(false, true);
+//                } else {
+//                    binding.appBarLayout.setVisibility(View.VISIBLE);
+//                    binding.appBarLayout.setExpanded(true, true);
+//                }
+//            }
+//        });
 
 
 
@@ -56,7 +61,14 @@ public class ActivityViewPatient extends AppCompatActivity {
 
                 //todo set up recyclerview
                 if(adapter == null){
-                    adapter = new ViewPatientCasesAdapter(response,ActivityViewPatient.this);
+                    adapter = new ViewPatientCasesAdapter(response, ActivityViewPatient.this, new ViewPatientCasesAdapter.VPCaseListener() {
+                        @Override
+                        public void caseClicked(String caseId) {
+                            Intent i = new Intent(ActivityViewPatient.this,PatientDetailedHistoryActivity.class);
+                            i.putExtra("CASE_ID",caseId);
+                            startActivity(i);
+                        }
+                    });
                 }
 
                 binding.rcvVPCases.setAdapter(adapter);

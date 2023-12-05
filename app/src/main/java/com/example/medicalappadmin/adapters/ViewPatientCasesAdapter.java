@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,10 +24,17 @@ public class ViewPatientCasesAdapter extends RecyclerView.Adapter<ViewPatientCas
     TextView tvVPDetails;
     TextView tvVPCaseName;
     ImageView ivVPShareCase;
+    LinearLayout llVPClick;
+    VPCaseListener listener;
 
-    public ViewPatientCasesAdapter(ViewPatientRP viewPatientRP, Context context) {
+    public ViewPatientCasesAdapter(ViewPatientRP viewPatientRP, Context context,VPCaseListener listener) {
         this.viewPatientRP = viewPatientRP;
         this.context = context;
+        this.listener = listener;
+    }
+
+    public interface VPCaseListener{
+        default void caseClicked(String caseId){}
     }
 
     @NonNull
@@ -40,6 +48,8 @@ public class ViewPatientCasesAdapter extends RecyclerView.Adapter<ViewPatientCas
         tvVPStatus = view.findViewById(R.id.tvVPStatus);
         tvVPDetails = view.findViewById(R.id.tvVPDetails);
         ivVPShareCase = view.findViewById(R.id.ivVPShareCase);
+        llVPClick = view.findViewById(R.id.llVPClick);
+
 
         return new ViewHolder(view);
     }
@@ -56,6 +66,10 @@ public class ViewPatientCasesAdapter extends RecyclerView.Adapter<ViewPatientCas
             tvVPStatus.setText("Closed");
             tvVPStatus.setTextColor(context.getColor(R.color.colorDanger));
         }
+
+        llVPClick.setOnClickListener(view -> {
+            listener.caseClicked(viewPatientRP.getPatientCases().get(holder.getAdapterPosition()).get_id());
+        });
     }
 
     @Override
