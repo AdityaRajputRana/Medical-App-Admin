@@ -5,7 +5,7 @@
     </style>
 
     <style name="Theme.MedicalAppAdmin" parent="Base.Theme.MedicalAppAdmin" >
-        <item name="android:statusBarColor">@color/colorStatusBar</item>
+        <item name="android:statusBarColor">@color/colorBackground</item>
         <item name="android:windowLightStatusBar">true</item>
 
     </style>

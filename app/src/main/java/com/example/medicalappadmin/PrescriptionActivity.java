@@ -194,7 +194,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             etMobileNumber.setError("Required");
             return;
         }
-        req.setPageNumber(Integer.parseInt(etPageNumber.getText().toString()));
+        req.setPageNumber(currentPageNumber);
         req.setMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
 
         Log.i(TAG, "req set mobile" + req.toString());

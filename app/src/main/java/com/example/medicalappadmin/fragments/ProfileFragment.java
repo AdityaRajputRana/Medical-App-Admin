@@ -19,6 +19,7 @@ import com.example.medicalappadmin.LoginActivity;
 import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.Transformations.CircleTransformation;
 import com.example.medicalappadmin.databinding.FragmentProfileBinding;
 import com.google.gson.Gson;
@@ -50,6 +51,7 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         if (binding == null){
             binding = FragmentProfileBinding.inflate(inflater);
+            Methods.setStatusBarColor(requireActivity().getColor(R.color.colorStatusBar),requireActivity());
             loadData();
             loadUI();
             setListeners();

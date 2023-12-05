@@ -51,7 +51,7 @@
             android:padding="8dp"
             app:tint="@color/colorInactiveGray"
             android:background="@android:color/transparent"
-            android:src="@drawable/search"
+            android:src="@drawable/pencil"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
