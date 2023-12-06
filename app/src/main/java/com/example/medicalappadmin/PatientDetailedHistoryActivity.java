@@ -6,8 +6,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
@@ -25,6 +27,8 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     String caseId;
     PagesHistoryAdapter adapter;
     GridLayoutManager manager;
+    private boolean isFirstItemVisible = true;
+
 
 
     @Override
@@ -42,23 +46,45 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
 
 
 
-        binding.rcvPages.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
-                    if (binding.llStrip.getVisibility() == View.VISIBLE) {
-                        binding.llStrip.setVisibility(View.INVISIBLE);
-                    }
-                }
+//        binding.rcvPages.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+//            @Override
+//            public void onScrollChange(View view, int i, int i1, int i2, int i3) {
+//                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
+//                    if (binding.llStrip.getVisibility() == View.VISIBLE) {
+//                        binding.llStrip.setVisibility(View.INVISIBLE);
+//                    }
+//                }
+//
+//                if (manager.findFirstCompletelyVisibleItemPosition() == 1) {
+//                    if (binding.llStrip.getVisibility() != View.VISIBLE) {
+//                        binding.llStrip.setVisibility(View.VISIBLE);
+//                    }
+//                }
+//            }
+//        });
 
-                if (manager.findFirstCompletelyVisibleItemPosition() == 1) {
-                    if (binding.llStrip.getVisibility() != View.VISIBLE) {
-                        binding.llStrip.setVisibility(View.VISIBLE);
+
+        binding.rcvPages.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0 && binding.appBarLayout.getHeight() > 0) {
+                    binding.appBarLayout.setExpanded(false, true);
+                } else if (dy < 0 && binding.appBarLayout.getHeight() == 0) {
+                    binding.appBarLayout.setExpanded(true, true);
+
+
+                }
+                int firstVisibleItemPosition = manager.findFirstVisibleItemPosition();
+                if (firstVisibleItemPosition == 0) {
+                    if (!isFirstItemVisible) {
+                        binding.appBarLayout.setExpanded(true, true);
+                        isFirstItemVisible = true;
                     }
+                } else {
+                    isFirstItemVisible = false;
                 }
             }
         });
-
 
 
 

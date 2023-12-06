@@ -68,7 +68,7 @@ public class ViewPatientCasesAdapter extends RecyclerView.Adapter<ViewPatientCas
         }
 
         llVPClick.setOnClickListener(view -> {
-            listener.caseClicked(viewPatientRP.getPatientCases().get(holder.getAdapterPosition()).get_id());
+            listener.caseClicked(viewPatientRP.getPatientCases().get(position).get_id());
         });
     }
 

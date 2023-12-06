@@ -73,7 +73,7 @@ public class CaseHistoryRVAdapter extends RecyclerView.Adapter<CaseHistoryRVAdap
         llCaseItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onCaseClicked(caseHistoryRP.getCases().get(holder.getAdapterPosition()).get_id());
+                listener.onCaseClicked(caseHistoryRP.getCases().get(position).get_id());
             }
         });
 
