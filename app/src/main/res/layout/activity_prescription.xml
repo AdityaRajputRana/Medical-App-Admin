@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     <LinearLayout
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/llTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
