@@ -57,6 +57,7 @@ import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
+import com.example.medicalappadmin.rest.response.CaseSubmitRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
@@ -844,7 +845,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
 
-
     @Override
     public void onPaperButtonPress(int id, String name) {
 
@@ -852,6 +852,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             if (!isMobileSheetVisible) {
                 showMobileBottomSheet();
                 isMobileSheetVisible = true;
+            }
+            if(bsMobile.length() == 10){
+                linkMobileNumber(Long.parseLong(bsMobile));
+                return;
             }
             switch (id) {
                 case 0: {
@@ -918,15 +922,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             }
 
-        } else if (id == 100) {
-            if (etBSMobile.getText().length() < 10) {
-                bsAMNActionText.setVisibility(View.VISIBLE);
-                bsAMNActionText.setText("Enter a valid mobile number");
-            } else {
-                bsAMNActionText.setVisibility(View.GONE);
-                linkMobileNumber(Long.parseLong(etBSMobile.getText().toString()));
-            }
-        } else if (id == 21 ||id == 22 ||id == 23) {
+        }
+        else if (id == 21 ||id == 22 ||id == 23) {
             showRecordVoiceSheet();
             switch (id) {
                 case 21 : {
@@ -938,6 +935,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 case 23 : {
                     submitRecording();
                 }
+            }
+        }
+        else if(id == 100){
+            if(currentPage == null){
+                Toast.makeText(this, "Please initialise the page before submitting", Toast.LENGTH_SHORT).show();
+            } else {
+                submitCase(currentPage.getCaseId());
             }
         }
 
@@ -1085,6 +1089,23 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
 
+
+    private void submitCase(String caseId){
+        APIMethods.submitCase(PrescriptionActivity.this, caseId, new APIResponseListener<CaseSubmitRP>() {
+            @Override
+            public void success(CaseSubmitRP response) {
+                Toast.makeText(PrescriptionActivity.this, "Case submitted", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                showError(message,null);
+            }
+        });
+    }
+
+
     //Bottom Sheet attach audio views
     TextView bsAVActionText;
     AppCompatButton btnBSAVAttach;
@@ -1208,6 +1229,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void submitRecording() {
         //todo implement it
+
     }
 
     private void releaseMediaRecorder() {
