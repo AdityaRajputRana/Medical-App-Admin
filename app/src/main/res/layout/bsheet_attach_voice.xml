@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg_bottom_sheets"
     android:orientation="vertical"
     android:paddingHorizontal="16dp"
@@ -19,15 +20,43 @@
 
 
 
-    <TextView
-        android:visibility="visible"
-        android:id="@+id/bsAVActionText"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_semibold"
-        android:text=""
-        android:textColor="@color/colorCta"
-        android:textSize="12sp" />
+        android:orientation="horizontal">
+        <TextView
+            android:visibility="visible"
+            android:id="@+id/bsAVActionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/poppins_semibold"
+            android:text=""
+            android:layout_weight="1"
+            android:textColor="@color/colorCta"
+            android:textSize="12sp" />
+        <ImageView
+            android:id="@+id/ivDeleteAudio"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_delete_24"
+            android:layout_weight="6"
+            android:padding="8dp"/>
+    </LinearLayout>
+
+
+
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:visibility="gone"
+        android:id="@+id/voiceAnimation"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:lottie_rawRes="@raw/voice"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="true"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"

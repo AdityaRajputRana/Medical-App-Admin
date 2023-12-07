@@ -37,6 +37,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.medicalappadmin.Models.LinkedPatient;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Models.Point;
@@ -97,6 +98,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     EditText etBSMobile;
     TextView tvMale;
     TextView tvFemale;
+    TextView tvDrawerInit;
     LinearLayout llPrevPatientList;
     LinearLayout llNewPatient;
     LinearLayout llAddMobileNumber;
@@ -133,8 +135,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     //testing
     private final static int REQUEST_RECORD_AUDIO_PERMISSION = 1000;
-    private final static int REQUEST_RECORD_STORAGE_PERMISSION = 1001;
-    private String [] permissions = {Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private final String [] permissions = {Manifest.permission.RECORD_AUDIO};
 
     private boolean permissionToRecordAccepted = false;
 
@@ -149,6 +150,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             }
         }
         if(!permissionToRecordAccepted ){
+            Toast.makeText(this, "Permission are necessary", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -251,19 +253,20 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         Methods.setStatusBarColor(getColor(R.color.colorCta), PrescriptionActivity.this);
 
-
-
         setSupportActionBar(binding.toolbar);
 
-        //testing
+        //requesting permissions
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
-/////////
 
 
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_close);
         binding.drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+
+        //Initial drawer layout
+        tvDrawerInit = binding.navView.getHeaderView(0).findViewById(R.id.tvDrawerInit);
 
 
         //LL Sync page
@@ -308,8 +311,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         handleGender();
 
 
-        drawEvent(0,0,151,0);
-
         //initialise page
         btnSyncPage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -337,10 +338,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
 
 
+        //todo: remove it
         binding.actionBtn.setOnClickListener(view -> {
             showRecordVoiceSheet();
         });
-
 
         intialiseControls();
 
@@ -353,6 +354,36 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llExistingPatientDetails.setVisibility(View.GONE);
         llRelPrevCases.setVisibility(View.GONE);
     }
+    private void showRelativesCasesLayout() {
+        llAddMobileNumber.setVisibility(View.GONE);
+        llPrevPatientList.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.GONE);
+        llExistingPatientDetails.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.VISIBLE);
+    }
+    private void showAddNewPatientLayout() {
+        llAddMobileNumber.setVisibility(View.GONE);
+        llPrevPatientList.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.VISIBLE);
+        llExistingPatientDetails.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
+    }
+    private void showAddMobileNoLayout() {
+        llExistingPatientDetails.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.GONE);
+        llAddMobileNumber.setVisibility(View.VISIBLE);
+        llNewPatient.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
+    }
+    private void showExistingPatientLayout() {
+        llExistingPatientDetails.setVisibility(View.VISIBLE);
+        llAddMobileNumber.setVisibility(View.GONE);
+        llPrevPatientList.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
+
+    }
+
 
     private void setBtnSaveListener() {
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -450,21 +481,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    private void showRelativesCasesLayout() {
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.VISIBLE);
-    }
-
-    private void showAddNewPatientLayout() {
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.VISIBLE);
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-    }
 
     //Link as new case of relative
     private void linkPageToPatient(LinkedPatient selectedRelative) {
@@ -567,14 +583,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    private void showAddMobileNoLayout() {
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llAddMobileNumber.setVisibility(View.VISIBLE);
-        llNewPatient.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-    }
-
     private void handleGender() {
         tvMale.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -638,10 +646,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
     private void searchPens() {
-
-
         //TODO remove it
-        dialog.dismiss();
+//        dialog.dismiss();
         /////
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
@@ -768,6 +774,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     public void drawEvent(float x, float y, int pageId, int actionType) {
 
 
+
         if (pageId != currentPageNumber) {
             uploadPoints();
             if (handler != null) {
@@ -817,6 +824,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                     hidePB();
                     currentPage = response.getPage();
                     setTimelyUploads();
+                    tvDrawerInit.setVisibility(View.GONE);
                     binding.drawerLayout.close();
                     binding.toolbar.setSubtitle("Page initialised successfully");
 
@@ -835,14 +843,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         pendingPoints.add(new Point(x, y, actionType));
     }
 
-    private void showExistingPatientLayout() {
-        llExistingPatientDetails.setVisibility(View.VISIBLE);
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
 
-    }
 
     @Override
     public void onPaperButtonPress(int id, String name) {
@@ -939,7 +940,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             }
         }
-
 
         Log.i("eta-symbol ", name);
 //        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
@@ -1085,13 +1085,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
 
-
-
+    //Bottom Sheet attach audio views
     TextView bsAVActionText;
     AppCompatButton btnBSAVAttach;
     AppCompatButton btnBSAVStop;
+    AppCompatButton btnBSAVStart;
     private MediaRecorder mediaRecorder;
-    private MediaPlayer mediaPlayer;
+    private LottieAnimationView voiceAnimation;
+    private  ImageView ivDeleteAudio;
     private String outputFile;
 
     private void showRecordVoiceSheet(){
@@ -1099,14 +1100,36 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         dialog.setContentView(R.layout.bsheet_attach_voice);
         bsAVActionText = dialog.findViewById(R.id.bsAVActionText);
         btnBSAVAttach = dialog.findViewById(R.id.btnBSAVAttach);
+        btnBSAVStart = dialog.findViewById(R.id.btnBSAVStart);
         btnBSAVStop = dialog.findViewById(R.id.btnBSAVStop);
+        voiceAnimation = dialog.findViewById(R.id.voiceAnimation);
+        ivDeleteAudio = dialog.findViewById(R.id.ivDeleteAudio);
 
-        btnBSAVAttach.setOnClickListener(view -> {
+
+        btnBSAVStart.setOnClickListener(view -> {
 
             startRecording();
 
         });
-        btnBSAVStop.setOnClickListener(view -> stopRecording());
+        btnBSAVStop.setOnClickListener(view -> {
+            if(outputFile == null){
+                bsAVActionText.setText("Please press start to record a voice");
+                bsAVActionText.setTextColor(getColor(R.color.colorDanger));
+            } else {
+                stopRecording();
+            }
+
+
+
+        });
+        btnBSAVAttach.setOnClickListener(view -> {
+            if(outputFile != null){
+                //TODO : implement submit voice to server
+            } else {
+                bsAVActionText.setText("Please record a voice before submitting");
+                bsAVActionText.setTextColor(getColor(R.color.colorDanger));
+            }
+        });
         dialog.show();
 
 
@@ -1116,10 +1139,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         if(currentPage != null){
             releaseMediaRecorder();
             Log.i(TAG, "startRecording: " + currentPage.get_id());
+
+            //todo:  make path dynamic
             outputFile = getExternalCacheDir().getAbsolutePath() + "/recordingTest.3gp";
             bsAVActionText.setVisibility(View.VISIBLE);
+            bsAVActionText.setTextColor(getColor(R.color.colorCta));
             bsAVActionText.setText("Recording...");
             Log.i(TAG, "recording ");
+            voiceAnimation.setVisibility(View.VISIBLE);
 
 
             if (mediaRecorder == null) {
@@ -1134,11 +1161,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                     mediaRecorder.prepare();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Toast.makeText(this, "Some error occurred while preparing voice recorder", Toast.LENGTH_SHORT).show();
                     Log.i(TAG, "startRecording: not prepared " + e.getLocalizedMessage() );
                 }
                 mediaRecorder.start();
-
-
 
 
             }
@@ -1154,8 +1180,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             mediaRecorder = null;
 
         }
+        voiceAnimation.setVisibility(View.GONE);
         bsAVActionText.setText(outputFile);
-        bsAVActionText.setOnClickListener(view -> {
+        ivDeleteAudio.setVisibility(View.VISIBLE);
+
+        ivDeleteAudio.setOnClickListener(view -> {
             deleteRecording();
         });
     }
@@ -1166,7 +1195,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         if (recordingFile.exists()) {
             if (recordingFile.delete()) {
                 Toast.makeText(this, "Recording deleted", Toast.LENGTH_SHORT).show();
+                outputFile = null;
                 bsAVActionText.setVisibility(View.GONE);
+                ivDeleteAudio.setVisibility(View.GONE);
             } else {
                 Toast.makeText(this, "Failed to delete recording", Toast.LENGTH_SHORT).show();
             }
@@ -1185,9 +1216,5 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             mediaRecorder = null;
         }
     }
-
-
-
-
 
 }
