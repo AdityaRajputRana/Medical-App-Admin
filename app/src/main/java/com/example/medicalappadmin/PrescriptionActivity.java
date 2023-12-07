@@ -937,6 +937,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             }
         }
+        else if(id == 51){
+            gender = "M";
+        }
+        else if(id == 52){
+            gender = "F";
+        }
         else if(id == 100){
             if(currentPage == null){
                 Toast.makeText(this, "Please initialise the page before submitting", Toast.LENGTH_SHORT).show();
