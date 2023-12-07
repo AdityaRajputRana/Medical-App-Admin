@@ -166,6 +166,8 @@ public class ActivityCaseHistory extends AppCompatActivity {
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
 
+
+
             }
         });
 

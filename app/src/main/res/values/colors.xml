@@ -12,7 +12,7 @@
     <color name="color_secondary_text">#464A4C</color>
 
 
-    <color name="colorStatusBar">#FFFFFF</color>
+    <color name="colorStatusBar">#f1efee</color>
     <color name="colorPrimTxt">#383838</color>
     <color name="colorSecTxt">#5D5D5D</color>
     <color name="colorCta">#1C6BA4</color>

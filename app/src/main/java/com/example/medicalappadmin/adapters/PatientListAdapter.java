@@ -1,6 +1,7 @@
 package com.example.medicalappadmin.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,9 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
         tvPatientsName.setText(patientListRP.getPatients().get(position).getFullName());
         tvPatientsMobileNumber.setText(String.valueOf(patientListRP.getPatients().get(position).getMobileNumber()));
         llPatientItem.setOnClickListener(view -> {
-            listener.onPatientClicked(patientListRP.getPatients().get(holder.getAdapterPosition()).get_id());
+            Log.i("Adi adapter", "onBindViewHolder: name "+patientListRP.getPatients().get(holder.getAdapterPosition()).getFullName());
+            Log.i("Adi adapter", "onBindViewHolder: position "+holder.getAdapterPosition());
+            listener.onPatientClicked(patientListRP.getPatients().get(position).get_id());
         });
 
         ivSharePatient.setOnClickListener(view -> {

@@ -68,7 +68,7 @@ public class PageViewRV extends View {
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.LTGRAY);
         bgPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(getLeft() + 25, getTop() + 5, 100*scaleFactor, 120* scaleFactor, bgPaint);
+        canvas.drawRect(getLeft() + 25, getTop() + 5, 100*scaleFactor, 100* scaleFactor, bgPaint);
 
         for (ArrayList<Point> points: mStrokes) {
 
