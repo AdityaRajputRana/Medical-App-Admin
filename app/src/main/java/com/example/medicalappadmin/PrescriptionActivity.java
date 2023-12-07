@@ -52,6 +52,7 @@ import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -83,6 +84,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     EditText etMobileNumber;
     EditText etEmail;
     EditText etPageNumber;
+    EditText etBSMobile;
     TextView tvMale;
     TextView tvFemale;
     LinearLayout llPrevPatientList;
@@ -109,94 +111,16 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     ArrayList<LinkedPatient> relatives;
     SmartPenDriver driver = SmartPenDriver.getInstance(this); //driverStep1
     long tempMobile = 0;
+    RelativePreviousCasesAdapter relativePreviousCasesAdapter;
+    boolean isMobileSheetVisible = false;
+    String bsMobile = "";
+    int i = 0;
+    TextView bsAMNActionText;
+    AppCompatButton btnBSAMNNext;
     private Handler handler;
     private Runnable runnable;
 
-    RelativePreviousCasesAdapter relativePreviousCasesAdapter;
-
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityPrescriptionBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        Methods.setStatusBarColor(getColor(R.color.colorCta), PrescriptionActivity.this);
-
-
-        setSupportActionBar(binding.toolbar);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_close);
-        binding.drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.syncState();
-
-
-        //LL Sync page
-        btnSyncPage = binding.navView.getHeaderView(0).findViewById(R.id.btnLinkPage);
-        pbSyncPage = binding.navView.getHeaderView(0).findViewById(R.id.pbLinkPage);
-
-        //LL Existing patient  details
-        llExistingPatientDetails = binding.navView.getHeaderView(0).findViewById(R.id.llExistingPatientDetails);
-        tvEPatientName = binding.navView.getHeaderView(0).findViewById(R.id.tvEPatientName);
-        tvEPatientsNo = binding.navView.getHeaderView(0).findViewById(R.id.tvEPatientsNo);
-        tvEPGender = binding.navView.getHeaderView(0).findViewById(R.id.tvEPGender);
-        ivEPatientsDp = binding.navView.getHeaderView(0).findViewById(R.id.ivEPatientsDp);
-
-        //LL add mobile number
-        llAddMobileNumber = binding.navView.getHeaderView(0).findViewById(R.id.llAddMobileNumber);
-        etMobileNumber = binding.navView.getHeaderView(0).findViewById(R.id.etMobile);
-        etPageNumber = binding.navView.getHeaderView(0).findViewById(R.id.etPageNumber);
-        btnCheckRelatives = binding.navView.getHeaderView(0).findViewById(R.id.btnCheckRelatives);
-        pbAddMobile = binding.navView.getHeaderView(0).findViewById(R.id.pbAddMobile);
-
-
-        //LL check relatives
-        llPrevPatientList = binding.navView.getHeaderView(0).findViewById(R.id.llPrevPatientList);
-        relativeRadioSelector = binding.navView.getHeaderView(0).findViewById(R.id.relativeRadioSelector);
-        btnNext = binding.navView.getHeaderView(0).findViewById(R.id.btnNext);
-        pbSelectRelative = binding.navView.getHeaderView(0).findViewById(R.id.pbSelectRelative);
-
-        //LL previous cases of relative
-        llRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.llRelPrevCases);
-        btnRelNewCase = binding.navView.getHeaderView(0).findViewById(R.id.btnRelNewCase);
-        rcvRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.rcvRelPrevCases);
-
-
-        //LL new patient
-        llNewPatient = binding.navView.getHeaderView(0).findViewById(R.id.llNewPatient);
-        etFullName = binding.navView.getHeaderView(0).findViewById(R.id.etFullName);
-        etEmail = binding.navView.getHeaderView(0).findViewById(R.id.etEmail);
-        tvMale = binding.navView.getHeaderView(0).findViewById(R.id.tvMale);
-        tvFemale = binding.navView.getHeaderView(0).findViewById(R.id.tvFemale);
-        btnSave = binding.navView.getHeaderView(0).findViewById(R.id.btnSave);
-        pbSaveNewPatient = binding.navView.getHeaderView(0).findViewById(R.id.pbSaveNewPatient);
-        handleGender();
-
-
-        //initialise page
-        btnSyncPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pbSyncPage.setVisibility(View.VISIBLE);
-                hideKeyboard(view);
-                Log.i(TAG, "onClick: current page no " + currentPageNumber);
-                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
-            }
-        });
-
-        btnCheckRelatives.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hideKeyboard(view);
-                tempMobile = Long.parseLong(etMobileNumber.getText().toString());
-                linkMobileNumber();
-            }
-        });
-        intialiseControls();
-
-    }
-
-    private void linkMobileNumber() {
+    private void linkMobileNumber(long mobileNo) {
         if (currentPageNumber == -1) {
             Toast.makeText(PrescriptionActivity.this, "Please touch your page with pen", Toast.LENGTH_SHORT).show();
             binding.drawerLayout.close();
@@ -204,12 +128,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         }
 
         AddMobileNoReq req = new AddMobileNoReq();
-        if (etMobileNumber.getText() == null || etMobileNumber.getText().toString().isEmpty() || etMobileNumber.getText().toString().equals("")) {
-            etMobileNumber.setError("Required");
-            return;
-        }
+
         req.setPageNumber(currentPageNumber);
-        req.setMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
+        req.setMobileNumber(mobileNo);
 
         Log.i(TAG, "req set mobile" + req.toString());
         pbAddMobile.setVisibility(View.VISIBLE);
@@ -288,6 +209,99 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityPrescriptionBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        Methods.setStatusBarColor(getColor(R.color.colorCta), PrescriptionActivity.this);
+
+
+        setSupportActionBar(binding.toolbar);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_close);
+        binding.drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+
+
+        //LL Sync page
+        btnSyncPage = binding.navView.getHeaderView(0).findViewById(R.id.btnLinkPage);
+        pbSyncPage = binding.navView.getHeaderView(0).findViewById(R.id.pbLinkPage);
+
+        //LL Existing patient  details
+        llExistingPatientDetails = binding.navView.getHeaderView(0).findViewById(R.id.llExistingPatientDetails);
+        tvEPatientName = binding.navView.getHeaderView(0).findViewById(R.id.tvEPatientName);
+        tvEPatientsNo = binding.navView.getHeaderView(0).findViewById(R.id.tvEPatientsNo);
+        tvEPGender = binding.navView.getHeaderView(0).findViewById(R.id.tvEPGender);
+        ivEPatientsDp = binding.navView.getHeaderView(0).findViewById(R.id.ivEPatientsDp);
+
+        //LL add mobile number
+        llAddMobileNumber = binding.navView.getHeaderView(0).findViewById(R.id.llAddMobileNumber);
+        etMobileNumber = binding.navView.getHeaderView(0).findViewById(R.id.etMobile);
+        etPageNumber = binding.navView.getHeaderView(0).findViewById(R.id.etPageNumber);
+        btnCheckRelatives = binding.navView.getHeaderView(0).findViewById(R.id.btnCheckRelatives);
+        pbAddMobile = binding.navView.getHeaderView(0).findViewById(R.id.pbAddMobile);
+
+
+        //LL check relatives
+        llPrevPatientList = binding.navView.getHeaderView(0).findViewById(R.id.llPrevPatientList);
+        relativeRadioSelector = binding.navView.getHeaderView(0).findViewById(R.id.relativeRadioSelector);
+        btnNext = binding.navView.getHeaderView(0).findViewById(R.id.btnNext);
+        pbSelectRelative = binding.navView.getHeaderView(0).findViewById(R.id.pbSelectRelative);
+
+        //LL previous cases of relative
+        llRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.llRelPrevCases);
+        btnRelNewCase = binding.navView.getHeaderView(0).findViewById(R.id.btnRelNewCase);
+        rcvRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.rcvRelPrevCases);
+
+
+        //LL new patient
+        llNewPatient = binding.navView.getHeaderView(0).findViewById(R.id.llNewPatient);
+        etFullName = binding.navView.getHeaderView(0).findViewById(R.id.etFullName);
+        etEmail = binding.navView.getHeaderView(0).findViewById(R.id.etEmail);
+        tvMale = binding.navView.getHeaderView(0).findViewById(R.id.tvMale);
+        tvFemale = binding.navView.getHeaderView(0).findViewById(R.id.tvFemale);
+        btnSave = binding.navView.getHeaderView(0).findViewById(R.id.btnSave);
+        pbSaveNewPatient = binding.navView.getHeaderView(0).findViewById(R.id.pbSaveNewPatient);
+        handleGender();
+
+
+        //initialise page
+        btnSyncPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pbSyncPage.setVisibility(View.VISIBLE);
+                hideKeyboard(view);
+                Log.i(TAG, "onClick: current page no " + currentPageNumber);
+                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
+            }
+        });
+
+        btnCheckRelatives.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideKeyboard(view);
+                tempMobile = Long.parseLong(etMobileNumber.getText().toString());
+                if (etMobileNumber.getText() == null ||
+                        etMobileNumber.getText().toString().isEmpty() ||
+                        etMobileNumber.getText().toString().equals("")) {
+                    etMobileNumber.setError("Required");
+                } else {
+                    linkMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
+                }
+            }
+        });
+
+
+        binding.actionBtn.setOnClickListener(view -> {
+            showMobileBottomSheet();
+        });
+
+
+        intialiseControls();
+
+    }
+
     private void showPreviousPatientsLayout() {
         llAddMobileNumber.setVisibility(View.GONE);
         llNewPatient.setVisibility(View.GONE);
@@ -332,12 +346,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             public void success(ViewPatientRP response) {
                 showRelativesCasesLayout();
                 rcvRelPrevCases.setLayoutManager(new LinearLayoutManager(PrescriptionActivity.this));
-                    relativePreviousCasesAdapter = new RelativePreviousCasesAdapter(response, PrescriptionActivity.this, new RelativePreviousCasesAdapter.SelectCaseListener() {
-                        @Override
-                        public void onCaseSelected(String caseId) {
-                            linkPageToCase(caseId,relativeId,selectedRelative);
-                        }
-                    });
+                relativePreviousCasesAdapter = new RelativePreviousCasesAdapter(response, PrescriptionActivity.this, new RelativePreviousCasesAdapter.SelectCaseListener() {
+                    @Override
+                    public void onCaseSelected(String caseId) {
+                        linkPageToCase(caseId, relativeId, selectedRelative);
+                    }
+                });
 
 
                 rcvRelPrevCases.setAdapter(relativePreviousCasesAdapter);
@@ -348,16 +362,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 pbSelectRelative.setVisibility(View.GONE);
 
 
-
-
-
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 pbSelectRelative.setVisibility(View.GONE);
 
-                showError(message,null);
+                showError(message, null);
             }
         });
 
@@ -390,7 +401,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                showError(message,null);
+                showError(message, null);
             }
         });
     }
@@ -410,7 +421,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llExistingPatientDetails.setVisibility(View.GONE);
         llRelPrevCases.setVisibility(View.GONE);
     }
-
 
     //Link as new case of relative
     private void linkPageToPatient(LinkedPatient selectedRelative) {
@@ -521,7 +531,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llRelPrevCases.setVisibility(View.GONE);
     }
 
-
     private void handleGender() {
         tvMale.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -588,7 +597,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
         //TODO remove it
-//        dialog.dismiss();
+        dialog.dismiss();
         /////
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
@@ -640,7 +649,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
 
     }
-
 
     private void connectToSmartPen(SmartPen selectedPen) {
 
@@ -783,7 +791,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         pendingPoints.add(new Point(x, y, actionType));
     }
 
-
     private void showExistingPatientLayout() {
         llExistingPatientDetails.setVisibility(View.VISIBLE);
         llAddMobileNumber.setVisibility(View.GONE);
@@ -793,16 +800,93 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     }
 
-
-
     @Override
     public void onPaperButtonPress(int id, String name) {
-        Log.i("eta-symbol", name);
-        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
+
+        if (id >= 0 && id <= 10) {
+            if (!isMobileSheetVisible) {
+                showMobileBottomSheet();
+                isMobileSheetVisible = true;
+            }
+            switch (id) {
+                case 0: {
+                    bsMobile += "0";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 1: {
+                    bsMobile += "1";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 2: {
+                    bsMobile += "2";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 3: {
+                    bsMobile += "3";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 4: {
+                    bsMobile += "4";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 5: {
+                    bsMobile += "5";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 6: {
+                    bsMobile += "6";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 7: {
+                    bsMobile += "7";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 8: {
+                    bsMobile += "8";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 9: {
+                    bsMobile += "9";
+                    etBSMobile.setText(bsMobile);
+                    break;
+                }
+                case 10: {
+                    if (!bsMobile.isEmpty()) {
+                        bsMobile = bsMobile.substring(0, bsMobile.length() - 1);
+                    }
+                    etBSMobile.setText(bsMobile);
+                    break;
+
+                }
+                default: {
+                    Log.i(TAG, "onPaperButtonPress: default");
+                    break;
+                }
+            }
+
+        } else if (id == 100) {
+            if (etBSMobile.getText().length() < 10) {
+                bsAMNActionText.setVisibility(View.VISIBLE);
+                bsAMNActionText.setText("Enter a valid mobile number");
+            } else {
+                bsAMNActionText.setVisibility(View.GONE);
+                linkMobileNumber(Long.parseLong(etBSMobile.getText().toString()));
+            }
+        }
+
+
+        Log.i("eta-symbol ", name);
+//        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
     }
-
-
-
 
     private void setTimelyUploads() {
         if (handler != null && runnable != null) {
@@ -846,7 +930,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             });
         }
     }
-
 
     private void showError(String message, View.OnClickListener listener) {
 
@@ -922,4 +1005,25 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
+    private void showMobileBottomSheet() {
+        BottomSheetDialog dialog = new BottomSheetDialog(PrescriptionActivity.this);
+        dialog.setContentView(R.layout.bsheet_add_mobile_no);
+        etBSMobile = dialog.findViewById(R.id.etBSMobile);
+        bsAMNActionText = dialog.findViewById(R.id.bsAMNActionText);
+        btnBSAMNNext = dialog.findViewById(R.id.btnBSAMNNext);
+        btnBSAMNNext.setOnClickListener(view -> {
+            if (etBSMobile.getText().length() < 10) {
+                bsAMNActionText.setVisibility(View.VISIBLE);
+                bsAMNActionText.setText("Enter a valid mobile number");
+            } else {
+                bsAMNActionText.setVisibility(View.GONE);
+                linkMobileNumber(Long.parseLong(etBSMobile.getText().toString()));
+            }
+        });
+
+        dialog.show();
+    }
+
+
 }

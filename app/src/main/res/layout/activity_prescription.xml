@@ -30,12 +30,15 @@
             android:padding="10dp">
 
             <ImageView
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:src="@drawable/hos_name" />
 
             <LinearLayout
+                android:visibility="gone"
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -57,6 +60,7 @@
                     android:textColor="@color/white"
                     android:textSize="14sp" />
             <TextView
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_medium"
@@ -74,6 +78,7 @@
                 >
 
                 <TextView
+                    android:id="@+id/actionBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
@@ -86,6 +91,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
@@ -98,6 +104,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
@@ -165,6 +172,8 @@
         app:headerLayout="@layout/nav_drawer_body"
         android:background="@color/colorBackground"
         />
+
+
 
 
 
