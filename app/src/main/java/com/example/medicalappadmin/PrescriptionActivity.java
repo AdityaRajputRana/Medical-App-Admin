@@ -1,12 +1,18 @@
 package com.example.medicalappadmin;
 
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -26,9 +32,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.medicalappadmin.Models.LinkedPatient;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Models.Point;
@@ -48,12 +57,15 @@ import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
+import com.example.medicalappadmin.rest.response.CaseSubmitRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -87,6 +99,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     EditText etBSMobile;
     TextView tvMale;
     TextView tvFemale;
+    TextView tvDrawerInit;
     LinearLayout llPrevPatientList;
     LinearLayout llNewPatient;
     LinearLayout llAddMobileNumber;
@@ -120,6 +133,29 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     private Handler handler;
     private Runnable runnable;
 
+
+    //testing
+    private final static int REQUEST_RECORD_AUDIO_PERMISSION = 1000;
+    private final String [] permissions = {Manifest.permission.RECORD_AUDIO};
+
+    private boolean permissionToRecordAccepted = false;
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case REQUEST_RECORD_AUDIO_PERMISSION:{
+                permissionToRecordAccepted = (grantResults[0] == PackageManager.PERMISSION_GRANTED );
+//                        && grantResults[1] == PackageManager.PERMISSION_GRANTED);
+            }
+        }
+        if(!permissionToRecordAccepted ){
+            Toast.makeText(this, "Permission are necessary", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+
     private void linkMobileNumber(long mobileNo) {
         if (currentPageNumber == -1) {
             Toast.makeText(PrescriptionActivity.this, "Please touch your page with pen", Toast.LENGTH_SHORT).show();
@@ -138,6 +174,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         APIMethods.addMobileNumber(PrescriptionActivity.this, req, new APIResponseListener<AddMobileNoRP>() {
             @Override
             public void success(AddMobileNoRP response) {
+                binding.drawerLayout.open();
                 pbAddMobile.setVisibility(View.GONE);
                 Log.i(TAG, "success: size of relatives " + response.getPatients().size());
 
@@ -217,11 +254,20 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         Methods.setStatusBarColor(getColor(R.color.colorCta), PrescriptionActivity.this);
 
-
         setSupportActionBar(binding.toolbar);
+
+        //requesting permissions
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+
+
+
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_close);
         binding.drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+
+        //Initial drawer layout
+        tvDrawerInit = binding.navView.getHeaderView(0).findViewById(R.id.tvDrawerInit);
 
 
         //LL Sync page
@@ -293,10 +339,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
 
 
+        //todo: remove it
         binding.actionBtn.setOnClickListener(view -> {
-            showMobileBottomSheet();
+            showRecordVoiceSheet();
         });
-
 
         intialiseControls();
 
@@ -309,6 +355,36 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llExistingPatientDetails.setVisibility(View.GONE);
         llRelPrevCases.setVisibility(View.GONE);
     }
+    private void showRelativesCasesLayout() {
+        llAddMobileNumber.setVisibility(View.GONE);
+        llPrevPatientList.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.GONE);
+        llExistingPatientDetails.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.VISIBLE);
+    }
+    private void showAddNewPatientLayout() {
+        llAddMobileNumber.setVisibility(View.GONE);
+        llPrevPatientList.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.VISIBLE);
+        llExistingPatientDetails.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
+    }
+    private void showAddMobileNoLayout() {
+        llExistingPatientDetails.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.GONE);
+        llAddMobileNumber.setVisibility(View.VISIBLE);
+        llNewPatient.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
+    }
+    private void showExistingPatientLayout() {
+        llExistingPatientDetails.setVisibility(View.VISIBLE);
+        llAddMobileNumber.setVisibility(View.GONE);
+        llPrevPatientList.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
+
+    }
+
 
     private void setBtnSaveListener() {
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -406,21 +482,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    private void showRelativesCasesLayout() {
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.VISIBLE);
-    }
-
-    private void showAddNewPatientLayout() {
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.VISIBLE);
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-    }
 
     //Link as new case of relative
     private void linkPageToPatient(LinkedPatient selectedRelative) {
@@ -523,14 +584,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    private void showAddMobileNoLayout() {
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llAddMobileNumber.setVisibility(View.VISIBLE);
-        llNewPatient.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-    }
-
     private void handleGender() {
         tvMale.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -594,10 +647,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
     private void searchPens() {
-
-
         //TODO remove it
-        dialog.dismiss();
+//        dialog.dismiss();
         /////
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
@@ -724,6 +775,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     public void drawEvent(float x, float y, int pageId, int actionType) {
 
 
+
         if (pageId != currentPageNumber) {
             uploadPoints();
             if (handler != null) {
@@ -773,6 +825,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                     hidePB();
                     currentPage = response.getPage();
                     setTimelyUploads();
+                    tvDrawerInit.setVisibility(View.GONE);
                     binding.drawerLayout.close();
                     binding.toolbar.setSubtitle("Page initialised successfully");
 
@@ -791,14 +844,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         pendingPoints.add(new Point(x, y, actionType));
     }
 
-    private void showExistingPatientLayout() {
-        llExistingPatientDetails.setVisibility(View.VISIBLE);
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-
-    }
 
     @Override
     public void onPaperButtonPress(int id, String name) {
@@ -807,6 +852,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             if (!isMobileSheetVisible) {
                 showMobileBottomSheet();
                 isMobileSheetVisible = true;
+            }
+            if(bsMobile.length() == 10){
+                linkMobileNumber(Long.parseLong(bsMobile));
+                return;
             }
             switch (id) {
                 case 0: {
@@ -873,20 +922,40 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             }
 
-        } else if (id == 100) {
-            if (etBSMobile.getText().length() < 10) {
-                bsAMNActionText.setVisibility(View.VISIBLE);
-                bsAMNActionText.setText("Enter a valid mobile number");
-            } else {
-                bsAMNActionText.setVisibility(View.GONE);
-                linkMobileNumber(Long.parseLong(etBSMobile.getText().toString()));
+        }
+        else if (id == 21 ||id == 22 ||id == 23) {
+            showRecordVoiceSheet();
+            switch (id) {
+                case 21 : {
+                    startRecording();
+                }
+                case 22 : {
+                    stopRecording();
+                }
+                case 23 : {
+                    submitRecording();
+                }
             }
         }
-
+        else if(id == 51){
+            gender = "M";
+        }
+        else if(id == 52){
+            gender = "F";
+        }
+        else if(id == 100){
+            if(currentPage == null){
+                Toast.makeText(this, "Please initialise the page before submitting", Toast.LENGTH_SHORT).show();
+            } else {
+                submitCase(currentPage.getCaseId());
+            }
+        }
 
         Log.i("eta-symbol ", name);
 //        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
     }
+
+
 
     private void setTimelyUploads() {
         if (handler != null && runnable != null) {
@@ -1025,5 +1094,155 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         dialog.show();
     }
 
+
+
+    private void submitCase(String caseId){
+        APIMethods.submitCase(PrescriptionActivity.this, caseId, new APIResponseListener<CaseSubmitRP>() {
+            @Override
+            public void success(CaseSubmitRP response) {
+                Toast.makeText(PrescriptionActivity.this, "Case submitted", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                showError(message,null);
+            }
+        });
+    }
+
+
+    //Bottom Sheet attach audio views
+    TextView bsAVActionText;
+    AppCompatButton btnBSAVAttach;
+    AppCompatButton btnBSAVStop;
+    AppCompatButton btnBSAVStart;
+    private MediaRecorder mediaRecorder;
+    private LottieAnimationView voiceAnimation;
+    private  ImageView ivDeleteAudio;
+    private String outputFile;
+
+    private void showRecordVoiceSheet(){
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        dialog.setContentView(R.layout.bsheet_attach_voice);
+        bsAVActionText = dialog.findViewById(R.id.bsAVActionText);
+        btnBSAVAttach = dialog.findViewById(R.id.btnBSAVAttach);
+        btnBSAVStart = dialog.findViewById(R.id.btnBSAVStart);
+        btnBSAVStop = dialog.findViewById(R.id.btnBSAVStop);
+        voiceAnimation = dialog.findViewById(R.id.voiceAnimation);
+        ivDeleteAudio = dialog.findViewById(R.id.ivDeleteAudio);
+
+
+        btnBSAVStart.setOnClickListener(view -> {
+
+            startRecording();
+
+        });
+        btnBSAVStop.setOnClickListener(view -> {
+            if(outputFile == null){
+                bsAVActionText.setText("Please press start to record a voice");
+                bsAVActionText.setTextColor(getColor(R.color.colorDanger));
+            } else {
+                stopRecording();
+            }
+
+
+
+        });
+        btnBSAVAttach.setOnClickListener(view -> {
+            if(outputFile != null){
+                //TODO : implement submit voice to server
+            } else {
+                bsAVActionText.setText("Please record a voice before submitting");
+                bsAVActionText.setTextColor(getColor(R.color.colorDanger));
+            }
+        });
+        dialog.show();
+
+
+    }
+
+    private void startRecording() {
+        if(currentPage != null){
+            releaseMediaRecorder();
+            Log.i(TAG, "startRecording: " + currentPage.get_id());
+
+            //todo:  make path dynamic
+            outputFile = getExternalCacheDir().getAbsolutePath() + "/recordingTest.3gp";
+            bsAVActionText.setVisibility(View.VISIBLE);
+            bsAVActionText.setTextColor(getColor(R.color.colorCta));
+            bsAVActionText.setText("Recording...");
+            Log.i(TAG, "recording ");
+            voiceAnimation.setVisibility(View.VISIBLE);
+
+
+            if (mediaRecorder == null) {
+                mediaRecorder = new MediaRecorder();
+                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                mediaRecorder.setOutputFile(outputFile);
+                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+
+                try {
+                    mediaRecorder.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Some error occurred while preparing voice recorder", Toast.LENGTH_SHORT).show();
+                    Log.i(TAG, "startRecording: not prepared " + e.getLocalizedMessage() );
+                }
+                mediaRecorder.start();
+
+
+            }
+        } else {
+            Toast.makeText(this, "Please initialize page first", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void stopRecording() {
+        if (mediaRecorder != null) {
+            mediaRecorder.stop();
+            mediaRecorder.release();
+            mediaRecorder = null;
+
+        }
+        voiceAnimation.setVisibility(View.GONE);
+        bsAVActionText.setText(outputFile);
+        ivDeleteAudio.setVisibility(View.VISIBLE);
+
+        ivDeleteAudio.setOnClickListener(view -> {
+            deleteRecording();
+        });
+    }
+
+    private void deleteRecording() {
+        stopRecording();
+        File recordingFile = new File(outputFile);
+        if (recordingFile.exists()) {
+            if (recordingFile.delete()) {
+                Toast.makeText(this, "Recording deleted", Toast.LENGTH_SHORT).show();
+                outputFile = null;
+                bsAVActionText.setVisibility(View.GONE);
+                ivDeleteAudio.setVisibility(View.GONE);
+            } else {
+                Toast.makeText(this, "Failed to delete recording", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "Recording file not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void submitRecording() {
+        //todo implement it
+
+    }
+
+    private void releaseMediaRecorder() {
+        if (mediaRecorder != null) {
+            mediaRecorder.release();
+            mediaRecorder = null;
+        }
+    }
 
 }
