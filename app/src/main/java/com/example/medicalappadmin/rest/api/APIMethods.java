@@ -2,13 +2,16 @@ package com.example.medicalappadmin.rest.api;
 
 import android.content.Context;
 
+import com.example.medicalappadmin.Models.FileMetadata;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
+import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
 import com.example.medicalappadmin.rest.requests.AddDetailsReq;
 import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
 import com.example.medicalappadmin.rest.requests.CaseHistoryReq;
 import com.example.medicalappadmin.rest.requests.CaseSubmitReq;
+import com.example.medicalappadmin.rest.requests.HomeReq;
 import com.example.medicalappadmin.rest.requests.InitialisePageReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.requests.LoginReq;
@@ -16,6 +19,7 @@ import com.example.medicalappadmin.rest.requests.MergeCasesReq;
 import com.example.medicalappadmin.rest.requests.PatientListReq;
 import com.example.medicalappadmin.rest.requests.SignupReq;
 import com.example.medicalappadmin.rest.requests.UploadPointsReq;
+import com.example.medicalappadmin.rest.requests.UploadVoiceReq;
 import com.example.medicalappadmin.rest.requests.ViewCaseReq;
 import com.example.medicalappadmin.rest.requests.ViewPatientReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
@@ -28,13 +32,21 @@ import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.LoginRP;
 import com.example.medicalappadmin.rest.response.PatientListRP;
 import com.example.medicalappadmin.rest.response.SignupRP;
+import com.example.medicalappadmin.rest.response.UploadVoiceRP;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class APIMethods {
+
+    public static void uploadVoice(Context context, File file, int pageNumber, FileTransferResponseListener<UploadVoiceRP> listener){
+        UploadVoiceReq req = new UploadVoiceReq(new FileMetadata("mp3", "audio/mp3", "Voice"), pageNumber);
+        API.uploadFile(context, file, req, EndPoints.uploadAdditional, UploadVoiceRP.class, listener);
+    }
 
     //login method
     public static void loginWithEmailAndPassword(Context context, String email, String password, APIResponseListener<LoginRP> listener) {

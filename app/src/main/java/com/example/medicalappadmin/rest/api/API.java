@@ -20,6 +20,8 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -183,6 +185,90 @@ public class API {
 
 
 
+    }
+
+    public static void uploadFile(Context context, File mFile, Object rawData, String endpoint, Class klass, FileTransferResponseListener listener){
+        try {
+            String encodedData = "";
+            AppRequest request = HashUtils.getHashedDataObject(rawData, context, endpoint);
+            Log.i("encodedData", request.getData());
+            if (request != null){
+                encodedData = request.getData();
+            }
+            String finalEncodedData = encodedData;
+
+            String url = VolleyClient.getBaseUrl() + endpoint + VolleyClient.suffix;
+            Log.i("eta url", url);
+
+            byte[] file = new byte[(int) mFile.length()];
+            FileInputStream inputStream = new FileInputStream(mFile);
+            inputStream.read(file);
+            inputStream.close();
+
+
+
+            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, url,
+                    new Response.Listener<NetworkResponse>() {
+                        @Override
+                        public void onResponse(NetworkResponse rsp) {
+                            onNetWorkResponse(listener, rsp, klass);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.i("eta eror", new Gson().toJson(error));
+                            if (error.networkResponse != null && error.networkResponse.data != null){
+                                Log.i("Eta network data", String.valueOf(error.networkResponse.data));
+                                onNetWorkResponse(listener, error.networkResponse, klass);
+                            } else {
+                                listener.fail("VE-1", String.valueOf(error) + " : " + error.getMessage(), "", false, true );
+                            }
+                        }
+                    }, listener) {
+
+                long totalSize = file.length;
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("data", finalEncodedData);
+                    return params;
+                }
+                @Override
+                protected Map<String, DataPart> getByteData() {
+                    Map<String, DataPart> params = new HashMap<>();
+                    long imagename = System.currentTimeMillis();
+                    totalSize = file.length;
+                    params.put("image", new DataPart(imagename + ".png", file));
+                    return params;
+                }
+
+                long transferred = 0;
+
+                @Override
+                protected Response<NetworkResponse> parseNetworkResponse(NetworkResponse response) {
+                    transferred += (256*1024);
+                    Log.i("Eta Transferred Bytes", String.valueOf(transferred));
+                    int progress = (int) ((transferred * 100f)/file.length);
+                    listener.onProgress(progress);
+                    return super.parseNetworkResponse(response);
+                }
+            };
+            //End
+
+            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    180000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    2f));
+            VolleyClient.getRequestQueue().add(multipartRequest);
+
+
+
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void postFile(Context context, FileTransferResponseListener listener, Object rawData, String endpoint, Class klass,
