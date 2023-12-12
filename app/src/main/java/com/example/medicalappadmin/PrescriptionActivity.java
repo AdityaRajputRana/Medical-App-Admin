@@ -6,13 +6,10 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -33,14 +30,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.medicalappadmin.Models.FileMetadata;
 import com.example.medicalappadmin.Models.LinkedPatient;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Models.Point;
+import com.example.medicalappadmin.Models.retrofit.UploadAudioResponse;
 import com.example.medicalappadmin.PenDriver.ConnectionsHandler;
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
@@ -51,6 +49,8 @@ import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
 import com.example.medicalappadmin.databinding.ActivityPrescriptionBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
+import com.example.medicalappadmin.rest.api.ApiClient;
+import com.example.medicalappadmin.rest.api.ApiService;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.requests.AddDetailsReq;
 import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
@@ -63,32 +63,38 @@ import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+
 public class PrescriptionActivity extends AppCompatActivity implements SmartPenListener {
 
 
+    //testing
+    private final static int REQUEST_RECORD_AUDIO_PERMISSION = 1000;
+    private final String[] permissions = {Manifest.permission.RECORD_AUDIO};
     String TAG = "pres";
-
     boolean isPenSearchRunning = false;
-
     ActivityPrescriptionBinding binding;
-
     DialogPenBinding dialogPenBinding;
-
     AlertDialog dialog;
     int state = 0;
     SmartPen selectedPen;
     ArrayList<SmartPen> smartPens;
-
     ArrayList<Point> pointsArrayList;
     ViewTreeObserver viewTreeObserver;
     int currentPageNumber = -1;
-
     ArrayList<Point> pendingPoints = new ArrayList<>();
     Page currentPage;
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -130,27 +136,37 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     int i = 0;
     TextView bsAMNActionText;
     AppCompatButton btnBSAMNNext;
+
+
+
+
+    //Bottom Sheet attach audio views
+    TextView bsAVActionText;
+    AppCompatButton btnBSAVAttach;
+    AppCompatButton btnBSAVStop;
+    AppCompatButton btnBSAVStart;
+
+    private MediaRecorder mediaRecorder;
+    private LottieAnimationView voiceAnimation;
+    private ImageView ivDeleteAudio;
+    private String outputFile;
+
+
     private Handler handler;
     private Runnable runnable;
-
-
-    //testing
-    private final static int REQUEST_RECORD_AUDIO_PERMISSION = 1000;
-    private final String [] permissions = {Manifest.permission.RECORD_AUDIO};
-
     private boolean permissionToRecordAccepted = false;
 
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case REQUEST_RECORD_AUDIO_PERMISSION:{
-                permissionToRecordAccepted = (grantResults[0] == PackageManager.PERMISSION_GRANTED );
+        switch (requestCode) {
+            case REQUEST_RECORD_AUDIO_PERMISSION: {
+                permissionToRecordAccepted = (grantResults[0] == PackageManager.PERMISSION_GRANTED);
 //                        && grantResults[1] == PackageManager.PERMISSION_GRANTED);
             }
         }
-        if(!permissionToRecordAccepted ){
+        if (!permissionToRecordAccepted) {
             Toast.makeText(this, "Permission are necessary", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -260,7 +276,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
 
 
-
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_close);
         binding.drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
@@ -341,7 +356,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         //todo: remove it
         binding.actionBtn.setOnClickListener(view -> {
-            showRecordVoiceSheet();
+            //todo remove it
+            drawEvent(0,0,46,0);
+            showRecordVoiceSheet(false);
         });
 
         intialiseControls();
@@ -355,6 +372,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llExistingPatientDetails.setVisibility(View.GONE);
         llRelPrevCases.setVisibility(View.GONE);
     }
+
     private void showRelativesCasesLayout() {
         llAddMobileNumber.setVisibility(View.GONE);
         llPrevPatientList.setVisibility(View.GONE);
@@ -362,6 +380,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llExistingPatientDetails.setVisibility(View.GONE);
         llRelPrevCases.setVisibility(View.VISIBLE);
     }
+
     private void showAddNewPatientLayout() {
         llAddMobileNumber.setVisibility(View.GONE);
         llPrevPatientList.setVisibility(View.GONE);
@@ -369,6 +388,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llExistingPatientDetails.setVisibility(View.GONE);
         llRelPrevCases.setVisibility(View.GONE);
     }
+
     private void showAddMobileNoLayout() {
         llExistingPatientDetails.setVisibility(View.GONE);
         llNewPatient.setVisibility(View.GONE);
@@ -376,6 +396,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llNewPatient.setVisibility(View.GONE);
         llRelPrevCases.setVisibility(View.GONE);
     }
+
     private void showExistingPatientLayout() {
         llExistingPatientDetails.setVisibility(View.VISIBLE);
         llAddMobileNumber.setVisibility(View.GONE);
@@ -384,7 +405,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llRelPrevCases.setVisibility(View.GONE);
 
     }
-
 
     private void setBtnSaveListener() {
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -481,7 +501,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             }
         });
     }
-
 
     //Link as new case of relative
     private void linkPageToPatient(LinkedPatient selectedRelative) {
@@ -648,7 +667,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void searchPens() {
         //TODO remove it
-//        dialog.dismiss();
+        dialog.dismiss();
         /////
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
@@ -775,7 +794,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     public void drawEvent(float x, float y, int pageId, int actionType) {
 
 
-
         if (pageId != currentPageNumber) {
             uploadPoints();
             if (handler != null) {
@@ -844,7 +862,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         pendingPoints.add(new Point(x, y, actionType));
     }
 
-
     @Override
     public void onPaperButtonPress(int id, String name) {
 
@@ -853,7 +870,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 showMobileBottomSheet();
                 isMobileSheetVisible = true;
             }
-            if(bsMobile.length() == 10){
+            if (bsMobile.length() == 10) {
                 linkMobileNumber(Long.parseLong(bsMobile));
                 return;
             }
@@ -922,29 +939,49 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             }
 
-        }
-        else if (id == 21 ||id == 22 ||id == 23) {
-            showRecordVoiceSheet();
+        } else if (id == 21 || id == 22 || id == 23) {
             switch (id) {
-                case 21 : {
+                case 21: {
+                    showRecordVoiceSheet(false);
                     startRecording();
                 }
-                case 22 : {
+                case 22: {
                     stopRecording();
                 }
-                case 23 : {
+                case 23: {
                     submitRecording();
                 }
             }
-        }
-        else if(id == 51){
-            gender = "M";
-        }
-        else if(id == 52){
-            gender = "F";
-        }
-        else if(id == 100){
-            if(currentPage == null){
+        } else if (id == 51 || id == 52) {
+
+            //todo was saving gender when submit is clicked so is it required here?
+            if (id == 51) {
+                gender = "M";
+            } else {
+                gender = "F";
+            }
+            AddDetailsReq req = new AddDetailsReq();
+            req.setGender(gender);
+            req.setPageNumber(currentPageNumber);
+            binding.toolbar.setSubtitle("Saving patient details...");
+            binding.pbPrescription.setVisibility(View.VISIBLE);
+
+            APIMethods.addDetails(PrescriptionActivity.this, req, new APIResponseListener<AddDetailsRP>() {
+                @Override
+                public void success(AddDetailsRP response) {
+                    binding.toolbar.setSubtitle("Saved details successfully...");
+                    binding.pbPrescription.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                    showError(message, null);
+                    binding.pbPrescription.setVisibility(View.GONE);
+                }
+            });
+
+        } else if (id == 100) {
+            if (currentPage == null) {
                 Toast.makeText(this, "Please initialise the page before submitting", Toast.LENGTH_SHORT).show();
             } else {
                 submitCase(currentPage.getCaseId());
@@ -954,8 +991,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         Log.i("eta-symbol ", name);
 //        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
     }
-
-
 
     private void setTimelyUploads() {
         if (handler != null && runnable != null) {
@@ -1094,9 +1129,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         dialog.show();
     }
 
-
-
-    private void submitCase(String caseId){
+    private void submitCase(String caseId) {
         APIMethods.submitCase(PrescriptionActivity.this, caseId, new APIResponseListener<CaseSubmitRP>() {
             @Override
             public void success(CaseSubmitRP response) {
@@ -1106,25 +1139,18 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                showError(message,null);
+                showError(message, null);
             }
         });
     }
 
-
-    //Bottom Sheet attach audio views
-    TextView bsAVActionText;
-    AppCompatButton btnBSAVAttach;
-    AppCompatButton btnBSAVStop;
-    AppCompatButton btnBSAVStart;
-    private MediaRecorder mediaRecorder;
-    private LottieAnimationView voiceAnimation;
-    private  ImageView ivDeleteAudio;
-    private String outputFile;
-
-    private void showRecordVoiceSheet(){
+    private void showRecordVoiceSheet(boolean wantToHide) {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         dialog.setContentView(R.layout.bsheet_attach_voice);
+        if(wantToHide) {
+            dialog.dismiss();
+            return;
+        }
         bsAVActionText = dialog.findViewById(R.id.bsAVActionText);
         btnBSAVAttach = dialog.findViewById(R.id.btnBSAVAttach);
         btnBSAVStart = dialog.findViewById(R.id.btnBSAVStart);
@@ -1134,12 +1160,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
         btnBSAVStart.setOnClickListener(view -> {
-
             startRecording();
-
         });
         btnBSAVStop.setOnClickListener(view -> {
-            if(outputFile == null){
+            if (outputFile == null) {
                 bsAVActionText.setText("Please press start to record a voice");
                 bsAVActionText.setTextColor(getColor(R.color.colorDanger));
             } else {
@@ -1147,11 +1171,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             }
 
 
-
         });
         btnBSAVAttach.setOnClickListener(view -> {
-            if(outputFile != null){
-                //TODO : implement submit voice to server
+            if (outputFile != null) {
+                submitRecording();
             } else {
                 bsAVActionText.setText("Please record a voice before submitting");
                 bsAVActionText.setTextColor(getColor(R.color.colorDanger));
@@ -1163,7 +1186,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
     private void startRecording() {
-        if(currentPage != null){
+        if (currentPage != null) {
             releaseMediaRecorder();
             Log.i(TAG, "startRecording: " + currentPage.get_id());
 
@@ -1189,7 +1212,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(this, "Some error occurred while preparing voice recorder", Toast.LENGTH_SHORT).show();
-                    Log.i(TAG, "startRecording: not prepared " + e.getLocalizedMessage() );
+                    Log.i(TAG, "startRecording: not prepared " + e.getLocalizedMessage());
                 }
                 mediaRecorder.start();
 
@@ -1233,8 +1256,66 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         }
     }
 
+    ApiService apiService;
+
     private void submitRecording() {
-        //todo implement it
+        if(outputFile == null){
+            return;
+        }
+
+        Log.i(TAG, "submitRecording: output file is "+ outputFile);
+
+
+        if(apiService == null) {
+            apiService = ApiClient.createService();
+        }
+
+
+
+
+        File file = new File(outputFile);
+
+        FileMetadata metadata = new FileMetadata("mp3","audio/*","voice");
+        RequestBody metadataBody = RequestBody.create(MediaType.parse("application/json"), metadata.toString());
+
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+
+        Call<UploadAudioResponse> call = apiService.uploadFile(filePart, metadataBody);
+
+        bsAVActionText.setTextColor(getColor(R.color.colorCta));
+        bsAVActionText.setText("Uploading audio. Please wait...");
+
+        call.enqueue(new Callback<UploadAudioResponse>() {
+            @Override
+            public void onResponse(Call<UploadAudioResponse> call, Response<UploadAudioResponse> response) {
+                if (response.isSuccessful()) {
+                    Log.i(TAG, "onResponse: " + response);
+//                    UploadAudioResponse uploadRP = response.body();
+//                    bsAVActionText.setTextColor(getColor(R.color.colorCta));
+//                    bsAVActionText.setText("File Uploaded. You can access it here: " + uploadRP.getData().getUploadedFile().getPublicUrl().toString());
+                    Toast.makeText(PrescriptionActivity.this, "File uploaded successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    bsAVActionText.setTextColor(getColor(R.color.colorCta));
+                    bsAVActionText.setText("Upload failed");
+                    Toast.makeText(PrescriptionActivity.this, "Upload failed", Toast.LENGTH_SHORT).show();
+                }
+                showRecordVoiceSheet(true);
+
+            }
+
+            @Override
+            public void onFailure(Call<UploadAudioResponse> call, Throwable t) {
+//                showRecordVoiceSheet(true);
+                showError(t.getMessage(),null);
+                Log.i(TAG, "onFailure: message "+t.getMessage());
+                t.printStackTrace();
+                Toast.makeText(PrescriptionActivity.this, "Upload failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
 
     }
 
