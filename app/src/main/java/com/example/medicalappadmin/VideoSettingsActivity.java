@@ -136,7 +136,16 @@ public class VideoSettingsActivity extends AppCompatActivity {
             @Override
             public void success(GuidesVideosRP response) {
                 guidesVideosRP = response;
-                setUpRV(guidesVideosRP);
+                if(response.getAllGuides().isEmpty()){
+                    Toast.makeText(VideoSettingsActivity.this, "Add some guides by clicking on + button.", Toast.LENGTH_SHORT).show();
+                } else{
+                    setUI(guidesVideosRP);
+                }
+                if(response.getAllGuides().size() > 2){
+                    response.getAllGuides().remove(0);
+                    response.getAllGuides().remove(1);
+                    setUpRV(response);
+                }
                 Log.i(TAG, "success: loading guides");
                 binding.pbGuides.setVisibility(View.GONE);
             }
@@ -150,16 +159,23 @@ public class VideoSettingsActivity extends AppCompatActivity {
         });
     }
 
+    private void setUI(GuidesVideosRP guidesVideosRP) {
+        //todo ask position 1 aur 2 upar he milegi?
+        binding.llFirstGuide.setVisibility(View.VISIBLE);
+        binding.tvFirstGuideName.setText(guidesVideosRP.getAllGuides().get(0).getName());
+        binding.tvFirstGuideDesc.setText(guidesVideosRP.getAllGuides().get(0).getDescription());
+        if(guidesVideosRP.getAllGuides().size() > 1){
+            binding.llSecondGuide.setVisibility(View.VISIBLE);
+            binding.tvSecondGuideName.setText(guidesVideosRP.getAllGuides().get(1).getName());
+            binding.tvSecondGuideDesc.setText(guidesVideosRP.getAllGuides().get(1).getName());
+        }
+    }
+
     private void setUpRV(GuidesVideosRP response) {
 
+        binding.llRCV.setVisibility(View.VISIBLE);
         binding.rcvGuides.setLayoutManager(manager);
-//        if(adapter == null){
-//            Log.i(TAG, "setUpRV: adapter null");
-            adapter = new GuidesAdapter(response,VideoSettingsActivity.this);
-//        } else {
-//            Log.i(TAG, "setUpRV: adapter not null");
-//            adapter.notifyDataSetChanged();
-//        }
+        adapter = new GuidesAdapter(response,VideoSettingsActivity.this);
         binding.rcvGuides.setAdapter(adapter);
 
     }

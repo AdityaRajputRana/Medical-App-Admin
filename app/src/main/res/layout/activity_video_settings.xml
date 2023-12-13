@@ -78,9 +78,11 @@
                 android:layout_height="wrap_content"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
                 <LinearLayout
+                    android:id="@+id/llMainGuides"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
                     <LinearLayout
                         android:id="@+id/llFirstGuide"
@@ -89,7 +91,9 @@
                         android:layout_marginTop="4dp"
                         android:background="@drawable/bg_main"
                         android:orientation="vertical"
-                        android:padding="8dp">
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        >
 
                         <TextView
                             android:id="@+id/tvFirstGuideName"
@@ -146,6 +150,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:background="@drawable/bg_main"
+                        android:visibility="gone"
                         android:orientation="vertical"
                         android:padding="8dp">
 
@@ -205,6 +210,8 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <LinearLayout
+            android:id="@+id/llRCV"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
