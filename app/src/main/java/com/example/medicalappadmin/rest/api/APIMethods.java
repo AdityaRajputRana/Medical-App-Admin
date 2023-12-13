@@ -8,6 +8,7 @@ import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
 import com.example.medicalappadmin.rest.requests.AddDetailsReq;
+import com.example.medicalappadmin.rest.requests.AddGuideVideoReq;
 import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
 import com.example.medicalappadmin.rest.requests.CaseHistoryReq;
 import com.example.medicalappadmin.rest.requests.CaseSubmitReq;
@@ -24,6 +25,7 @@ import com.example.medicalappadmin.rest.requests.UploadVoiceReq;
 import com.example.medicalappadmin.rest.requests.ViewCaseReq;
 import com.example.medicalappadmin.rest.requests.ViewPatientReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
+import com.example.medicalappadmin.rest.response.AddGuideVideoRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
 import com.example.medicalappadmin.rest.response.CaseSubmitRP;
@@ -133,9 +135,8 @@ public class APIMethods {
         API.postData(listener, req, EndPoints.viewGuideVideos, GuidesVideosRP.class, context);
     }
 
-    public static void addGuideVideo(Context context, APIResponseListener<GuidesVideosRP> listener) {
-        EmptyReq req = new EmptyReq();
-        API.postData(listener, req, EndPoints.addGuideVideo, GuidesVideosRP.class, context);
+    public static void addGuideVideo(Context context, AddGuideVideoReq req, APIResponseListener<AddGuideVideoRP> listener) {
+        API.postData(listener, req, EndPoints.addGuideVideo, AddGuideVideoRP.class, context);
     }
 
 

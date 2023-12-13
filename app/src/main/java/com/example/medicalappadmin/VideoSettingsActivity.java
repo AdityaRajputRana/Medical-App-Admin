@@ -1,23 +1,34 @@
 package com.example.medicalappadmin;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.medicalappadmin.Models.Guide;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.GuidesAdapter;
 import com.example.medicalappadmin.databinding.ActivityVideoSettingsBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
+import com.example.medicalappadmin.rest.requests.AddGuideVideoReq;
+import com.example.medicalappadmin.rest.response.AddGuideVideoRP;
 import com.example.medicalappadmin.rest.response.GuidesVideosRP;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class VideoSettingsActivity extends AppCompatActivity {
 
     private ActivityVideoSettingsBinding binding;
     LinearLayoutManager manager;
     GuidesAdapter adapter;
+    GuidesVideosRP guidesVideosRP;
 
 
     @Override
@@ -39,14 +50,94 @@ public class VideoSettingsActivity extends AppCompatActivity {
         binding.ivBackBtnVideos.setOnClickListener(view -> finish());
         binding.addGuideBtn.setOnClickListener(view -> {
 
+            showAddVideoBS();
+
+
         });
     }
 
+    TextInputEditText etVideoLink;
+    TextInputEditText etVideoName;
+    TextInputEditText etVideoDesc;
+    TextView tvAGActionText;
+    AppCompatButton btnBSAGNSubmit;
+    ProgressBar pbBSAG;
+    BottomSheetDialog addVideoDialog;
+    private void showAddVideoBS() {
+        addVideoDialog= new BottomSheetDialog(this);
+        addVideoDialog.setContentView(R.layout.bsheet_add_guide_video);
+        etVideoLink = addVideoDialog.findViewById(R.id.etVideoLink);
+        etVideoName = addVideoDialog.findViewById(R.id.etVideoName);
+        etVideoDesc = addVideoDialog.findViewById(R.id.etVideoDesc);
+        tvAGActionText = addVideoDialog.findViewById(R.id.tvAGActionText);
+        btnBSAGNSubmit = addVideoDialog.findViewById(R.id.btnBSAGNSubmit);
+        pbBSAG = addVideoDialog.findViewById(R.id.pbBSAG);
+
+        btnBSAGNSubmit.setOnClickListener(view -> {
+            if(etVideoName.getText().toString().isEmpty() || etVideoName.getText() == null){
+                etVideoName.setError("Required");
+                tvAGActionText.setText("All fields are required");
+            }
+            if(etVideoDesc.getText().toString().isEmpty() || etVideoDesc.getText() == null){
+                etVideoDesc.setError("Required");
+                tvAGActionText.setText("All fields are required");
+            }
+            if(etVideoLink.getText().toString().isEmpty() || etVideoLink.getText() == null){
+                etVideoLink.setError("Required");
+                tvAGActionText.setText("All fields are required");
+            }
+            if(!etVideoName.getText().toString().isEmpty() && etVideoName.getText() != null
+            && !etVideoDesc.getText().toString().isEmpty() && etVideoDesc.getText() != null
+            && !etVideoLink.getText().toString().isEmpty() && etVideoLink.getText() != null){
+                saveGuide(etVideoName.getText().toString(),etVideoDesc.getText().toString(),etVideoLink.getText().toString());
+            }
+
+        });
+        addVideoDialog.show();
+
+
+
+
+
+    }
+
+    private void saveGuide(String name, String desc, String link) {
+        AddGuideVideoReq req = new AddGuideVideoReq(name, desc,link);
+        pbBSAG.setVisibility(View.VISIBLE);
+        tvAGActionText.setText("Saving video...");
+        tvAGActionText.setTextColor(getColor(R.color.colorCta));
+
+
+        APIMethods.addGuideVideo(VideoSettingsActivity.this, req, new APIResponseListener<AddGuideVideoRP>() {
+            @Override
+            public void success(AddGuideVideoRP response) {
+                Toast.makeText(VideoSettingsActivity.this, "Video saved successfully", Toast.LENGTH_SHORT).show();
+                loadGuides();
+                pbBSAG.setVisibility(View.GONE);
+                addVideoDialog.dismiss();
+
+
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                pbBSAG.setVisibility(View.GONE);
+                Methods.showError(VideoSettingsActivity.this,message,cancellable);
+            }
+        });
+
+
+    }
+    private String TAG = "Guide";
+
     private void loadGuides() {
+        Log.i(TAG, "loadGuides: called");
         APIMethods.listGuidesVideos(VideoSettingsActivity.this, new APIResponseListener<GuidesVideosRP>() {
             @Override
             public void success(GuidesVideosRP response) {
-                setUpRV(response);
+                guidesVideosRP = response;
+                setUpRV(guidesVideosRP);
+                Log.i(TAG, "success: loading guides");
                 binding.pbGuides.setVisibility(View.GONE);
             }
 
@@ -62,9 +153,13 @@ public class VideoSettingsActivity extends AppCompatActivity {
     private void setUpRV(GuidesVideosRP response) {
 
         binding.rcvGuides.setLayoutManager(manager);
-        if(adapter == null){
+//        if(adapter == null){
+//            Log.i(TAG, "setUpRV: adapter null");
             adapter = new GuidesAdapter(response,VideoSettingsActivity.this);
-        }
+//        } else {
+//            Log.i(TAG, "setUpRV: adapter not null");
+//            adapter.notifyDataSetChanged();
+//        }
         binding.rcvGuides.setAdapter(adapter);
 
     }
