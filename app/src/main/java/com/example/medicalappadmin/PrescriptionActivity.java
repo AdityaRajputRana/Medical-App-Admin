@@ -359,8 +359,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         //todo: remove it
         binding.actionBtn.setOnClickListener(view -> {
-            //todo remove it
-            drawEvent(0,0,99,0);
+//            drawEvent(0,0,46,0);
             showRecordVoiceSheet();
         });
 
@@ -671,7 +670,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void searchPens() {
         //TODO remove it
-        dialog.dismiss();
+//        dialog.dismiss();
         /////
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);

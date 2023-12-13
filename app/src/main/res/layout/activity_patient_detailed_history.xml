@@ -287,7 +287,8 @@
                     </LinearLayout>
 
                 </com.facebook.shimmer.ShimmerFrameLayout>
-            </com.google.android.material.appbar.CollapsingToolbarLayout>    </com.google.android.material.appbar.AppBarLayout>
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
 
 
