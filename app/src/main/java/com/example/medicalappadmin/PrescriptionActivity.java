@@ -63,7 +63,10 @@ import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -357,8 +360,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         //todo: remove it
         binding.actionBtn.setOnClickListener(view -> {
             //todo remove it
-            drawEvent(0,0,46,0);
-            showRecordVoiceSheet(false);
+            drawEvent(0,0,99,0);
+            showRecordVoiceSheet();
         });
 
         intialiseControls();
@@ -464,6 +467,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 pbSelectRelative.setVisibility(View.GONE);
 
+                Log.i(TAG, "fail: rel prev case");
                 showError(message, null);
             }
         });
@@ -942,7 +946,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         } else if (id == 21 || id == 22 || id == 23) {
             switch (id) {
                 case 21: {
-                    showRecordVoiceSheet(false);
+                    showRecordVoiceSheet();
                     startRecording();
                 }
                 case 22: {
@@ -1029,6 +1033,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 @Override
                 public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                     Methods.showError(PrescriptionActivity.this, message, true);
+                    Log.i(TAG, "fail: timely uploads");
 
                 }
             });
@@ -1144,13 +1149,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    private void showRecordVoiceSheet(boolean wantToHide) {
+    private void showRecordVoiceSheet() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         dialog.setContentView(R.layout.bsheet_attach_voice);
-        if(wantToHide) {
-            dialog.dismiss();
-            return;
-        }
+
         bsAVActionText = dialog.findViewById(R.id.bsAVActionText);
         btnBSAVAttach = dialog.findViewById(R.id.btnBSAVAttach);
         btnBSAVStart = dialog.findViewById(R.id.btnBSAVStart);
@@ -1281,40 +1283,47 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
-        Call<UploadAudioResponse> call = apiService.uploadFile(filePart, metadataBody);
+        String jwtToken = getSharedPreferences("MY_PREF", MODE_PRIVATE).getString("JWT_TOKEN","");
+        Log.i(TAG, "submitRecording: jwt token "+jwtToken);
+        Call<JSONObject> call = apiService.uploadFile(jwtToken,filePart, metadataBody);
 
         bsAVActionText.setTextColor(getColor(R.color.colorCta));
         bsAVActionText.setText("Uploading audio. Please wait...");
 
-        call.enqueue(new Callback<UploadAudioResponse>() {
+        call.enqueue(new Callback<JSONObject>() {
             @Override
-            public void onResponse(Call<UploadAudioResponse> call, Response<UploadAudioResponse> response) {
+            public void onResponse(Call<JSONObject> call, Response<JSONObject> response) {
+                Log.i(TAG, "onResponse: is success "+ response.isSuccessful());
                 if (response.isSuccessful()) {
-                    Log.i(TAG, "onResponse: " + response);
-//                    UploadAudioResponse uploadRP = response.body();
-//                    bsAVActionText.setTextColor(getColor(R.color.colorCta));
+                    JSONObject obj = response.body();
+//                    UploadAudioResponse uploadRP =  new Gson().fromJson(response.body(),UploadAudioResponse.class);
+
+                    Log.i(TAG, "onResponse: " + response.body().toString());
+//                    Log.i(TAG, "onResponse: " + obj.get("success").toString());
+//                    Log.i(TAG, "onResponse: " + uploadRP.getData().getUpdatedCase().getFullName());
+
+                    bsAVActionText.setTextColor(getColor(R.color.colorCta));
 //                    bsAVActionText.setText("File Uploaded. You can access it here: " + uploadRP.getData().getUploadedFile().getPublicUrl().toString());
+                    bsAVActionText.setText("Audio uploaded successfully.");
                     Toast.makeText(PrescriptionActivity.this, "File uploaded successfully", Toast.LENGTH_SHORT).show();
                 } else {
-                    bsAVActionText.setTextColor(getColor(R.color.colorCta));
+                    bsAVActionText.setTextColor(getColor(R.color.colorDanger));
                     bsAVActionText.setText("Upload failed");
+                    Log.i(TAG, "onResponse unsuccessfull: message" + response.message());
                     Toast.makeText(PrescriptionActivity.this, "Upload failed", Toast.LENGTH_SHORT).show();
                 }
-                showRecordVoiceSheet(true);
+
 
             }
 
             @Override
-            public void onFailure(Call<UploadAudioResponse> call, Throwable t) {
-//                showRecordVoiceSheet(true);
-                showError(t.getMessage(),null);
+            public void onFailure(Call<JSONObject> call, Throwable t) {
+                showError("Audio "+t.getMessage(),null);
                 Log.i(TAG, "onFailure: message "+t.getMessage());
                 t.printStackTrace();
                 Toast.makeText(PrescriptionActivity.this, "Upload failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
 
 
     }
