@@ -21,6 +21,7 @@ import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.Transformations.CircleTransformation;
+import com.example.medicalappadmin.VideoSettingsActivity;
 import com.example.medicalappadmin.databinding.FragmentProfileBinding;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -40,6 +41,9 @@ public class ProfileFragment extends Fragment {
 
     private CallBacksListener listener;
 
+
+    public ProfileFragment() {
+    }
 
     public ProfileFragment(CallBacksListener listener) {
         this.listener = listener;
@@ -79,6 +83,10 @@ public class ProfileFragment extends Fragment {
                 listener.disconnectFromPen();
             else
                 listener.startConnectionRoutine();
+        });
+
+        binding.videoSettingsBtn.setOnClickListener(view -> {
+            startActivity(new Intent(getActivity(), VideoSettingsActivity.class));
         });
     }
 
