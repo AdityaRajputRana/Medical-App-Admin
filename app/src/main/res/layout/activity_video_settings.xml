@@ -31,17 +31,14 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_semibold"
             android:paddingTop="4dp"
-            android:paddingEnd="24dp"
             android:text="Guides"
             android:textAlignment="center"
             android:textColor="@color/colorPrimTxt"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/addGuideBtn"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/ivBackBtnVideos"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageView
             android:id="@+id/addGuideBtn"
@@ -81,8 +78,7 @@
                     android:id="@+id/llMainGuides"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="visible">
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:id="@+id/llFirstGuide"

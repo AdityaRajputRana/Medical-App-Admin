@@ -15,4 +15,9 @@ public class SetGuidePosReq {
 
     public SetGuidePosReq() {
     }
+
+    public SetGuidePosReq(String guideId, int position) {
+        this.guideId = guideId;
+        this.position = position;
+    }
 }

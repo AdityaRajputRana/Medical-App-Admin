@@ -18,10 +18,13 @@ import com.example.medicalappadmin.databinding.ActivityVideoSettingsBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.requests.AddGuideVideoReq;
+import com.example.medicalappadmin.rest.requests.SetGuidePosReq;
 import com.example.medicalappadmin.rest.response.AddGuideVideoRP;
 import com.example.medicalappadmin.rest.response.GuidesVideosRP;
+import com.example.medicalappadmin.rest.response.SetGuidePosRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
 
 public class VideoSettingsActivity extends AppCompatActivity {
 
@@ -123,6 +126,8 @@ public class VideoSettingsActivity extends AppCompatActivity {
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 pbBSAG.setVisibility(View.GONE);
                 Methods.showError(VideoSettingsActivity.this,message,cancellable);
+                Log.i(TAG, "fail: add guide failed");
+
             }
         });
 
@@ -132,19 +137,27 @@ public class VideoSettingsActivity extends AppCompatActivity {
 
     private void loadGuides() {
         Log.i(TAG, "loadGuides: called");
+        binding.pbGuides.setVisibility(View.VISIBLE);
+
         APIMethods.listGuidesVideos(VideoSettingsActivity.this, new APIResponseListener<GuidesVideosRP>() {
             @Override
             public void success(GuidesVideosRP response) {
                 guidesVideosRP = response;
+                Log.i(TAG, "success: size "+ response.getAllGuides().size());
+                for(int i= 0; i<response.getAllGuides().size(); i++){
+                    Log.i(TAG, "success: list before"+ new Gson().toJson(response.getAllGuides().get(i).getName()));
+                }
                 if(response.getAllGuides().isEmpty()){
                     Toast.makeText(VideoSettingsActivity.this, "Add some guides by clicking on + button.", Toast.LENGTH_SHORT).show();
-                } else{
-                    setUI(guidesVideosRP);
                 }
-                if(response.getAllGuides().size() > 2){
-                    response.getAllGuides().remove(0);
-                    response.getAllGuides().remove(1);
-                    setUpRV(response);
+                else{
+                    setUI(guidesVideosRP);
+                    if(response.getAllGuides().size() > 2){
+                        for(int i= 0; i<response.getAllGuides().size(); i++){
+                            Log.i(TAG, "success: "+ new Gson().toJson(guidesVideosRP.getAllGuides().get(i).getName()));
+                        }
+                        setUpRV(guidesVideosRP);
+                    }
                 }
                 Log.i(TAG, "success: loading guides");
                 binding.pbGuides.setVisibility(View.GONE);
@@ -154,10 +167,13 @@ public class VideoSettingsActivity extends AppCompatActivity {
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 Methods.showError(VideoSettingsActivity.this,message,cancellable);
                 binding.pbGuides.setVisibility(View.GONE);
+                Log.i(TAG, "fail: load guides failed");
 
             }
         });
     }
+
+    GuidesVideosRP updatedRP;
 
     private void setUI(GuidesVideosRP guidesVideosRP) {
         //todo ask position 1 aur 2 upar he milegi?
@@ -167,15 +183,46 @@ public class VideoSettingsActivity extends AppCompatActivity {
         if(guidesVideosRP.getAllGuides().size() > 1){
             binding.llSecondGuide.setVisibility(View.VISIBLE);
             binding.tvSecondGuideName.setText(guidesVideosRP.getAllGuides().get(1).getName());
-            binding.tvSecondGuideDesc.setText(guidesVideosRP.getAllGuides().get(1).getName());
+            binding.tvSecondGuideDesc.setText(guidesVideosRP.getAllGuides().get(1).getDescription());
+        }
+        Log.i(TAG, "setUI: removing "+ guidesVideosRP.getAllGuides().get(0).getName());
+        guidesVideosRP.getAllGuides().remove(0);
+        if(guidesVideosRP.getAllGuides().size() > 1){
+            Log.i(TAG, "setUI: removing "+ guidesVideosRP.getAllGuides().get(1).getName());
+            guidesVideosRP.getAllGuides().remove(0);
+
         }
     }
+
+    private void setGuidePosition(SetGuidePosReq req){
+        APIMethods.setGuideVideoPosition(VideoSettingsActivity.this, req, new APIResponseListener<SetGuidePosRP>() {
+            @Override
+            public void success(SetGuidePosRP response) {
+                loadGuides();
+
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                Methods.showError(VideoSettingsActivity.this,message,cancellable);
+                Log.i(TAG, "fail: set guide position failed" + message);
+            }
+        });
+    }
+
+
 
     private void setUpRV(GuidesVideosRP response) {
 
         binding.llRCV.setVisibility(View.VISIBLE);
         binding.rcvGuides.setLayoutManager(manager);
-        adapter = new GuidesAdapter(response,VideoSettingsActivity.this);
+        adapter = new GuidesAdapter(response, VideoSettingsActivity.this, new GuidesAdapter.RepositionListener() {
+            @Override
+            public void onRepositionClicked(int position, String guideId) {
+                SetGuidePosReq req = new SetGuidePosReq(guideId,position);
+                setGuidePosition(req);
+            }
+        });
         binding.rcvGuides.setAdapter(adapter);
 
     }

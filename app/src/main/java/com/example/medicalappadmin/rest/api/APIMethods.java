@@ -19,6 +19,7 @@ import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.requests.LoginReq;
 import com.example.medicalappadmin.rest.requests.MergeCasesReq;
 import com.example.medicalappadmin.rest.requests.PatientListReq;
+import com.example.medicalappadmin.rest.requests.SetGuidePosReq;
 import com.example.medicalappadmin.rest.requests.SignupReq;
 import com.example.medicalappadmin.rest.requests.UploadPointsReq;
 import com.example.medicalappadmin.rest.requests.UploadVoiceReq;
@@ -35,6 +36,7 @@ import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.LoginRP;
 import com.example.medicalappadmin.rest.response.PatientListRP;
+import com.example.medicalappadmin.rest.response.SetGuidePosRP;
 import com.example.medicalappadmin.rest.response.SignupRP;
 import com.example.medicalappadmin.rest.response.UploadVoiceRP;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
@@ -137,6 +139,9 @@ public class APIMethods {
 
     public static void addGuideVideo(Context context, AddGuideVideoReq req, APIResponseListener<AddGuideVideoRP> listener) {
         API.postData(listener, req, EndPoints.addGuideVideo, AddGuideVideoRP.class, context);
+    }
+    public static void setGuideVideoPosition(Context context, SetGuidePosReq req, APIResponseListener<SetGuidePosRP> listener) {
+        API.postData(listener, req, EndPoints.setGuidePosition, SetGuidePosRP.class, context);
     }
 
 
