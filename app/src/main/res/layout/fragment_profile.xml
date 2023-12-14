@@ -133,6 +133,22 @@
                 android:textColor="@color/colorPrimTxt"
                 android:text="Pen Settings" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/videoSettingsBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:backgroundTint="@color/colorForeground"
+                app:cornerRadius="0dp"
+                android:fontFamily="@font/poppins_medium"
+                android:textSize="16sp"
+                android:layout_marginTop="-4dp"
+                android:textAlignment="viewStart"
+                android:drawableRight="@drawable/baseline_navigate_next_24"
+                android:drawableTint="@color/colorPrimTxt"
+                android:textColor="@color/colorPrimTxt"
+                android:text="Video Settings" />
+
 
 
 

@@ -16,7 +16,7 @@
         android:textColor="@color/colorPrimTxt"
         android:textSize="24sp" />
 
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/etBSMobile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

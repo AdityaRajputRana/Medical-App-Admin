@@ -7,27 +7,6 @@ public class AddDetailsReq {
     String gender;
     //TODO add age
     Long mobileNumber;
-
-    public int getPageNumber() {
-        return pageNumber;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public Long getMobileNumber() {
-        return mobileNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
     String email;
 
     public AddDetailsReq() {
@@ -41,20 +20,40 @@ public class AddDetailsReq {
         this.email = email;
     }
 
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
     public void setPageNumber(int pageNumber) {
         this.pageNumber = pageNumber;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
     public void setGender(String gender) {
         this.gender = gender;
     }
 
+    public Long getMobileNumber() {
+        return mobileNumber;
+    }
+
     public void setMobileNumber(Long mobileNumber) {
         this.mobileNumber = mobileNumber;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setEmail(String email) {

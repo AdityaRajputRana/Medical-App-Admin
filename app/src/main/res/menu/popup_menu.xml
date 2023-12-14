@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/setAs1"
+        android:title="Set as 1" />
+    <item
+        android:id="@+id/setAs2"
+        android:title="Set as 2" />
+</menu>
