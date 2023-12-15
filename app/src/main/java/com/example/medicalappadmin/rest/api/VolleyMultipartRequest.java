@@ -15,12 +15,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-/**
- * Custom request to make multipart header and upload file.
- *
- * Sketch Project Studio
- * Created by Angga on 27/04/2016 12.05.
- */
+
 public class VolleyMultipartRequest extends Request<NetworkResponse> {
     private final String twoHyphens = "--";
     private final String lineEnd = "\r\n";
@@ -30,14 +25,6 @@ public class VolleyMultipartRequest extends Request<NetworkResponse> {
     private Response.ErrorListener mErrorListener;
     private Map<String, String> mHeaders;
 
-    /**
-     * Default constructor with predefined header and post method.
-     *
-     * @param url           request destination
-     * @param headers       predefined custom header
-     * @param listener      on success achieved 200 code from request
-     * @param errorListener on error http or library timeout
-     */
     public VolleyMultipartRequest(String url, Map<String, String> headers,
                                   Response.Listener<NetworkResponse> listener,
                                   Response.ErrorListener errorListener) {
@@ -47,14 +34,6 @@ public class VolleyMultipartRequest extends Request<NetworkResponse> {
         this.mHeaders = headers;
     }
 
-    /**
-     * Constructor with option method and default header configuration.
-     *
-     * @param method        method for now accept POST and GET only
-     * @param url           request destination
-     * @param listener      on success event handler
-     * @param errorListener on error event handler
-     */
     public VolleyMultipartRequest(int method, String url,
                                   Response.Listener<NetworkResponse> listener,
                                   Response.ErrorListener errorListener) {
