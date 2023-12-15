@@ -71,6 +71,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/blue_rounded_bg"
             android:text="Start"
+            android:visibility="gone"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp" />

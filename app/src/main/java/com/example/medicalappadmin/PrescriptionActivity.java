@@ -365,13 +365,17 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
         //todo: remove it
-        binding.actionBtn.setOnClickListener(view -> {
-//            drawEvent(0,0,46,0);
-            showRecordVoiceSheet();
-        });
+//        binding.actionBtn.setOnClickListener(view -> {
+////            drawEvent(0,0,46,0);
+//            showRecordVoiceSheet();
+//        });
 
-        binding.actionBtn.setOnLongClickListener(view -> {drawEvent(0, 0, 46, 0);
-        return true;});
+        binding.actionBtn.setOnLongClickListener(view -> {
+            drawEvent(0, 0, 46, 0);
+            showRecordVoiceSheet();
+            startRecording();
+            return true;
+        });
 
         intialiseControls();
 
@@ -1157,22 +1161,24 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             }
         });
     }
+    BottomSheetDialog recordVoiceDialog;
 
     private void showRecordVoiceSheet() {
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
-        dialog.setContentView(R.layout.bsheet_attach_voice);
+        recordVoiceDialog = new BottomSheetDialog(this);
+        recordVoiceDialog.setContentView(R.layout.bsheet_attach_voice);
 
-        bsAVActionText = dialog.findViewById(R.id.bsAVActionText);
-        btnBSAVAttach = dialog.findViewById(R.id.btnBSAVAttach);
-        btnBSAVStart = dialog.findViewById(R.id.btnBSAVStart);
-        btnBSAVStop = dialog.findViewById(R.id.btnBSAVStop);
-        voiceAnimation = dialog.findViewById(R.id.voiceAnimation);
-        ivDeleteAudio = dialog.findViewById(R.id.ivDeleteAudio);
+        bsAVActionText = recordVoiceDialog.findViewById(R.id.bsAVActionText);
+        btnBSAVAttach = recordVoiceDialog.findViewById(R.id.btnBSAVAttach);
+        btnBSAVStart = recordVoiceDialog.findViewById(R.id.btnBSAVStart);
+        btnBSAVStop = recordVoiceDialog.findViewById(R.id.btnBSAVStop);
+        voiceAnimation = recordVoiceDialog.findViewById(R.id.voiceAnimation);
+        ivDeleteAudio = recordVoiceDialog.findViewById(R.id.ivDeleteAudio);
 
 
         btnBSAVStart.setOnClickListener(view -> {
             startRecording();
         });
+
         btnBSAVStop.setOnClickListener(view -> {
             if (outputFile == null) {
                 bsAVActionText.setText("Please press start to record a voice");
@@ -1191,7 +1197,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 bsAVActionText.setTextColor(getColor(R.color.colorDanger));
             }
         });
-        dialog.show();
+        recordVoiceDialog.show();
 
 
     }
@@ -1230,7 +1236,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
             }
         } else {
-            Toast.makeText(this, "Please initialize page first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please initialize the page first", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1267,30 +1273,46 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         }
     }
 
-    ApiService apiService;
+
+    Handler voiceHandler = new Handler();
+    Runnable voiceRunnable = new Runnable() {
+        @Override
+        public void run() {
+            binding.voiceUploadLayout.setVisibility(View.GONE);
+            binding.pbVoiceUpload.setProgress(0);
+
+        }
+    };
 
     private void submitRecording() {
         if(outputFile == null){
             return;
         }
+        recordVoiceDialog.dismiss();
 
         Log.i(TAG, "submitRecording: output file is "+ outputFile);
 
         File file = new File(outputFile);
+        binding.voiceUploadLayout.setVisibility(View.VISIBLE);
+        binding.pbVoiceUpload.setProgress(0);
         APIMethods.uploadVoice(this, file, currentPageNumber, new FileTransferResponseListener<UploadVoiceRP>() {
             @Override
             public void success(UploadVoiceRP response) {
-                Toast.makeText(PrescriptionActivity.this, "Success Upload", Toast.LENGTH_SHORT).show();
+                binding.pbVoiceUpload.setVisibility(View.INVISIBLE);
+                binding.ivVoiceUpload.setImageDrawable(AppCompatResources.getDrawable(PrescriptionActivity.this,R.drawable.ic_done_bg));
+                Toast.makeText(PrescriptionActivity.this, "Voice uploaded successfully", Toast.LENGTH_SHORT).show();
+                voiceHandler.postDelayed(voiceRunnable,7000);
             }
 
             @Override
             public void onProgress(int percent) {
-                Toast.makeText(PrescriptionActivity.this, "Uploading - " + percent + "%", Toast.LENGTH_SHORT).show();
+                binding.pbVoiceUpload.setProgress(percent);
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                Toast.makeText(PrescriptionActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                binding.voiceUploadLayout.setVisibility(View.GONE);
+                Toast.makeText(PrescriptionActivity.this, "Failed uploading voice. Try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
