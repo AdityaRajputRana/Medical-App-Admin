@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="@color/colorBackground"
     tools:context=".PrescriptionActivity">
 
     <LinearLayout
@@ -154,16 +155,54 @@
 
         </LinearLayout>
 
-        <com.example.medicalappadmin.canvas.NotepadView
-            android:id="@+id/canvasView"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:translationZ="1dp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            >
+
+            <com.example.medicalappadmin.canvas.NotepadView
+                android:id="@+id/canvasView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                android:visibility="visible" />
+
+            <RelativeLayout
+                android:visibility="visible"
+                android:id="@+id/voiceUploadLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:background="@drawable/circular_bg"
+                android:layout_gravity="bottom|end">
+
+                <ProgressBar
+                    android:id="@+id/pbVoiceUpload"
+                    android:layout_width="80dp"
+                    style="@style/CircularDeterminateProgressBar"
+                    android:layout_height="80dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:max="100"
+                    tools:progress="0" />
+
+                <ImageView
+                    android:id="@+id/ivVoiceUpload"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/baseline_cloud_upload_24" />
+
+            </RelativeLayout>
+
+        </FrameLayout>
+
+
+
+
 
     </LinearLayout>
 

@@ -1,6 +1,6 @@
 package com.example.medicalappadmin.rest.api;
+
 import com.example.medicalappadmin.Models.retrofit.UploadAudioResponse;
-import com.google.gson.JsonObject;
 
 import org.json.JSONObject;
 
@@ -17,9 +17,9 @@ public interface ApiService {
 
     @Multipart
     @POST("api/page/additional/upload")
-    Call<JSONObject> uploadFile(
+    Call<UploadAudioResponse> uploadFile(
             @Header("x-access-token") String token,
             @Part MultipartBody.Part file,
-            @Part("data") RequestBody data
+            @Part("data") String data
     );
 }
