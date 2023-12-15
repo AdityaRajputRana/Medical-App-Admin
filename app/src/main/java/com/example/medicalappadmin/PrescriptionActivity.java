@@ -48,21 +48,26 @@ import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
 import com.example.medicalappadmin.databinding.ActivityPrescriptionBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
+import com.example.medicalappadmin.rest.api.API;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.ApiClient;
 import com.example.medicalappadmin.rest.api.ApiService;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
+import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
 import com.example.medicalappadmin.rest.requests.AddDetailsReq;
 import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
+import com.example.medicalappadmin.rest.requests.UploadVoiceReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.CaseSubmitRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
+import com.example.medicalappadmin.rest.response.UploadVoiceRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
@@ -71,6 +76,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import okhttp3.MediaType;
@@ -362,6 +369,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 //            drawEvent(0,0,46,0);
             showRecordVoiceSheet();
         });
+
+        binding.actionBtn.setOnLongClickListener(view -> {drawEvent(0, 0, 46, 0);
+        return true;});
 
         intialiseControls();
 
@@ -1266,65 +1276,23 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         Log.i(TAG, "submitRecording: output file is "+ outputFile);
 
-
-        if(apiService == null) {
-            apiService = ApiClient.createService();
-        }
-
-
-
-
         File file = new File(outputFile);
-
-        FileMetadata metadata = new FileMetadata("mp3","audio/*","voice");
-        RequestBody metadataBody = RequestBody.create(MediaType.parse("application/json"), metadata.toString());
-
-        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-        MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-
-        String jwtToken = getSharedPreferences("MY_PREF", MODE_PRIVATE).getString("JWT_TOKEN","");
-        Log.i(TAG, "submitRecording: jwt token "+jwtToken);
-        Call<JSONObject> call = apiService.uploadFile(jwtToken,filePart, metadataBody);
-
-        bsAVActionText.setTextColor(getColor(R.color.colorCta));
-        bsAVActionText.setText("Uploading audio. Please wait...");
-
-        call.enqueue(new Callback<JSONObject>() {
+        APIMethods.uploadVoice(this, file, currentPageNumber, new FileTransferResponseListener<UploadVoiceRP>() {
             @Override
-            public void onResponse(Call<JSONObject> call, Response<JSONObject> response) {
-                Log.i(TAG, "onResponse: is success "+ response.isSuccessful());
-                if (response.isSuccessful()) {
-                    JSONObject obj = response.body();
-//                    UploadAudioResponse uploadRP =  new Gson().fromJson(response.body(),UploadAudioResponse.class);
-
-                    Log.i(TAG, "onResponse: " + response.body().toString());
-//                    Log.i(TAG, "onResponse: " + obj.get("success").toString());
-//                    Log.i(TAG, "onResponse: " + uploadRP.getData().getUpdatedCase().getFullName());
-
-                    bsAVActionText.setTextColor(getColor(R.color.colorCta));
-//                    bsAVActionText.setText("File Uploaded. You can access it here: " + uploadRP.getData().getUploadedFile().getPublicUrl().toString());
-                    bsAVActionText.setText("Audio uploaded successfully.");
-                    Toast.makeText(PrescriptionActivity.this, "File uploaded successfully", Toast.LENGTH_SHORT).show();
-                } else {
-                    bsAVActionText.setTextColor(getColor(R.color.colorDanger));
-                    bsAVActionText.setText("Upload failed");
-                    Log.i(TAG, "onResponse unsuccessfull: message" + response.message());
-                    Toast.makeText(PrescriptionActivity.this, "Upload failed", Toast.LENGTH_SHORT).show();
-                }
-
-
+            public void success(UploadVoiceRP response) {
+                Toast.makeText(PrescriptionActivity.this, "Success Upload", Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onFailure(Call<JSONObject> call, Throwable t) {
-                showError("Audio "+t.getMessage(),null);
-                Log.i(TAG, "onFailure: message "+t.getMessage());
-                t.printStackTrace();
-                Toast.makeText(PrescriptionActivity.this, "Upload failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onProgress(int percent) {
+                Toast.makeText(PrescriptionActivity.this, "Uploading - " + percent + "%", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                Toast.makeText(PrescriptionActivity.this, "Failed", Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
 
     private void releaseMediaRecorder() {

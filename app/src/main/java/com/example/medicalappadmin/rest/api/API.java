@@ -8,8 +8,10 @@ import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.medicalappadmin.Tools.Methods;
@@ -18,6 +20,7 @@ import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListe
 import com.example.medicalappadmin.rest.requests.App.AppRequest;
 import com.google.gson.Gson;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -187,7 +190,7 @@ public class API {
 
     }
 
-    public static void uploadFile(Context context, File mFile, Object rawData, String endpoint, Class klass, FileTransferResponseListener listener){
+    public static void postFile(Context context, File mFile, Object rawData, String endpoint, Class klass, FileTransferResponseListener fileListener, String name, String ext){
         try {
             String encodedData = "";
             AppRequest request = HashUtils.getHashedDataObject(rawData, context, endpoint);
@@ -205,91 +208,26 @@ public class API {
             inputStream.read(file);
             inputStream.close();
 
+            Map<String, String> params = new HashMap<>();
+            params.put("data", finalEncodedData);
 
-
-            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, url,
-                    new Response.Listener<NetworkResponse>() {
-                        @Override
-                        public void onResponse(NetworkResponse rsp) {
-                            onNetWorkResponse(listener, rsp, klass);
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.i("eta eror", new Gson().toJson(error));
-                            if (error.networkResponse != null && error.networkResponse.data != null){
-                                Log.i("Eta network data", String.valueOf(error.networkResponse.data));
-                                onNetWorkResponse(listener, error.networkResponse, klass);
-                            } else {
-                                listener.fail("VE-1", String.valueOf(error) + " : " + error.getMessage(), "", false, true );
-                            }
-                        }
-                    }, listener) {
-
-                long totalSize = file.length;
-
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("data", finalEncodedData);
-                    return params;
-                }
-                @Override
-                protected Map<String, DataPart> getByteData() {
-                    Map<String, DataPart> params = new HashMap<>();
-                    long imagename = System.currentTimeMillis();
-                    totalSize = file.length;
-                    params.put("image", new DataPart(imagename + ".png", file));
-                    return params;
-                }
-
-                long transferred = 0;
-
-                @Override
-                protected Response<NetworkResponse> parseNetworkResponse(NetworkResponse response) {
-                    transferred += (256*1024);
-                    Log.i("Eta Transferred Bytes", String.valueOf(transferred));
-                    int progress = (int) ((transferred * 100f)/file.length);
-                    listener.onProgress(progress);
-                    return super.parseNetworkResponse(response);
-                }
-            };
-            //End
-
-            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    180000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    2f));
-            VolleyClient.getRequestQueue().add(multipartRequest);
-
-
-
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public static void postFile(Context context, FileTransferResponseListener listener, Object rawData, String endpoint, Class klass,
-                                String name, String fileType, byte[] file){
-        try {
-            String encodedData = "";
-            AppRequest request = HashUtils.getHashedDataObject(rawData, context, endpoint);
-            Log.i("encodedData", request.getData());
-            if (request != null){
-                encodedData = request.getData();
+            Map<String, String> headers = new HashMap<String, String>();
+            SharedPreferences preferences = context.getSharedPreferences("MY_PREF", Context.MODE_PRIVATE);
+            if (preferences.contains("JWT_TOKEN") && !preferences.getString("JWT_TOKEN", "").isEmpty()){
+                headers.put("x-access-token",preferences.getString("JWT_TOKEN",""));
             }
-            String finalEncodedData = encodedData;
 
-            String url = VolleyClient.getBaseUrl() + endpoint + VolleyClient.suffix;
-            Log.i("eta url", url);
+
 
             VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, url,
                     new Response.Listener<NetworkResponse>() {
                         @Override
                         public void onResponse(NetworkResponse rsp) {
-                           onNetWorkResponse(listener, rsp, klass);
+                            Log.i("eta rsp", "got");
+                            if (context instanceof Activity)
+                                ((Activity) context).runOnUiThread(()->onNetWorkResponse(fileListener, rsp, klass));
+                            else
+                                onNetWorkResponse(fileListener, rsp, klass);
                         }
                     },
                     new Response.ErrorListener() {
@@ -298,14 +236,20 @@ public class API {
                             Log.i("eta eror", new Gson().toJson(error));
                             if (error.networkResponse != null && error.networkResponse.data != null){
                                 Log.i("Eta network data", String.valueOf(error.networkResponse.data));
-                                onNetWorkResponse(listener, error.networkResponse, klass);
+                                if (context instanceof Activity)
+                                    ((Activity) context).runOnUiThread(()->onNetWorkResponse(fileListener, error.networkResponse, klass));
+                                else
+                                    onNetWorkResponse(fileListener, error.networkResponse, klass);
                             } else {
-                                listener.fail("VE-1", String.valueOf(error) + " : " + error.getMessage(), "", false, true );
+                                if (context instanceof Activity)
+                                    ((Activity) context).runOnUiThread(()->fileListener.fail("VE-1", String.valueOf(error) + " : " + error.getMessage(), "", false, true ));
+                                else
+                                    fileListener.fail("VE-1", String.valueOf(error) + " : " + error.getMessage(), "", false, true );
                             }
                         }
-                    }, listener) {
+                    }) {
 
-                long totalSize = file.length;
+                long totalSize = mFile.length();
 
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
@@ -313,12 +257,22 @@ public class API {
                     params.put("data", finalEncodedData);
                     return params;
                 }
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<String, String>();
+                    SharedPreferences preferences = context.getSharedPreferences("MY_PREF", Context.MODE_PRIVATE);
+                    if (preferences.contains("JWT_TOKEN") && !preferences.getString("JWT_TOKEN", "").isEmpty()){
+                        headers.put("x-access-token",preferences.getString("JWT_TOKEN",""));
+                    }
+                    return headers;
+                }
+
                 @Override
                 protected Map<String, DataPart> getByteData() {
                     Map<String, DataPart> params = new HashMap<>();
-                    long imagename = System.currentTimeMillis();
                     totalSize = file.length;
-                    params.put("image", new DataPart(imagename + ".png", file));
+                    params.put("file", new DataPart("file", file));
                     return params;
                 }
 
@@ -327,9 +281,12 @@ public class API {
                 @Override
                 protected Response<NetworkResponse> parseNetworkResponse(NetworkResponse response) {
                     transferred += (256*1024);
-                    Log.i("Eta Transferred Bytes", String.valueOf(transferred));
+                    Log.i("eta progress", transferred + "/" + file.length);
                     int progress = (int) ((transferred * 100f)/file.length);
-                    listener.onProgress(progress);
+                    if (context instanceof Activity)
+                        ((Activity) context).runOnUiThread(()->fileListener.onProgress(Math.max(100, progress)));
+                    else
+                        fileListener.onProgress(progress);
                     return super.parseNetworkResponse(response);
                 }
             };
@@ -341,13 +298,91 @@ public class API {
                     2f));
             VolleyClient.getRequestQueue().add(multipartRequest);
 
+
+
+
         } catch (Exception e){
             e.printStackTrace();
         }
-
-
-
     }
+
+//    public static void postFile(Context context, FileTransferResponseListener listener, Object rawData, String endpoint, Class klass,
+//                                String name, String fileType, byte[] file){
+//        try {
+//            String encodedData = "";
+//            AppRequest request = HashUtils.getHashedDataObject(rawData, context, endpoint);
+//            Log.i("encodedData", request.getData());
+//            if (request != null){
+//                encodedData = request.getData();
+//            }
+//            String finalEncodedData = encodedData;
+//
+//            String url = VolleyClient.getBaseUrl() + endpoint + VolleyClient.suffix;
+//            Log.i("eta url", url);
+//
+//            VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, url,
+//                    new Response.Listener<NetworkResponse>() {
+//                        @Override
+//                        public void onResponse(NetworkResponse rsp) {
+//                           onNetWorkResponse(listener, rsp, klass);
+//                        }
+//                    },
+//                    new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//                            Log.i("eta eror", new Gson().toJson(error));
+//                            if (error.networkResponse != null && error.networkResponse.data != null){
+//                                Log.i("Eta network data", String.valueOf(error.networkResponse.data));
+//                                onNetWorkResponse(listener, error.networkResponse, klass);
+//                            } else {
+//                                listener.fail("VE-1", String.valueOf(error) + " : " + error.getMessage(), "", false, true );
+//                            }
+//                        }
+//                    }, listener) {
+//
+//                long totalSize = file.length;
+//
+//                @Override
+//                protected Map<String, String> getParams() throws AuthFailureError {
+//                    Map<String, String> params = new HashMap<>();
+//                    params.put("data", finalEncodedData);
+//                    return params;
+//                }
+//                @Override
+//                protected Map<String, DataPart> getByteData() {
+//                    Map<String, DataPart> params = new HashMap<>();
+//                    long imagename = System.currentTimeMillis();
+//                    totalSize = file.length;
+//                    params.put("image", new DataPart(imagename + ".png", file));
+//                    return params;
+//                }
+//
+//                long transferred = 0;
+//
+//                @Override
+//                protected Response<NetworkResponse> parseNetworkResponse(NetworkResponse response) {
+//                    transferred += (256*1024);
+//                    Log.i("Eta Transferred Bytes", String.valueOf(transferred));
+//                    int progress = (int) ((transferred * 100f)/file.length);
+//                    listener.onProgress(progress);
+//                    return super.parseNetworkResponse(response);
+//                }
+//            };
+//            //End
+//
+//            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(
+//                    180000,
+//                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                    2f));
+//            VolleyClient.getRequestQueue().add(multipartRequest);
+//
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+//
+//
+//
+//    }
 
     private static void onNetWorkResponse(FileTransferResponseListener listener, NetworkResponse rsp, Class klass) {
         try {

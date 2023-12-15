@@ -5,7 +5,7 @@ import com.example.medicalappadmin.app.MyApplication;
 
 public class VolleyClient {
 
-    public static String testURL = "http://10.0.2.2:8888/KantewaleBackend/";
+    public static String testURL = "http://10.0.2.2:8080/";
     public static String suffix = "";
     public static String BASE_URL = "https://medicalappmangal.onrender.com/";
 

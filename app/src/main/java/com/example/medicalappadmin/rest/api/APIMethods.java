@@ -49,9 +49,10 @@ import java.util.Objects;
 
 public class APIMethods {
 
+
     public static void uploadVoice(Context context, File file, int pageNumber, FileTransferResponseListener<UploadVoiceRP> listener){
         UploadVoiceReq req = new UploadVoiceReq(new FileMetadata("mp3", "audio/mp3", "Voice"), pageNumber);
-        API.uploadFile(context, file, req, EndPoints.uploadAdditional, UploadVoiceRP.class, listener);
+        API.postFile(context, file, req, EndPoints.uploadAdditional, UploadVoiceRP.class, listener, "test", "mp3");
     }
 
     //login method

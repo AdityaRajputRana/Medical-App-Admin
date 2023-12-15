@@ -1,7 +1,5 @@
 package com.example.medicalappadmin.rest.api;
 
-import android.util.Log;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -9,7 +7,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,7 +28,6 @@ public class VolleyMultipartRequest extends Request<NetworkResponse> {
 
     private Response.Listener<NetworkResponse> mListener;
     private Response.ErrorListener mErrorListener;
-    private FileTransferResponseListener progressListener;
     private Map<String, String> mHeaders;
 
     /**
@@ -49,7 +45,6 @@ public class VolleyMultipartRequest extends Request<NetworkResponse> {
         this.mListener = listener;
         this.mErrorListener = errorListener;
         this.mHeaders = headers;
-
     }
 
     /**
@@ -62,11 +57,10 @@ public class VolleyMultipartRequest extends Request<NetworkResponse> {
      */
     public VolleyMultipartRequest(int method, String url,
                                   Response.Listener<NetworkResponse> listener,
-                                  Response.ErrorListener errorListener, FileTransferResponseListener mListener) {
+                                  Response.ErrorListener errorListener) {
         super(method, url, errorListener);
         this.mListener = listener;
         this.mErrorListener = errorListener;
-        this.progressListener = mListener;
     }
 
     @Override
@@ -163,10 +157,8 @@ public class VolleyMultipartRequest extends Request<NetworkResponse> {
      * @param data             loop through data
      * @throws IOException
      */
-    long totalSize = 0;
     private void dataParse(DataOutputStream dataOutputStream, Map<String, DataPart> data) throws IOException {
         for (Map.Entry<String, DataPart> entry : data.entrySet()) {
-            totalSize = entry.getValue().content.length;
             buildDataPart(dataOutputStream, entry.getValue(), entry.getKey());
         }
     }
@@ -207,8 +199,7 @@ public class VolleyMultipartRequest extends Request<NetworkResponse> {
         ByteArrayInputStream fileInputStream = new ByteArrayInputStream(dataFile.getContent());
         int bytesAvailable = fileInputStream.available();
 
-
-        int maxBufferSize = 256 * 1024;
+        int maxBufferSize = 1024 * 1024;
         int bufferSize = Math.min(bytesAvailable, maxBufferSize);
         byte[] buffer = new byte[bufferSize];
 
@@ -218,8 +209,6 @@ public class VolleyMultipartRequest extends Request<NetworkResponse> {
             dataOutputStream.write(buffer, 0, bufferSize);
             bytesAvailable = fileInputStream.available();
             bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            Log.i("Eta Available Bytes: ",String.valueOf(bytesAvailable));
-
             bytesRead = fileInputStream.read(buffer, 0, bufferSize);
         }
 
