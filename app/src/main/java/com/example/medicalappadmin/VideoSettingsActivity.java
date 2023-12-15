@@ -151,8 +151,8 @@ public class VideoSettingsActivity extends AppCompatActivity {
                     Toast.makeText(VideoSettingsActivity.this, "Add some guides by clicking on + button.", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    setUI(guidesVideosRP);
-                    if(response.getAllGuides().size() > 2){
+                    setUI();
+                    if(response.getAllGuides().size() > 0){
                         for(int i= 0; i<response.getAllGuides().size(); i++){
                             Log.i(TAG, "success: "+ new Gson().toJson(guidesVideosRP.getAllGuides().get(i).getName()));
                         }
@@ -175,7 +175,7 @@ public class VideoSettingsActivity extends AppCompatActivity {
 
     GuidesVideosRP updatedRP;
 
-    private void setUI(GuidesVideosRP guidesVideosRP) {
+    private void setUI() {
         //todo ask position 1 aur 2 upar he milegi?
         binding.llFirstGuide.setVisibility(View.VISIBLE);
         binding.tvFirstGuideName.setText(guidesVideosRP.getAllGuides().get(0).getName());
@@ -188,8 +188,11 @@ public class VideoSettingsActivity extends AppCompatActivity {
         Log.i(TAG, "setUI: removing "+ guidesVideosRP.getAllGuides().get(0).getName());
         guidesVideosRP.getAllGuides().remove(0);
         if(guidesVideosRP.getAllGuides().size() > 1){
-            Log.i(TAG, "setUI: removing "+ guidesVideosRP.getAllGuides().get(1).getName());
+            Log.i(TAG, "setUI: removing "+ guidesVideosRP.getAllGuides().get(0).getName());
             guidesVideosRP.getAllGuides().remove(0);
+            Log.i(TAG, "setUI: remaining size "+ guidesVideosRP.getAllGuides().size());
+            Log.i(TAG, "setUI: remaining first element  "+ guidesVideosRP.getAllGuides().get(0).getName());
+
 
         }
     }
