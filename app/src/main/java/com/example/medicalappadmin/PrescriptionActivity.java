@@ -30,6 +30,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -93,7 +94,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     //testing
     private final static int REQUEST_RECORD_AUDIO_PERMISSION = 1000;
-    private final String[] permissions = {Manifest.permission.RECORD_AUDIO};
     String TAG = "pres";
     boolean isPenSearchRunning = false;
     ActivityPrescriptionBinding binding;
@@ -164,23 +164,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private Handler handler;
     private Runnable runnable;
-    private boolean permissionToRecordAccepted = false;
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_RECORD_AUDIO_PERMISSION: {
-                permissionToRecordAccepted = (grantResults[0] == PackageManager.PERMISSION_GRANTED);
-//                        && grantResults[1] == PackageManager.PERMISSION_GRANTED);
-            }
-        }
-        if (!permissionToRecordAccepted) {
-            Toast.makeText(this, "Permission are necessary", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-    }
 
     private void linkMobileNumber(long mobileNo) {
         if (currentPageNumber == -1) {
@@ -272,6 +255,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -282,8 +266,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         setSupportActionBar(binding.toolbar);
 
-        //requesting permissions
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+
+
+
 
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_close);
@@ -380,6 +365,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         intialiseControls();
 
     }
+
+
 
     private void showPreviousPatientsLayout() {
         llAddMobileNumber.setVisibility(View.GONE);
