@@ -183,6 +183,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         APIMethods.addMobileNumber(PrescriptionActivity.this, req, new APIResponseListener<AddMobileNoRP>() {
             @Override
             public void success(AddMobileNoRP response) {
+                mobileBSDialog.dismiss();
                 binding.drawerLayout.open();
                 pbAddMobile.setVisibility(View.GONE);
                 Log.i(TAG, "success: size of relatives " + response.getPatients().size());
@@ -815,6 +816,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 @Override
                 public void success(InitialisePageRP response) {
                     pbSyncPage.setVisibility(View.GONE);
+                    if(mobileBSDialog!=null)
+                        mobileBSDialog.dismiss();
+                    if(recordVoiceDialog != null){
+                        recordVoiceDialog.dismiss();
+                    }
 
                     if (!response.isNewPage()) {
                         if (response.getPage().getHospitalPatientId() != null) {
@@ -874,59 +880,65 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 showMobileBottomSheet();
                 isMobileSheetVisible = true;
             }
-            if (bsMobile.length() == 10) {
-                linkMobileNumber(Long.parseLong(bsMobile));
-                return;
-            }
             switch (id) {
                 case 0: {
                     bsMobile += "0";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 1: {
                     bsMobile += "1";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 2: {
                     bsMobile += "2";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 3: {
                     bsMobile += "3";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 4: {
                     bsMobile += "4";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 5: {
                     bsMobile += "5";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 6: {
                     bsMobile += "6";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 7: {
                     bsMobile += "7";
+                    checkMobileNumberLength(bsMobile);
                     etBSMobile.setText(bsMobile);
                     break;
                 }
                 case 8: {
                     bsMobile += "8";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 9: {
                     bsMobile += "9";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 10: {
@@ -948,12 +960,15 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 case 21: {
                     showRecordVoiceSheet();
                     startRecording();
+                    break;
                 }
                 case 22: {
                     stopRecording();
+                    break;
                 }
                 case 23: {
                     submitRecording();
+                    break;
                 }
             }
         } else if (id == 51 || id == 52) {
@@ -974,6 +989,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 @Override
                 public void success(AddDetailsRP response) {
                     binding.toolbar.setSubtitle("Saved details successfully...");
+                    if(gender.equals("M")){
+                        Toast.makeText(PrescriptionActivity.this, "Patient gender is set as Male", Toast.LENGTH_LONG).show();
+
+                    } else if(gender.equals("F")){
+                        Toast.makeText(PrescriptionActivity.this, "Patient gender is set as Female", Toast.LENGTH_LONG).show();
+
+                    }
                     binding.pbPrescription.setVisibility(View.GONE);
                 }
 
@@ -994,6 +1016,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         Log.i("eta-symbol ", name);
 //        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
+    }
+
+    private void checkMobileNumberLength(String bsMobile) {
+        if (bsMobile.length() == 10) {
+            linkMobileNumber(Long.parseLong(bsMobile));
+        }
     }
 
     private void setTimelyUploads() {
@@ -1114,13 +1142,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
-
+    BottomSheetDialog mobileBSDialog;
     private void showMobileBottomSheet() {
-        BottomSheetDialog dialog = new BottomSheetDialog(PrescriptionActivity.this);
-        dialog.setContentView(R.layout.bsheet_add_mobile_no);
-        etBSMobile = dialog.findViewById(R.id.etBSMobile);
-        bsAMNActionText = dialog.findViewById(R.id.bsAMNActionText);
-        btnBSAMNNext = dialog.findViewById(R.id.btnBSAMNNext);
+        mobileBSDialog = new BottomSheetDialog(PrescriptionActivity.this);
+        mobileBSDialog.setContentView(R.layout.bsheet_add_mobile_no);
+        etBSMobile = mobileBSDialog.findViewById(R.id.etBSMobile);
+        bsAMNActionText = mobileBSDialog.findViewById(R.id.bsAMNActionText);
+        btnBSAMNNext = mobileBSDialog.findViewById(R.id.btnBSAMNNext);
         btnBSAMNNext.setOnClickListener(view -> {
             if (etBSMobile.getText().length() < 10) {
                 bsAMNActionText.setVisibility(View.VISIBLE);
@@ -1131,7 +1159,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             }
         });
 
-        dialog.show();
+        mobileBSDialog.show();
     }
 
     private void submitCase(String caseId) {
