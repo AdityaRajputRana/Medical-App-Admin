@@ -27,12 +27,12 @@ public class SymbolController {
         s.add(new Symbol(22, "VOICE_STOP", 73.5f, 65.8f, 80.65f, 70.7f ));
         s.add(new Symbol(23, "VOICE_SUBMIT", 83.3f, 65.8f, 90f, 70.7f ));
 
-//        s.add(new Symbol(31, "ATTACHMENT_PLAY_1", 50, 9, 62, 12.5f ));
-//        s.add(new Symbol(32, "ATTACHMENT_SHARE_2", 50, 9, 62, 12.5f ));
-//        s.add(new Symbol(33, "ATTACHMENT_PLAY_2", 50, 9, 62, 12.5f ));
-//        s.add(new Symbol(34, "ATTACHMENT_SHARE_2", 50, 9, 62, 12.5f ));
-//        s.add(new Symbol(38, "ATTACHMENT_PLAY_OTHERS", 50, 9, 62, 12.5f ));
-//        s.add(new Symbol(39, "ATTACHMENT_SHARE_OTHERS", 50, 9, 62, 12.5f ));
+        s.add(new Symbol(31, "ATTACHMENT_PLAY_1", 65, 77, 81, 81 ));
+        s.add(new Symbol(32, "ATTACHMENT_SHARE_2", 82, 77, 89, 81 ));
+        s.add(new Symbol(33, "ATTACHMENT_PLAY_2", 65, 82, 81, 86 ));
+        s.add(new Symbol(34, "ATTACHMENT_SHARE_2", 82, 82, 89, 86 ));
+        s.add(new Symbol(38, "ATTACHMENT_PLAY_OTHERS", 65, 87, 89, 91 ));
+        s.add(new Symbol(39, "ATTACHMENT_SHARE_OTHERS", 82, 87, 89, 91 ));
 
 //        s.add(new Symbol(41, "ASSOCIATE_1", 50, 9, 62, 12.5f ));
 //        s.add(new Symbol(42, "ASSOCIATE_2", 50, 9, 62, 12.5f ));
@@ -41,7 +41,7 @@ public class SymbolController {
         s.add(new Symbol(51, "GENDER_MALE", 36.1f, 28.8f, 40.7f, 31.4f ));
         s.add(new Symbol(52, "GENDER_FEMALE", 40.7f, 28.8f, 45.3f, 31.4f ));
 
-        s.add(new Symbol(100, "SUBMIT_CASE", 67.45f, 123.84f, 82.17f, 127.19f ));
+        s.add(new Symbol(100, "SUBMIT_CASE", 65f, 123.84f, 82.17f, 127.19f ));
 //        s.add(new Symbol(101, "CLOSE_CASE", 50, 9, 62, 12.5f ));
 
 
