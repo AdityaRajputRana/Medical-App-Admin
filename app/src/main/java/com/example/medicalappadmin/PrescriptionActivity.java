@@ -40,6 +40,7 @@ import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.Models.retrofit.UploadAudioResponse;
 import com.example.medicalappadmin.PenDriver.ConnectionsHandler;
+import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
@@ -344,7 +345,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 pbSyncPage.setVisibility(View.VISIBLE);
                 hideKeyboard(view);
                 Log.i(TAG, "onClick: current page no " + currentPageNumber);
-                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
+//                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
             }
         });
 
@@ -371,7 +372,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 //        });
 
         binding.actionBtn.setOnLongClickListener(view -> {
-            drawEvent(0, 0, 46, 0);
+//            drawEvent(0, 0, 46, 0);
             showRecordVoiceSheet();
             startRecording();
             return true;
@@ -660,6 +661,21 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     private void intialiseControls() {
 
         driver.setListener(this);
+        driver.observeBuffer(this, buff->{
+            ArrayList<DrawLiveDataBuffer.DrawAction> actions = DrawLiveDataBuffer.emptyBuffer();
+            if (actions != null && actions.size() > 0){
+                if (actions.size() == 1){
+                    Log.i("lv-data", "single val");
+                    handleSingleDraw(actions.get(0));
+                } else {
+                    //Todo: Optimize this
+                    Log.i("lv-data", "mult val");
+                    for (DrawLiveDataBuffer.DrawAction action: actions){
+                        handleSingleDraw(action);
+                    }
+                }
+            }
+        });
 
         if (PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue() != null && PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue()) {
             showDrawView();
@@ -807,9 +823,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         showMessage(s, message);
     }
 
-    @Override
-    public void drawEvent(float x, float y, int pageId, int actionType) {
-
+    private void handleSingleDraw(DrawLiveDataBuffer.DrawAction drawAction){
+        float x = drawAction.x;
+        float y = drawAction.y;
+        int pageId = drawAction.pageId;
+        int actionType = drawAction.actionType;
 
         if (pageId != currentPageNumber) {
             uploadPoints();

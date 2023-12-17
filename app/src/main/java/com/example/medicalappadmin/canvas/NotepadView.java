@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.example.medicalappadmin.Models.Point;
+import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.R;
 
 import java.util.ArrayList;
@@ -121,11 +122,28 @@ public class NotepadView extends View {
         invalidate();
     }
 
+    //Todo: Shift Both Functions to BG Thread to generate a bmp and send that back to our thread
     public void addCoordinates(ArrayList<Point> points) {
         for(Point p:points){
             float x = p.getX();
             float y = p.getY();
             int actionType = p.getActionType();
+            x = x*scaleFactor + getLeft();
+            y = y*scaleFactor + getTop();
+            if(actionType == 1){
+                mStrokes.add(new ArrayList<>());
+            } else if(actionType == 3){
+
+                mStrokes.get(mStrokes.size()-1).add(new Point(x, y));
+            }
+        }
+        invalidate();
+    }
+    public void addActions(ArrayList<DrawLiveDataBuffer.DrawAction> points){
+        for(DrawLiveDataBuffer.DrawAction p:points){
+            float x = p.x;
+            float y = p.y;
+            int actionType = p.actionType;
             x = x*scaleFactor + getLeft();
             y = y*scaleFactor + getTop();
             if(actionType == 1){

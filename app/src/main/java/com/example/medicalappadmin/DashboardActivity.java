@@ -7,6 +7,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +23,7 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.medicalappadmin.PenDriver.ConnectionsHandler;
+import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
@@ -89,21 +91,11 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         }
 
         @Override
-        public void drawEvent(float x, float y, int pageId, int actionType) {
-            if (!presActStarted) {
-                presActStarted = true;
-                Intent i = new Intent(DashboardActivity.this, PrescriptionActivity.class);
-                DashboardActivity.this.startActivity(i);
-            }
-        }
-
-        @Override
         public void onPaperButtonPress(int id, String name) {
 
         }
     };
 
-    private boolean presActStarted = false;
     private boolean isPenSearchRunning;
 
     private void showError(String message, View.OnClickListener listener){
@@ -273,7 +265,6 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
     @Override
     protected void onResume() {
-        presActStarted = false;
         driver.setListener(smartPenListener);
         super.onResume();
     }
@@ -300,9 +291,35 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
                 return true;
             }
         });
-
-
         activateAutoSmartPenConnect();
+        setOnDrawNavigation();
+    }
+
+    private void setOnDrawNavigation() {
+        driver.observeBuffer(this, buffer->{
+            ArrayList< DrawLiveDataBuffer.DrawAction> bufferInstance = DrawLiveDataBuffer.readBuffer();
+            if (bufferInstance != null && bufferInstance.size() >0){
+                Log.i("lv-data", "NON NULL");
+                startDrawActivity();
+            }
+        });
+    }
+
+
+    private boolean isDrawStarted = false;
+    private void startDrawActivity(){
+        if (isDrawStarted)
+            return;
+        isDrawStarted = true;
+        Intent i = new Intent(this, PrescriptionActivity.class);
+        Log.i("lv-data", "STARTING DRAW");
+        startActivity(i);
+    }
+
+    @Override
+    protected void onPostResume() {
+        isDrawStarted = false;
+        super.onPostResume();
     }
 
     private final HomeFragment homeFragment = new HomeFragment(this);

@@ -9,6 +9,5 @@ public interface SmartPenListener {
     void onConnection(boolean establised);
     void disconnected();
     void message(String s, String message);
-    void drawEvent(float x, float y, int pageId, int actionType);
     void onPaperButtonPress(int id, String name);
 }
