@@ -2,7 +2,9 @@ package com.example.medicalappadmin;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -36,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.medicalappadmin.Models.FileMetadata;
+import com.example.medicalappadmin.Models.Guide;
 import com.example.medicalappadmin.Models.LinkedPatient;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Models.Point;
@@ -46,6 +49,7 @@ import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
 import com.example.medicalappadmin.Tools.Methods;
+import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
 import com.example.medicalappadmin.databinding.ActivityPrescriptionBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
@@ -57,13 +61,17 @@ import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
 import com.example.medicalappadmin.rest.requests.AddDetailsReq;
 import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
+import com.example.medicalappadmin.rest.requests.EmptyReq;
+import com.example.medicalappadmin.rest.requests.LinkGuideReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.requests.UploadVoiceReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.CaseSubmitRP;
+import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
+import com.example.medicalappadmin.rest.response.LinkGuideRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.UploadVoiceRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
@@ -267,6 +275,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         setSupportActionBar(binding.toolbar);
 
+        loadDoctorConfigurations();
+
 
 
 
@@ -351,15 +361,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
         //todo: remove it
-//        binding.actionBtn.setOnClickListener(view -> {
-////            drawEvent(0,0,46,0);
-//            showRecordVoiceSheet();
-//        });
+        binding.actionBtn.setOnClickListener(view -> {
+            drawEvent(0, 0, 46, 0);
+        });
 
         binding.actionBtn.setOnLongClickListener(view -> {
-            drawEvent(0, 0, 46, 0);
-            showRecordVoiceSheet();
-            startRecording();
+            showOtherGuidesBS();
             return true;
         });
 
@@ -880,6 +887,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 showMobileBottomSheet();
                 isMobileSheetVisible = true;
             }
+            if(bsMobile.length() == 10){
+                return;
+            }
             switch (id) {
                 case 0: {
                     bsMobile += "0";
@@ -1006,7 +1016,36 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             });
 
-        } else if (id == 100) {
+        } else if(id == 31 || id == 32 || id == 33 || id ==34 ){
+            //31 -> play 1,   32 -> share 1,  33 -> play 2, 34 -> share 2
+
+            switch (id) {
+                case 31: {
+                    Log.i(TAG, "onPaperButtonPress: 31");
+                    break;
+                }
+                case 32: {
+                    linkGuideToPatient(guidesList.get(0));
+                    break;
+                }
+                case 33: {
+                    // todo: play guide video
+                    Log.i(TAG, "onPaperButtonPress: 33");
+                    break;
+                }
+                case 34: {
+                    linkGuideToPatient(guidesList.get(1));
+                    break;
+                }
+            }
+
+            
+        }
+
+
+
+
+        else if (id == 100) {
             if (currentPage == null) {
                 Toast.makeText(this, "Please initialise the page before submitting", Toast.LENGTH_SHORT).show();
             } else {
@@ -1017,6 +1056,123 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         Log.i("eta-symbol ", name);
 //        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
     }
+
+
+    public void linkGuideToPatient(Guide guide){
+        if(otherGuidesBSDialog != null){
+            otherGuidesBSDialog.dismiss();
+        }
+        binding.toolbar.setSubtitle("Linking guide "+ guide.getName());
+        binding.pbPrescription.setVisibility(View.VISIBLE);
+        LinkGuideReq req = new LinkGuideReq(guide.get_id(),currentPageNumber);
+        APIMethods.linkAdditionalGuide(PrescriptionActivity.this, req, new APIResponseListener<LinkGuideRP>() {
+            @Override
+            public void success(LinkGuideRP response) {
+                binding.toolbar.setSubtitle("Added guide "+ guide.getName() + " to the patient");
+
+                binding.pbPrescription.setVisibility(View.GONE);
+
+                Toast.makeText(PrescriptionActivity.this, guide.getName() + "is attached to the patient.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                binding.toolbar.setSubtitle("Some error occurred while linking guide.");
+
+                Log.i(TAG, "fail: linking guide "+message);
+                binding.pbPrescription.setVisibility(View.GONE);
+                showError(message,null);
+            }
+        });
+
+    }
+
+
+    private ConfigurePageRP pageConfigurations;
+    private ArrayList<Guide> guidesList;
+    private ArrayList<Guide> otherGuidesList;
+    private void loadDoctorConfigurations() {
+        binding.toolbar.setSubtitle("Loading configurations");
+        binding.pbPrescription.setVisibility(View.VISIBLE);
+
+        APIMethods.configurePage(PrescriptionActivity.this, new EmptyReq(), new APIResponseListener<ConfigurePageRP>() {
+            @Override
+            public void success(ConfigurePageRP response) {
+                binding.toolbar.setSubtitle("Configured page");
+                binding.pbPrescription.setVisibility(View.GONE);
+
+
+                pageConfigurations = response;
+                guidesList = response.getGuides();
+                Log.i(TAG, "success: guides list size "+ guidesList.size());
+                if(guidesList.size() > 2){
+                    otherGuidesList =  new ArrayList<>();
+                    for(int i=2; i<guidesList.size(); i++){
+                        Log.i(TAG, "success: adding to other guide "+ guidesList.get(i));
+                        otherGuidesList.add(guidesList.get(i));
+                    }
+                }
+                Log.i(TAG, "success: other guides list size "+ otherGuidesList.size());
+
+                
+//                binding.canvasView.getPrescriptionBMP()
+
+
+//                SharedPreferences preferences = getSharedPreferences("PAGE_CONFIGURATION_PREFS", MODE_PRIVATE);
+//                SharedPreferences.Editor editor = preferences.edit();
+//
+//                editor.putString("PAGE_CONFIGS",new Gson().toJson(response));
+//
+//                editor.commit();
+
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+//                Methods.showError(PrescriptionActivity.this,message,cancellable);
+                showError(message, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                    }
+                });
+            }
+        });
+    }
+
+
+    BottomSheetDialog  otherGuidesBSDialog;
+     RecyclerView rcvOtherGuides;
+
+    private void showOtherGuidesBS(){
+        Log.i(TAG, "showOtherGuidesBS: guides size "+guidesList.size());
+        if(guidesList == null || guidesList.size() <= 2 ){
+            Toast.makeText(this, "No other guides available. Add them from settings.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(otherGuidesList != null){
+            otherGuidesBSDialog = new BottomSheetDialog(PrescriptionActivity.this);
+            otherGuidesBSDialog.setContentView(R.layout.bsheet_other_guides);
+            rcvOtherGuides = otherGuidesBSDialog.findViewById(R.id.rvOtherGuides);
+            rcvOtherGuides.setLayoutManager(new LinearLayoutManager(PrescriptionActivity.this));
+            rcvOtherGuides.setAdapter(new OtherGuidesAdapterBS(otherGuidesList, PrescriptionActivity.this, new OtherGuidesAdapterBS.GuideLinkListener() {
+                @Override
+                public void onLinkGuideClicked(Guide guide) {
+                    linkGuideToPatient(guide);
+                }
+            }));
+
+            otherGuidesBSDialog.show();
+        } else {
+            Toast.makeText(this, "No other guides", Toast.LENGTH_SHORT).show();
+        }
+        
+
+
+    }
+
+
 
     private void checkMobileNumberLength(String bsMobile) {
         if (bsMobile.length() == 10) {

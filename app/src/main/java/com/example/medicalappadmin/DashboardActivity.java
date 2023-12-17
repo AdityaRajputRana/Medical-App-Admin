@@ -25,12 +25,18 @@ import com.example.medicalappadmin.PenDriver.ConnectionsHandler;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
+import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.databinding.ActivityDashboardBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
 import com.example.medicalappadmin.fragments.HomeFragment;
 import com.example.medicalappadmin.fragments.NotepadFragment;
 import com.example.medicalappadmin.fragments.ProfileFragment;
+import com.example.medicalappadmin.rest.api.APIMethods;
+import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
+import com.example.medicalappadmin.rest.requests.EmptyReq;
+import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -287,6 +293,8 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         setContentView(binding.getRoot());
         binding.bottomNavigationView.setItemIconTintList(null);
         changeFragment(0);
+
+
         binding.bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -304,6 +312,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
         activateAutoSmartPenConnect();
     }
+
 
     private final HomeFragment homeFragment = new HomeFragment(this);
     private final  ProfileFragment profileFragment = new ProfileFragment(this);

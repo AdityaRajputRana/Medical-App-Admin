@@ -20,6 +20,9 @@ public class EndPoints {
     public static String viewGuideVideos = "api/guides/list";
     public static String addGuideVideo = "api/guides/addVideo";
     public static String setGuidePosition = "api/guides/setPosition";
+    public static String linkAdditionalGuide = "api/page/additional/linkGuide";
+    public static String configurePage = "api/doctor/getPageConfig";
+
 
 
 

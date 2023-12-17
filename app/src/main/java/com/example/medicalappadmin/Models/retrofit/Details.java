@@ -1,34 +1,27 @@
 package com.example.medicalappadmin.Models.retrofit;
 
 public class Details {
-    String publicUrl;
+    String name;
 
-    String folder;
+    String description;
 
-    String publicId;
-    String storage;
-    String path;
-
-    public String getPath() {
-        return path;
-    }
 
     public Details() {
     }
 
-    public String getPublicUrl() {
-        return publicUrl;
+    public String getName() {
+        return name;
     }
 
-    public String getFolder() {
-        return folder;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getPublicId() {
-        return publicId;
+    public String getDescription() {
+        return description;
     }
 
-    public String getStorage() {
-        return storage;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
