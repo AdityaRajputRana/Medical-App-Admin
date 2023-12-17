@@ -4,8 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 
+import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.Models.Symbol;
 import com.google.gson.Gson;
@@ -43,6 +47,13 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
 
 
     private SharedPreferences mPref;
+
+    public static void observeBuffer(@NonNull LifecycleOwner owner, @NonNull Observer<ArrayList<DrawLiveDataBuffer.DrawAction>> observer){
+        DrawLiveDataBuffer.observeBuffer(owner, observer);
+    }
+    public static void removeObserver(Observer observer){
+        DrawLiveDataBuffer.removeObserver(observer);
+    }
 
     public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener){
         ConnectionsHandler.PenConnectionsListener mConListener = new ConnectionsHandler.PenConnectionsListener() {
@@ -288,7 +299,10 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
         }
         else if (DotType.isPenActionMove(dot.dotType))
             actionType = 3;
-        smartPenListener.drawEvent(dot.x, dot.y, dot.pageId, actionType);
+
+        DrawLiveDataBuffer.insertAction(new DrawLiveDataBuffer.DrawAction(
+                dot.x, dot.y, dot.pageId, actionType, false
+        ));
     }
 
     public enum CONNECT_MESSAGE{
@@ -402,9 +416,5 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
         }
     }
 
-
-    //getList
-    //connectToPen
-    //SmartPenConnector
 
 }
