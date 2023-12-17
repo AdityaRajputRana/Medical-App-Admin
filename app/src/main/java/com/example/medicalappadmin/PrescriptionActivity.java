@@ -369,7 +369,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         //todo: remove it
         binding.actionBtn.setOnClickListener(view -> {
-            drawEvent(0, 0, 46, 0);
+//            drawEvent(0, 0, 46, 0);
         });
 
         binding.actionBtn.setOnLongClickListener(view -> {
