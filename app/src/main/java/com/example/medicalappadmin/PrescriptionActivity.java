@@ -177,6 +177,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         if (currentPageNumber == -1) {
             Toast.makeText(PrescriptionActivity.this, "Please touch your page with pen", Toast.LENGTH_SHORT).show();
             binding.drawerLayout.close();
+            if(mobileBSDialog != null){
+                mobileBSDialog.dismiss();
+            }
             return;
         }
 
@@ -191,7 +194,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         APIMethods.addMobileNumber(PrescriptionActivity.this, req, new APIResponseListener<AddMobileNoRP>() {
             @Override
             public void success(AddMobileNoRP response) {
-                mobileBSDialog.dismiss();
+                if(mobileBSDialog != null) {
+                    mobileBSDialog.dismiss();
+                }
                 binding.drawerLayout.open();
                 pbAddMobile.setVisibility(View.GONE);
                 Log.i(TAG, "success: size of relatives " + response.getPatients().size());
@@ -243,7 +248,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                     });
 
 
-                } else {
+                }
+                else {
                     //new patient
                     Log.i(TAG, "success: relative does not exist, new patient");
 
@@ -437,7 +443,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             showRelativePrevCases(selectedRelative);
         } else {
             Log.i(TAG, "showRelativeDetails: relatives null");
-
         }
 
 
