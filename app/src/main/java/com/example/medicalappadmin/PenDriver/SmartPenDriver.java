@@ -10,10 +10,12 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
+import com.example.medicalappadmin.PenDriver.Models.NoteModel;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.Models.Symbol;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,12 +24,15 @@ import java.util.ArrayList;
 
 import kr.neolab.sdk.ink.structure.Dot;
 import kr.neolab.sdk.ink.structure.DotType;
+import kr.neolab.sdk.ink.structure.Stroke;
 import kr.neolab.sdk.metadata.IMetadataCtrl;
 import kr.neolab.sdk.metadata.IMetadataListener;
 import kr.neolab.sdk.metadata.MetadataCtrl;
 import kr.neolab.sdk.pen.IPenCtrl;
 import kr.neolab.sdk.pen.PenCtrl;
 import kr.neolab.sdk.pen.bluetooth.BTLEAdt;
+import kr.neolab.sdk.pen.bluetooth.lib.ProtocolNotSupportedException;
+import kr.neolab.sdk.pen.penmsg.IOfflineDataListener;
 import kr.neolab.sdk.pen.penmsg.IPenDotListener;
 import kr.neolab.sdk.pen.penmsg.IPenMsgListener;
 import kr.neolab.sdk.pen.penmsg.JsonTag;
@@ -47,6 +52,10 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
 
 
     private SharedPreferences mPref;
+
+
+
+
 
     public static void observeBuffer(@NonNull LifecycleOwner owner, @NonNull Observer<ArrayList<DrawLiveDataBuffer.DrawAction>> observer){
         DrawLiveDataBuffer.observeBuffer(owner, observer);
@@ -74,6 +83,9 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
 
     @Override
     public void onReceiveMessage(String s, PenMsg penMsg) {
+        Log.i("pen-msg-type", String.valueOf(penMsg.penMsgType));
+        Log.i("pen-msg-head", String.valueOf(s));
+        Log.i("pen-msg-body", new Gson().toJson(penMsg));
         switch ( penMsg.penMsgType )
         {
             case PenMsgType.PEN_CONNECTION_SUCCESS:
@@ -209,76 +221,78 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
             break;
 
 
-//            case PenMsgType.OFFLINE_DATA_NOTE_LIST:
-//
-//                try
-//                {
-//                    JSONArray list = new JSONArray( penMsg.getContent() );
-//
-//                    for ( int i = 0; i < list.length(); i++ )
-//                    {
-//                        JSONObject jobj = list.getJSONObject( i );
-//
-//                        int sectionId = jobj.getInt( Const.JsonTag.INT_SECTION_ID );
-//                        int ownerId = jobj.getInt( Const.JsonTag.INT_OWNER_ID );
-//                        int noteId = jobj.getInt( Const.JsonTag.INT_NOTE_ID );
-//                        NLog.d( "offline(" + ( i + 1 ) + ") note => sectionId : " + sectionId + ", ownerId : " + ownerId + ", noteId : " + noteId );
-//
-//                        // 오프라인 데이터 리스트 노트북 단위로 받기
+            case PenMsgType.OFFLINE_DATA_NOTE_LIST:
+
+                try
+                {
+                    JSONArray list = new JSONArray( penMsg.getContent() );
+
+                    for ( int i = 0; i < list.length(); i++ )
+                    {
+                        JSONObject jobj = list.getJSONObject( i );
+
+                        int sectionId = jobj.getInt( Const.JsonTag.INT_SECTION_ID );
+                        int ownerId = jobj.getInt( Const.JsonTag.INT_OWNER_ID );
+                        int noteId = jobj.getInt( Const.JsonTag.INT_NOTE_ID );
+                        NLog.d( "offline(" + ( i + 1 ) + ") note => sectionId : " + sectionId + ", ownerId : " + ownerId + ", noteId : " + noteId );
+
+                        // Requesting Individual Pages
+                        iPenCtrl.reqOfflineDataPageList(sectionId, ownerId, noteId);
 //                        iPenCtrl.reqOfflineData(sectionId,  ownerId, noteId );
-//                    }
-//
-//                }
-//                catch ( JSONException e )
-//                {
-//                    e.printStackTrace();
-//                }
-//                break;
-//
-//            case PenMsgType.OFFLINE_DATA_PAGE_LIST:
-//
-//                try
-//                {
-//                    JSONArray list = new JSONArray( penMsg.getContent() );
-//
-//                    int prvSec = -1;
-//                    int prvOwn = -1;
-//                    int prvNote = -1;
-//                    ArrayList<Integer> pageIds = new ArrayList<>( );
-//
-//                    for ( int i = 0; i < list.length(); i++ )
-//                    {
-//                        JSONObject jobj = list.getJSONObject( i );
-//
-//                        int sectionId = jobj.getInt( Const.JsonTag.INT_SECTION_ID );
-//                        int ownerId = jobj.getInt( Const.JsonTag.INT_OWNER_ID );
-//                        int noteId = jobj.getInt( Const.JsonTag.INT_NOTE_ID );
-//                        int pageId = jobj.getInt( Const.JsonTag.INT_PAGE_ID );
-//                        NLog.d( "offline(" + ( i + 1 ) + ") note => sectionId : " + sectionId + ", ownerId : " + ownerId + ", noteId : " + noteId + ", pageId : " + pageId );
-//
-//                        pageIds.add( pageId );
-//                        // 오프라인 데이터 리스트 페이지 단위로 받기
-//                        if( prvSec != sectionId || prvOwn != ownerId || prvNote != noteId )
-//                        {
-//                            iPenCtrl.reqOfflineData( sectionId, ownerId, noteId, Util.convertIntegers( pageIds ) );
-//                            pageIds.clear();
-//                        }
-//
-//                    }
-//
-//                }
-//                catch ( JSONException e )
-//                {
-//                    e.printStackTrace();
-//                } catch ( ProtocolNotSupportedException e )
-//                {
-//                    e.printStackTrace();
-//                } catch ( OutOfRangeException e )
-//                {
-//                    e.printStackTrace();
-//                }
-//
-//                break;
+                    }
+
+                }
+                catch ( JSONException e )
+                {
+                    e.printStackTrace();
+                } catch (ProtocolNotSupportedException e) {
+                    throw new RuntimeException(e);
+                }
+                break;
+
+            case PenMsgType.OFFLINE_DATA_PAGE_LIST:
+
+                try
+                {
+                    JSONArray list = new JSONArray( penMsg.getContent() );
+
+                    int prvSec = -1;
+                    int prvOwn = -1;
+                    int prvNote = -1;
+                    ArrayList<Integer> pageIds = new ArrayList<>( );
+
+                    for ( int i = 0; i < list.length(); i++ )
+                    {
+                        JSONObject jobj = list.getJSONObject( i );
+
+                        int sectionId = jobj.getInt( Const.JsonTag.INT_SECTION_ID );
+                        int ownerId = jobj.getInt( Const.JsonTag.INT_OWNER_ID );
+                        int noteId = jobj.getInt( Const.JsonTag.INT_NOTE_ID );
+                        int pageId = jobj.getInt( Const.JsonTag.INT_PAGE_ID );
+                        Log.i("offline-page-req", "offline(" + ( i + 1 ) + ") note => sectionId : " + sectionId + ", ownerId : " + ownerId + ", noteId : " + noteId + ", pageId : " + pageId );
+
+                        pageIds.add( pageId );
+                        // 오프라인 데이터 리스트 페이지 단위로 받기
+                        if( prvSec != sectionId || prvOwn != ownerId || prvNote != noteId )
+                        {
+//                            iPenCtrl.reqOfflineData( sectionId, ownerId, noteId, page );
+                            offlineNotes.add(new NoteModel(sectionId, ownerId, noteId, pageIds));
+                            pageIds.clear();
+                        }
+
+                    }
+
+                }
+                catch ( Exception e )
+                {
+                    e.printStackTrace();
+                    if (smartPenListener != null){
+                        smartPenListener.error("Error during offline data processing - organizing notes - " + e.getMessage());
+                    }
+                }
+
+                break;
+
         }
     }
 
@@ -417,4 +431,37 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
     }
 
 
+
+
+    //--------------------OFFLINE DATA HANDLING SECTION-------------------------------
+    private ArrayList<NoteModel> offlineNotes = new ArrayList<>();
+    public boolean isOfflineDataAvailable(){
+        return offlineNotes.size() > 0;
+    }
+    public void transferOfflineData(){
+        if (offlineNotes.size() <= 0|| iPenCtrl == null){
+            return;
+        }
+        try {
+            for (NoteModel note : offlineNotes) {
+                iPenCtrl.setOffLineDataListener(new IOfflineDataListener() {
+                    @Override
+                    public void onReceiveOfflineStrokes(Object o, String s, Stroke[] strokes, int i, int i1, int i2, kr.neolab.sdk.metadata.structure.Symbol[] symbols) {
+                        for (Stroke stroke: strokes){
+                            for (Dot d: stroke.getDots()){
+                                //Todo: Handle Button Presses Offline
+                                onReceiveDot(s, d);
+                            }
+                        }
+                    }
+                });
+                iPenCtrl.reqOfflineData(note.sectionId, note.ownerId, note.noteId, note.getPagesArray());
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            if (smartPenListener != null){
+                smartPenListener.error("Error during offline data processing - transferring data - " + e.getMessage());
+            }
+        }
+    }
 }
