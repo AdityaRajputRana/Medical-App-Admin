@@ -2,7 +2,9 @@ package com.example.medicalappadmin;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -30,11 +32,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.medicalappadmin.Models.FileMetadata;
+import com.example.medicalappadmin.Models.Guide;
 import com.example.medicalappadmin.Models.LinkedPatient;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Models.Point;
@@ -46,6 +50,7 @@ import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
 import com.example.medicalappadmin.Tools.Methods;
+import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
 import com.example.medicalappadmin.databinding.ActivityPrescriptionBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
@@ -57,13 +62,17 @@ import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
 import com.example.medicalappadmin.rest.requests.AddDetailsReq;
 import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
+import com.example.medicalappadmin.rest.requests.EmptyReq;
+import com.example.medicalappadmin.rest.requests.LinkGuideReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.requests.UploadVoiceReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.CaseSubmitRP;
+import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
+import com.example.medicalappadmin.rest.response.LinkGuideRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.UploadVoiceRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
@@ -94,7 +103,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     //testing
     private final static int REQUEST_RECORD_AUDIO_PERMISSION = 1000;
-    private final String[] permissions = {Manifest.permission.RECORD_AUDIO};
     String TAG = "pres";
     boolean isPenSearchRunning = false;
     ActivityPrescriptionBinding binding;
@@ -165,28 +173,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private Handler handler;
     private Runnable runnable;
-    private boolean permissionToRecordAccepted = false;
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_RECORD_AUDIO_PERMISSION: {
-                permissionToRecordAccepted = (grantResults[0] == PackageManager.PERMISSION_GRANTED);
-//                        && grantResults[1] == PackageManager.PERMISSION_GRANTED);
-            }
-        }
-        if (!permissionToRecordAccepted) {
-            Toast.makeText(this, "Permission are necessary", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-    }
 
     private void linkMobileNumber(long mobileNo) {
         if (currentPageNumber == -1) {
             Toast.makeText(PrescriptionActivity.this, "Please touch your page with pen", Toast.LENGTH_SHORT).show();
             binding.drawerLayout.close();
+            if(mobileBSDialog != null){
+                mobileBSDialog.dismiss();
+            }
             return;
         }
 
@@ -201,6 +195,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         APIMethods.addMobileNumber(PrescriptionActivity.this, req, new APIResponseListener<AddMobileNoRP>() {
             @Override
             public void success(AddMobileNoRP response) {
+                if(mobileBSDialog != null) {
+                    mobileBSDialog.dismiss();
+                }
                 binding.drawerLayout.open();
                 pbAddMobile.setVisibility(View.GONE);
                 Log.i(TAG, "success: size of relatives " + response.getPatients().size());
@@ -252,7 +249,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                     });
 
 
-                } else {
+                }
+                else {
                     //new patient
                     Log.i(TAG, "success: relative does not exist, new patient");
 
@@ -273,6 +271,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -283,8 +282,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         setSupportActionBar(binding.toolbar);
 
-        //requesting permissions
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+        loadDoctorConfigurations();
+
+
+
+
 
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_close);
@@ -366,21 +368,19 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
         //todo: remove it
-//        binding.actionBtn.setOnClickListener(view -> {
-////            drawEvent(0,0,46,0);
-//            showRecordVoiceSheet();
-//        });
+        binding.actionBtn.setOnClickListener(view -> {
+            drawEvent(0, 0, 46, 0);
+        });
 
         binding.actionBtn.setOnLongClickListener(view -> {
-//            drawEvent(0, 0, 46, 0);
-            showRecordVoiceSheet();
-            startRecording();
+            showOtherGuidesBS();
             return true;
         });
 
         intialiseControls();
 
     }
+
 
     @Override
     protected void onPostResume() {
@@ -449,7 +449,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             showRelativePrevCases(selectedRelative);
         } else {
             Log.i(TAG, "showRelativeDetails: relatives null");
-
         }
 
 
@@ -860,6 +859,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 @Override
                 public void success(InitialisePageRP response) {
                     pbSyncPage.setVisibility(View.GONE);
+                    if(mobileBSDialog!=null)
+                        mobileBSDialog.dismiss();
+                    if(recordVoiceDialog != null){
+                        recordVoiceDialog.dismiss();
+                    }
 
                     if (!response.isNewPage()) {
                         if (response.getPage().getHospitalPatientId() != null) {
@@ -919,59 +923,68 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 showMobileBottomSheet();
                 isMobileSheetVisible = true;
             }
-            if (bsMobile.length() == 10) {
-                linkMobileNumber(Long.parseLong(bsMobile));
+            if(bsMobile.length() == 10){
                 return;
             }
             switch (id) {
                 case 0: {
                     bsMobile += "0";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 1: {
                     bsMobile += "1";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 2: {
                     bsMobile += "2";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 3: {
                     bsMobile += "3";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 4: {
                     bsMobile += "4";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 5: {
                     bsMobile += "5";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 6: {
                     bsMobile += "6";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 7: {
                     bsMobile += "7";
+                    checkMobileNumberLength(bsMobile);
                     etBSMobile.setText(bsMobile);
                     break;
                 }
                 case 8: {
                     bsMobile += "8";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 9: {
                     bsMobile += "9";
                     etBSMobile.setText(bsMobile);
+                    checkMobileNumberLength(bsMobile);
                     break;
                 }
                 case 10: {
@@ -993,12 +1006,15 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 case 21: {
                     showRecordVoiceSheet();
                     startRecording();
+                    break;
                 }
                 case 22: {
                     stopRecording();
+                    break;
                 }
                 case 23: {
                     submitRecording();
+                    break;
                 }
             }
         } else if (id == 51 || id == 52) {
@@ -1019,6 +1035,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 @Override
                 public void success(AddDetailsRP response) {
                     binding.toolbar.setSubtitle("Saved details successfully...");
+                    if(gender.equals("M")){
+                        Toast.makeText(PrescriptionActivity.this, "Patient gender is set as Male", Toast.LENGTH_LONG).show();
+
+                    } else if(gender.equals("F")){
+                        Toast.makeText(PrescriptionActivity.this, "Patient gender is set as Female", Toast.LENGTH_LONG).show();
+
+                    }
                     binding.pbPrescription.setVisibility(View.GONE);
                 }
 
@@ -1029,7 +1052,36 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             });
 
-        } else if (id == 100) {
+        } else if(id == 31 || id == 32 || id == 33 || id ==34 ){
+            //31 -> play 1,   32 -> share 1,  33 -> play 2, 34 -> share 2
+
+            switch (id) {
+                case 31: {
+                    Log.i(TAG, "onPaperButtonPress: 31");
+                    break;
+                }
+                case 32: {
+                    linkGuideToPatient(guidesList.get(0));
+                    break;
+                }
+                case 33: {
+                    // todo: play guide video
+                    Log.i(TAG, "onPaperButtonPress: 33");
+                    break;
+                }
+                case 34: {
+                    linkGuideToPatient(guidesList.get(1));
+                    break;
+                }
+            }
+
+            
+        }
+
+
+
+
+        else if (id == 100) {
             if (currentPage == null) {
                 Toast.makeText(this, "Please initialise the page before submitting", Toast.LENGTH_SHORT).show();
             } else {
@@ -1039,6 +1091,129 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         Log.i("eta-symbol ", name);
 //        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
+    }
+
+
+    public void linkGuideToPatient(Guide guide){
+        if(otherGuidesBSDialog != null){
+            otherGuidesBSDialog.dismiss();
+        }
+        binding.toolbar.setSubtitle("Linking guide "+ guide.getName());
+        binding.pbPrescription.setVisibility(View.VISIBLE);
+        LinkGuideReq req = new LinkGuideReq(guide.get_id(),currentPageNumber);
+        APIMethods.linkAdditionalGuide(PrescriptionActivity.this, req, new APIResponseListener<LinkGuideRP>() {
+            @Override
+            public void success(LinkGuideRP response) {
+                binding.toolbar.setSubtitle("Added guide "+ guide.getName() + " to the patient");
+
+                binding.pbPrescription.setVisibility(View.GONE);
+
+                Toast.makeText(PrescriptionActivity.this, guide.getName() + "is attached to the patient.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                binding.toolbar.setSubtitle("Some error occurred while linking guide.");
+
+                Log.i(TAG, "fail: linking guide "+message);
+                binding.pbPrescription.setVisibility(View.GONE);
+                showError(message,null);
+            }
+        });
+
+    }
+
+
+    private ConfigurePageRP pageConfigurations;
+    private ArrayList<Guide> guidesList;
+    private ArrayList<Guide> otherGuidesList;
+    private void loadDoctorConfigurations() {
+        binding.toolbar.setSubtitle("Loading configurations");
+        binding.pbPrescription.setVisibility(View.VISIBLE);
+
+        APIMethods.configurePage(PrescriptionActivity.this, new EmptyReq(), new APIResponseListener<ConfigurePageRP>() {
+            @Override
+            public void success(ConfigurePageRP response) {
+                binding.toolbar.setSubtitle("Configured page");
+                binding.pbPrescription.setVisibility(View.GONE);
+
+
+                pageConfigurations = response;
+                guidesList = response.getGuides();
+                Log.i(TAG, "success: guides list size "+ guidesList.size());
+                if(guidesList.size() > 2){
+                    otherGuidesList =  new ArrayList<>();
+                    for(int i=2; i<guidesList.size(); i++){
+                        Log.i(TAG, "success: adding to other guide "+ guidesList.get(i));
+                        otherGuidesList.add(guidesList.get(i));
+                    }
+                }
+                Log.i(TAG, "success: other guides list size "+ otherGuidesList.size());
+
+                
+//                binding.canvasView.getPrescriptionBMP()
+
+
+//                SharedPreferences preferences = getSharedPreferences("PAGE_CONFIGURATION_PREFS", MODE_PRIVATE);
+//                SharedPreferences.Editor editor = preferences.edit();
+//
+//                editor.putString("PAGE_CONFIGS",new Gson().toJson(response));
+//
+//                editor.commit();
+
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+//                Methods.showError(PrescriptionActivity.this,message,cancellable);
+                showError(message, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                    }
+                });
+            }
+        });
+    }
+
+
+    BottomSheetDialog  otherGuidesBSDialog;
+     RecyclerView rcvOtherGuides;
+
+    private void showOtherGuidesBS(){
+        Log.i(TAG, "showOtherGuidesBS: guides size "+guidesList.size());
+        if(guidesList == null || guidesList.size() <= 2 ){
+            Toast.makeText(this, "No other guides available. Add them from settings.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(otherGuidesList != null){
+            otherGuidesBSDialog = new BottomSheetDialog(PrescriptionActivity.this);
+            otherGuidesBSDialog.setContentView(R.layout.bsheet_other_guides);
+            rcvOtherGuides = otherGuidesBSDialog.findViewById(R.id.rvOtherGuides);
+            rcvOtherGuides.setLayoutManager(new LinearLayoutManager(PrescriptionActivity.this));
+            rcvOtherGuides.setAdapter(new OtherGuidesAdapterBS(otherGuidesList, PrescriptionActivity.this, new OtherGuidesAdapterBS.GuideLinkListener() {
+                @Override
+                public void onLinkGuideClicked(Guide guide) {
+                    linkGuideToPatient(guide);
+                }
+            }));
+
+            otherGuidesBSDialog.show();
+        } else {
+            Toast.makeText(this, "No other guides", Toast.LENGTH_SHORT).show();
+        }
+        
+
+
+    }
+
+
+
+    private void checkMobileNumberLength(String bsMobile) {
+        if (bsMobile.length() == 10) {
+            linkMobileNumber(Long.parseLong(bsMobile));
+        }
     }
 
     private void setTimelyUploads() {
@@ -1159,13 +1334,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
-
+    BottomSheetDialog mobileBSDialog;
     private void showMobileBottomSheet() {
-        BottomSheetDialog dialog = new BottomSheetDialog(PrescriptionActivity.this);
-        dialog.setContentView(R.layout.bsheet_add_mobile_no);
-        etBSMobile = dialog.findViewById(R.id.etBSMobile);
-        bsAMNActionText = dialog.findViewById(R.id.bsAMNActionText);
-        btnBSAMNNext = dialog.findViewById(R.id.btnBSAMNNext);
+        mobileBSDialog = new BottomSheetDialog(PrescriptionActivity.this);
+        mobileBSDialog.setContentView(R.layout.bsheet_add_mobile_no);
+        etBSMobile = mobileBSDialog.findViewById(R.id.etBSMobile);
+        bsAMNActionText = mobileBSDialog.findViewById(R.id.bsAMNActionText);
+        btnBSAMNNext = mobileBSDialog.findViewById(R.id.btnBSAMNNext);
         btnBSAMNNext.setOnClickListener(view -> {
             if (etBSMobile.getText().length() < 10) {
                 bsAMNActionText.setVisibility(View.VISIBLE);
@@ -1176,7 +1351,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             }
         });
 
-        dialog.show();
+        mobileBSDialog.show();
     }
 
     private void submitCase(String caseId) {

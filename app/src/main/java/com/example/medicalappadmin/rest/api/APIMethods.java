@@ -15,6 +15,7 @@ import com.example.medicalappadmin.rest.requests.CaseSubmitReq;
 import com.example.medicalappadmin.rest.requests.EmptyReq;
 import com.example.medicalappadmin.rest.requests.HomeReq;
 import com.example.medicalappadmin.rest.requests.InitialisePageReq;
+import com.example.medicalappadmin.rest.requests.LinkGuideReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.requests.LoginReq;
 import com.example.medicalappadmin.rest.requests.MergeCasesReq;
@@ -30,9 +31,11 @@ import com.example.medicalappadmin.rest.response.AddGuideVideoRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
 import com.example.medicalappadmin.rest.response.CaseSubmitRP;
+import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.GuidesVideosRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
+import com.example.medicalappadmin.rest.response.LinkGuideRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.LoginRP;
 import com.example.medicalappadmin.rest.response.PatientListRP;
@@ -50,10 +53,17 @@ import java.util.Objects;
 public class APIMethods {
 
 
+    public static void configurePage(Context context, EmptyReq req, APIResponseListener<ConfigurePageRP> listener){
+        API.postData(listener,req, EndPoints.configurePage, ConfigurePageRP.class, context);
+    }
+    public static void linkAdditionalGuide(Context context, LinkGuideReq req, APIResponseListener<LinkGuideRP> listener){
+        API.postData(listener,req, EndPoints.linkAdditionalGuide, LinkGuideRP.class, context);
+    }
     public static void uploadVoice(Context context, File file, int pageNumber, FileTransferResponseListener<UploadVoiceRP> listener){
         UploadVoiceReq req = new UploadVoiceReq(new FileMetadata("mp3", "audio/mp3", "Voice"), pageNumber);
         API.postFile(context, file, req, EndPoints.uploadAdditional, UploadVoiceRP.class, listener, "test", "mp3");
     }
+
 
     //login method
     public static void loginWithEmailAndPassword(Context context, String email, String password, APIResponseListener<LoginRP> listener) {
