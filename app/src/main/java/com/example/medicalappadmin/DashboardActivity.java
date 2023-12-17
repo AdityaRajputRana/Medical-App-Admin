@@ -91,21 +91,11 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         }
 
         @Override
-        public void drawEvent(float x, float y, int pageId, int actionType) {
-            if (!presActStarted) {
-                presActStarted = true;
-                Intent i = new Intent(DashboardActivity.this, PrescriptionActivity.class);
-                DashboardActivity.this.startActivity(i);
-            }
-        }
-
-        @Override
         public void onPaperButtonPress(int id, String name) {
 
         }
     };
 
-    private boolean presActStarted = false;
     private boolean isPenSearchRunning;
 
     private void showError(String message, View.OnClickListener listener){
@@ -275,7 +265,6 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
     @Override
     protected void onResume() {
-        presActStarted = false;
         driver.setListener(smartPenListener);
         super.onResume();
     }

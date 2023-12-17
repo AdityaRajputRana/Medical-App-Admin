@@ -345,7 +345,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 pbSyncPage.setVisibility(View.VISIBLE);
                 hideKeyboard(view);
                 Log.i(TAG, "onClick: current page no " + currentPageNumber);
-                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
+//                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
             }
         });
 
@@ -372,7 +372,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 //        });
 
         binding.actionBtn.setOnLongClickListener(view -> {
-            drawEvent(0, 0, 46, 0);
+//            drawEvent(0, 0, 46, 0);
             showRecordVoiceSheet();
             startRecording();
             return true;
@@ -821,11 +821,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     @Override
     public void message(String s, String message) {
         showMessage(s, message);
-    }
-
-    @Override
-    public void drawEvent(float x, float y, int pageId, int actionType) {
-        handleSingleDraw(new DrawLiveDataBuffer.DrawAction(x, y, pageId, actionType, false));
     }
 
     private void handleSingleDraw(DrawLiveDataBuffer.DrawAction drawAction){
