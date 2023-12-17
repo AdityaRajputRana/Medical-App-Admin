@@ -382,6 +382,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        offlineData();
+    }
 
     private void showPreviousPatientsLayout() {
         llAddMobileNumber.setVisibility(View.GONE);
@@ -695,6 +700,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 dialogPenBinding.bodyTxt.setText("Requesting Permissions");
             } else
                 showError(String.valueOf(message), null);
+        }
+    }
+
+    private void offlineData(){
+        if (driver != null && driver.isOfflineDataAvailable()){
+            //Todo: Show UI for offline Data
+            Log.i("pen-msg-log", "transferring offline data");
+            driver.transferOfflineData();
         }
     }
 
@@ -1517,5 +1530,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             mediaRecorder = null;
         }
     }
+
+
 
 }
