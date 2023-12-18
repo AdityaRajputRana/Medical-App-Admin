@@ -457,6 +457,7 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
                 });
                 iPenCtrl.reqOfflineData(note.sectionId, note.ownerId, note.noteId, note.getPagesArray());
             }
+            offlineNotes.clear();
         } catch (Exception e){
             e.printStackTrace();
             if (smartPenListener != null){
