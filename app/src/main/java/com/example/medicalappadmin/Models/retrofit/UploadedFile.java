@@ -1,5 +1,8 @@
 package com.example.medicalappadmin.Models.retrofit;
 
+import com.example.medicalappadmin.Models.Details;
+import com.example.medicalappadmin.Models.MetaData;
+
 public class UploadedFile {
     String public_url;
 

@@ -299,6 +299,41 @@
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
             >
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="24dp"
+                    android:text="Pages"
+                    android:textColor="@color/colorPrimTxt"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/colorPrimTxt"
+                    android:id="@+id/llStrip"
+                    android:visibility="gone"
+                    android:orientation="horizontal" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvPages"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -306,22 +341,17 @@
                 android:fontFamily="@font/poppins_semibold"
                 android:paddingTop="4dp"
                 android:paddingEnd="24dp"
-                android:text="Pages"
+                android:text="Additionals"
                 android:textColor="@color/colorPrimTxt"
                 android:textSize="16sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/colorPrimTxt"
-                android:id="@+id/llStrip"
-                android:visibility="gone"
-                android:orientation="horizontal" />
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcvPages"
+                android:id="@+id/rcvAdditionals"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
+        </LinearLayout>
+
+
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
