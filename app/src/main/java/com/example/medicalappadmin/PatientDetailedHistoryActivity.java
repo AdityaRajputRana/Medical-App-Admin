@@ -1,17 +1,23 @@
 package com.example.medicalappadmin;
 
 import android.content.Intent;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.medicalappadmin.Models.Additional;
 import com.example.medicalappadmin.Models.Page;
+import com.example.medicalappadmin.adapters.AdditionalsRVAdapter;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
 import com.example.medicalappadmin.databinding.ActivityPatientDetailedHistoryBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
@@ -19,7 +25,9 @@ import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class PatientDetailedHistoryActivity extends AppCompatActivity {
 
@@ -28,6 +36,8 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     PagesHistoryAdapter adapter;
     GridLayoutManager manager;
     private boolean isFirstItemVisible = true;
+    private MediaPlayer mediaPlayer;
+
 
 
 
@@ -43,26 +53,6 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
             downloadCase(caseId);
         }
         manager = new GridLayoutManager(PatientDetailedHistoryActivity.this, 2);
-
-
-
-//        binding.rcvPages.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-//            @Override
-//            public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-//                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
-//                    if (binding.llStrip.getVisibility() == View.VISIBLE) {
-//                        binding.llStrip.setVisibility(View.INVISIBLE);
-//                    }
-//                }
-//
-//                if (manager.findFirstCompletelyVisibleItemPosition() == 1) {
-//                    if (binding.llStrip.getVisibility() != View.VISIBLE) {
-//                        binding.llStrip.setVisibility(View.VISIBLE);
-//                    }
-//                }
-//            }
-//        });
-
 
         binding.rcvPages.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -97,6 +87,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
 
     private void downloadCase(String caseId) {
 
+        Log.i("add", "downloadCase: id "+ caseId);
         APIMethods.viewCase(PatientDetailedHistoryActivity.this, caseId, new APIResponseListener<ViewCaseRP>() {
             @Override
             public void success(ViewCaseRP response) {
@@ -128,6 +119,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
             binding.tvDiagnosis.setText(response.getDiagnosis());
             binding.tvLastUpdated.setText(response.getUpdatedAt());
             setUpRCV(response);
+            setUpAdditionalsRCV(response.getAdditionals());
 
         } else {
             finish();
@@ -138,23 +130,60 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
 
     }
 
+    private void setUpAdditionalsRCV(ArrayList<Additional> additionalsList) {
 
+        binding.rcvAdditionals.setLayoutManager(new LinearLayoutManager(this));
 
-    //todo click on page to open it on next page, create new canvas view
+        binding.rcvAdditionals.setAdapter(new AdditionalsRVAdapter(additionalsList, PatientDetailedHistoryActivity.this, new AdditionalsRVAdapter.AdditionItemListener() {
+            @Override
+            public void onItemClicked(String type, String url) {
+                if(Objects.equals(type, "Voice")){
+                   if(!isPlaying){
+                       playAudio(url);
+                   } else {
+                       stopAudio();
+                   }
+                } else if(Objects.equals(type,"Video")){
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(url), "video/*");
+                    startActivity(intent);
+                }
+            }
+        }));
 
+    }
 
+    private String TAG = "add";
+    private boolean isPlaying = false;
 
+    private void playAudio(String audioUrl) {
+        Log.i(TAG, "playAudio: url "+ audioUrl);
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mediaPlayer.setDataSource(audioUrl);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Toast.makeText(this, "Playing..", Toast.LENGTH_SHORT).show();
+        isPlaying = true;
+    }
 
+    private void stopAudio() {
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            mediaPlayer.release();
+            Toast.makeText(PatientDetailedHistoryActivity.this, "Audio has been stopped", Toast.LENGTH_SHORT).show();
+            isPlaying = false;
 
-
-
-
-
-
-
-
-
+        } else {
+            Toast.makeText(PatientDetailedHistoryActivity.this, "Audio has not played", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void setUpRCV(ViewCaseRP response) {
 
@@ -178,5 +207,14 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
         binding.rcvPages.setAdapter(adapter);
 
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 }

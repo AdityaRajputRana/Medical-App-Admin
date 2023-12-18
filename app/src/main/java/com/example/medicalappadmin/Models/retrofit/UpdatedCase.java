@@ -1,6 +1,8 @@
 package com.example.medicalappadmin.Models.retrofit;
 
 
+import com.example.medicalappadmin.Models.Additional;
+
 import java.util.ArrayList;
 
 public class UpdatedCase {
