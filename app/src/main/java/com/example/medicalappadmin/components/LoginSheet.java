@@ -210,6 +210,8 @@ public class LoginSheet {
         binding.llBSNewPatient.setVisibility(View.VISIBLE);
         binding.llBSExistingPatientDetails.setVisibility(View.GONE);
         binding.llBSRelPrevCases.setVisibility(View.GONE);
+        setBtnSaveListener();
+
     }
 
     public void showRelativePrevCases(LinkedPatient selectedRelative) {
