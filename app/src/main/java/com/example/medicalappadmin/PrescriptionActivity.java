@@ -944,7 +944,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             });
 
-        } else if(id == 31 || id == 32 || id == 33 || id ==34 ){
+        } else if(id == 31 || id == 32 || id == 33 || id ==34 || id == 38){
             //31 -> play 1,   32 -> share 1,  33 -> play 2, 34 -> share 2
 
             switch (id) {
@@ -963,6 +963,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
                 case 34: {
                     linkGuideToPatient(guidesList.get(1));
+                    break;
+                }
+                case 38:{
+                    showOtherGuidesBS();
+                    break;
+                }
+                default:{
+                    Log.i(TAG, "onPaperButtonPress: thala default");
                     break;
                 }
             }
