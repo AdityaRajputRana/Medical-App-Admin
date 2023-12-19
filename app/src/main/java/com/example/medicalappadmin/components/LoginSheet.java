@@ -63,10 +63,9 @@ public class LoginSheet {
     }
 
     public static LoginSheet getInstance(Activity context, int pageNo) {
-        if (instance == null || instance.pageNo != pageNo) {
+        if (instance == null || instance.pageNo != pageNo || instance.context != context) {
             instance = new LoginSheet(context, pageNo);
         }
-        instance.context = context;
         return instance;
     }
 
