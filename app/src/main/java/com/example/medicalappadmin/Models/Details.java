@@ -1,4 +1,4 @@
-package com.example.medicalappadmin.Models.retrofit;
+package com.example.medicalappadmin.Models;
 
 public class Details {
     String name;
