@@ -38,7 +38,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:visibility="visible"
+            android:visibility="gone"
             android:id="@+id/bsAMNActionText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -375,8 +375,6 @@
         </LinearLayout>
 
     </LinearLayout>
-
-
 
 
 
