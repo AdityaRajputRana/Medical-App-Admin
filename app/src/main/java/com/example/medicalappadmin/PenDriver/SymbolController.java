@@ -31,7 +31,7 @@ public class SymbolController {
         s.add(new Symbol(32, "ATTACHMENT_SHARE_2", 82, 77, 89, 81 ));
         s.add(new Symbol(33, "ATTACHMENT_PLAY_2", 65, 82, 81, 86 ));
         s.add(new Symbol(34, "ATTACHMENT_SHARE_2", 82, 82, 89, 86 ));
-        s.add(new Symbol(38, "ATTACHMENT_PLAY_OTHERS", 65, 87, 89, 91 ));
+        s.add(new Symbol(38, "ATTACHMENT_PLAY_OTHERS", 65, 87, 81, 91 ));
         s.add(new Symbol(39, "ATTACHMENT_SHARE_OTHERS", 82, 87, 89, 91 ));
 
 //        s.add(new Symbol(41, "ASSOCIATE_1", 50, 9, 62, 12.5f ));

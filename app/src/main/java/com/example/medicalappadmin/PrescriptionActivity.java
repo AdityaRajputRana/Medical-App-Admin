@@ -809,6 +809,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         if (pageId != currentPageNumber) {
             uploadPoints();
+            LoginSheet.hideSheet();
             if (handler != null) {
                 handler.removeCallbacks(runnable);
                 handler = null;

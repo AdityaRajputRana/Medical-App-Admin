@@ -354,5 +354,11 @@ public class LoginSheet {
         void detailsAdded(AddDetailsRP response, int pageNo);
     }
 
+    public static void hideSheet(){
+        if (instance != null && instance.dialog != null && instance.dialog.isShowing()){
+            instance.dialog.dismiss();
+        }
+    }
+
 
 }

@@ -22,6 +22,8 @@ public class Page {
     String gender;
 
     public Long getMobileNumber() {
+        if (mobileNumber == null)
+            return 0L;
         return mobileNumber;
     }
 
