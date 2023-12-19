@@ -63,8 +63,8 @@ public class LoginSheet {
     public static LoginSheet getInstance(Activity context, int pageNo) {
         if (instance == null || instance.pageNo != pageNo) {
             instance = new LoginSheet(context, pageNo);
-
         }
+        instance.context = context;
         return instance;
     }
 
@@ -73,6 +73,12 @@ public class LoginSheet {
             dialog.show();
         }
         if (binding.etBSMobile.getText().length() >= 10) return;
+        if (character == 10){
+            String text = binding.etBSMobile.getText().toString();
+            text = text.substring(0, text.length()-1);
+            binding.etBSMobile.setText(text);
+            return;
+        }
         binding.etBSMobile.setText(binding.etBSMobile.getText() + String.valueOf(character));
         if (binding.etBSMobile.getText().length() >= 10) {
             linkMobileNumber();
