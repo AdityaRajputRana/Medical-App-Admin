@@ -53,7 +53,9 @@ public class LoginSheet {
                 binding.bsAMNActionText.setVisibility(View.VISIBLE);
                 binding.bsAMNActionText.setText("Enter a valid mobile number");
             } else {
-                binding.bsAMNActionText.setVisibility(View.GONE);
+                binding.bsAMNActionText.setVisibility(View.VISIBLE);
+                binding.bsAMNActionText.setText("Linking mobile. Please wait...");
+                binding.bsAMNActionText.setTextColor(context.getColor(R.color.colorCta));
                 linkMobileNumber();
             }
         });
@@ -168,16 +170,19 @@ public class LoginSheet {
                 req.setFullName(binding.etBSFullName.getText().toString());
             if (binding.etBSEmail.getText() != null && !binding.etBSEmail.getText().toString().isEmpty())
                 req.setEmail(binding.etBSEmail.getText().toString());
+            binding.pbBSSaveNewPatient.setVisibility(View.VISIBLE);
             APIMethods.addDetails(context, req, new APIResponseListener<AddDetailsRP>() {
                 @Override
                 public void success(AddDetailsRP response) {
+                    binding.pbBSSaveNewPatient.setVisibility(View.GONE);
                     if (listener != null) listener.detailsAdded(response, pageNo);
                     showPatientDetails(response);
                 }
 
                 @Override
                 public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-
+                    binding.pbBSSaveNewPatient.setVisibility(View.GONE);
+                    Methods.showError(context,message,cancellable);
                 }
             });
         });
@@ -200,7 +205,7 @@ public class LoginSheet {
         }
     }
 
-    private void showAddNewPatientLayout() {
+    public void showAddNewPatientLayout() {
         binding.llBSPrevPatientList.setVisibility(View.GONE);
         binding.llBSAddMobileNumber.setVisibility(View.GONE);
         binding.llBSNewPatient.setVisibility(View.VISIBLE);
@@ -214,6 +219,8 @@ public class LoginSheet {
         APIMethods.viewPatient(context, relativeId, new APIResponseListener<ViewPatientRP>() {
             @Override
             public void success(ViewPatientRP response) {
+                binding.pbSelectRelative.setVisibility(View.GONE);
+
                 if (listener != null)
                     listener.relativePreviousCases(response, selectedRelative, relativeId, pageNo);
                 showRelativesCasesLayout(response, relativeId, selectedRelative);
@@ -224,6 +231,7 @@ public class LoginSheet {
 //                pbSelectRelative.setVisibility(View.GONE);
 //                Log.i(TAG, "fail: rel prev case");
 //                showError(message, null);
+                binding.pbSelectRelative.setVisibility(View.GONE);
                 Methods.showError(context,message,cancellable);
             }
         });
@@ -256,7 +264,6 @@ public class LoginSheet {
         if (selectedRelative == null) return;
         req.setPatientId(selectedRelative.get_id());
         req.setPageNumber(pageNo);
-        binding.pbSelectRelative.setVisibility(View.VISIBLE);
         linkPatientApi(req, selectedRelative);
 
     }
@@ -271,6 +278,8 @@ public class LoginSheet {
     }
 
     public void linkPatientApi(LinkPageReq req, LinkedPatient selectedRelative) {
+        binding.pbSelectRelative.setVisibility(View.VISIBLE);
+
         APIMethods.linkPage(context, req, new APIResponseListener<LinkPageRP>() {
             @Override
             public void success(LinkPageRP response) {
@@ -284,6 +293,7 @@ public class LoginSheet {
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
 //                showError(message, null);
                 Methods.showError(context,message,cancellable);
+                binding.pbSelectRelative.setVisibility(View.GONE);
 
             }
         });

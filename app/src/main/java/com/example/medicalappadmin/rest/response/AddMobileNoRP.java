@@ -5,6 +5,7 @@ import com.example.medicalappadmin.Models.LinkedPatient;
 import java.util.ArrayList;
 
 public class AddMobileNoRP {
+    Long mobileNumber;
     ArrayList<LinkedPatient> patients;
 
     public AddMobileNoRP() {

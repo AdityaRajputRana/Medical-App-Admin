@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:gravity="end"
-                android:visibility="visible" />
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
@@ -197,7 +197,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="16dp"
                 android:gravity="center_vertical"
-                android:visibility="visible" />
+                android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>
@@ -371,7 +371,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:gravity="end"
-                android:visibility="visible" />
+                android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>

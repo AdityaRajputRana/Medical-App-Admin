@@ -831,7 +831,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                     }
 
                     if (!response.isNewPage()) {
-                        if (response.getPage().getHospitalPatientId() != null) {
+                        if(response.getPage().getHospitalPatientId() == null && response.getPage().getMobileNumber() != 0){
+                            showAddNewPatientLayout();
+                            LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showAddNewPatientLayout();
+                        } else if (response.getPage().getHospitalPatientId() != null) {
                             String name = "";
                             String gender = "";
                             String mobileNo = "";
