@@ -45,6 +45,7 @@ import com.example.medicalappadmin.PenDriver.SmartPenListener;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
+import com.example.medicalappadmin.canvas.NotepadView;
 import com.example.medicalappadmin.components.LoginSheet;
 import com.example.medicalappadmin.components.WebVideoPlayer;
 import com.example.medicalappadmin.components.YTVideoPlayer;
@@ -1068,6 +1069,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                     }
                 }
                 Log.i(TAG, "success: other guides list size "+ otherGuidesList.size());
+
+                binding.canvasView.setBackgroundImageUrl(pageConfigurations.getPageDetails().getPageBackground(),
+                        pageConfigurations.getPageDetails().getPageWidth(),pageConfigurations.getPageDetails().getPageHeight());
 
 
 //                binding.canvasView.getPrescriptionBMP()
