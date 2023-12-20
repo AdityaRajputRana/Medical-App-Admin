@@ -1,11 +1,13 @@
 package com.example.medicalappadmin.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,7 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.Models.Guide;
+import com.example.medicalappadmin.PrescriptionActivity;
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.components.WebVideoPlayer;
+import com.example.medicalappadmin.components.YTVideoPlayer;
 import com.example.medicalappadmin.rest.response.GuidesVideosRP;
 
 public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder> {
@@ -25,6 +30,8 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
     TextView tvGuideName;
     ImageView ivPositionGuides;
     RepositionListener listener;
+    LinearLayout llGuide;
+
 
     public GuidesAdapter(GuidesVideosRP guidesList, Context context,RepositionListener listener) {
         this.guidesList = guidesList;
@@ -39,7 +46,7 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
         tvGuideName = view.findViewById(R.id.tvGuideName);
         tvGuideDesc = view.findViewById(R.id.tvGuideDesc);
         ivPositionGuides = view.findViewById(R.id.ivPosition);
-
+        llGuide= view.findViewById(R.id.llGuide);
         return new ViewHolder(view);
     }
 
@@ -52,7 +59,23 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
             showPopupMenu(view, guidesList.getAllGuides().get(position));
         });
 
+        llGuide.setOnClickListener(view -> {
+            playGuideVideo(guidesList.getAllGuides().get(position));
+        });
 
+    }
+    private  YTVideoPlayer ytVideoPlayer;
+    private  WebVideoPlayer webVideoPlayer;
+    private void playGuideVideo(Guide guide) {
+
+        Toast.makeText(context,"Loading Video...", Toast.LENGTH_SHORT).show();
+        if(guide.getMime().equals("link/youtube")){
+            ytVideoPlayer = new YTVideoPlayer(context);
+            ytVideoPlayer.playVideo(guide.getUrl());
+        } else {
+            webVideoPlayer = new WebVideoPlayer(context);
+            webVideoPlayer.playVideo(guide.getUrl());
+        }
     }
 
     @Override
@@ -84,8 +107,8 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
     }
 
     public interface RepositionListener {
-        default void onRepositionClicked(int position, String guideId) {
-        }
+        void onRepositionClicked(int position, String guideId);
+//        void playGuideClicked(Guide guide);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

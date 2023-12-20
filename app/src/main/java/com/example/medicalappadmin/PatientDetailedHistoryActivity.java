@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,9 +17,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.Models.Additional;
+import com.example.medicalappadmin.Models.Guide;
+import com.example.medicalappadmin.Models.MetaData;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.adapters.AdditionalsRVAdapter;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
+import com.example.medicalappadmin.components.WebVideoPlayer;
+import com.example.medicalappadmin.components.YTVideoPlayer;
 import com.example.medicalappadmin.databinding.ActivityPatientDetailedHistoryBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -119,7 +124,9 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
             binding.tvDiagnosis.setText(response.getDiagnosis());
             binding.tvLastUpdated.setText(response.getUpdatedAt());
             setUpRCV(response);
-            setUpAdditionalsRCV(response.getAdditionals());
+            if(response.getAdditionals() != null && response.getAdditionals().size() != 0){
+                setUpAdditionalsRCV(response.getAdditionals());
+            }
 
         } else {
             finish();
@@ -131,26 +138,38 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     }
 
     private void setUpAdditionalsRCV(ArrayList<Additional> additionalsList) {
-
+        binding.llAdditionals.setVisibility(View.VISIBLE);
         binding.rcvAdditionals.setLayoutManager(new LinearLayoutManager(this));
 
         binding.rcvAdditionals.setAdapter(new AdditionalsRVAdapter(additionalsList, PatientDetailedHistoryActivity.this, new AdditionalsRVAdapter.AdditionItemListener() {
             @Override
-            public void onItemClicked(String type, String url) {
+            public void onItemClicked(MetaData metaData,String type, String url) {
                 if(Objects.equals(type, "Voice")){
                    if(!isPlaying){
                        playAudio(url);
                    } else {
                        stopAudio();
                    }
-                } else if(Objects.equals(type,"Video")){
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(url), "video/*");
-                    startActivity(intent);
+                } else if(type.equals("Link")){
+                    playVideo(metaData,url);
                 }
             }
         }));
 
+    }
+
+    private  YTVideoPlayer ytVideoPlayer;
+    private  WebVideoPlayer webVideoPlayer;
+    private void playVideo(MetaData metaData, String url) {
+        Toast.makeText(PatientDetailedHistoryActivity.this, "Loading video. Please wait...", Toast.LENGTH_SHORT).show();
+        if(metaData.getMime().equals("link/youtube")){
+            ytVideoPlayer = new YTVideoPlayer(PatientDetailedHistoryActivity.this);
+            Log.i(TAG, "onLinkGuideClicked: url "+url );
+            ytVideoPlayer.playVideo(url);
+        } else {
+            webVideoPlayer = new WebVideoPlayer(PatientDetailedHistoryActivity.this);
+            webVideoPlayer.playVideo(url);
+        }
     }
 
     private String TAG = "add";

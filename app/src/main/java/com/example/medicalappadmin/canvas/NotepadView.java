@@ -1,5 +1,6 @@
 package com.example.medicalappadmin.canvas;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -7,21 +8,29 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -34,6 +43,8 @@ public class NotepadView extends View {
     private float translateY = 0;
     private Bitmap prescriptionBg;
 
+    private int pageHeight ;
+    private int pageWidth;
 
     ArrayList<ArrayList<Point>> mStrokes;
 
@@ -54,10 +65,29 @@ public class NotepadView extends View {
         paint.setStrokeWidth(5);
         scaleGestureDetector = new ScaleGestureDetector(getContext(),new ScaleListener());
         gestureDetector = new GestureDetector(getContext(), new ScrollListener());
-
         mStrokes = new ArrayList<>();
-        prescriptionBg = getPrescriptionBMP();
+
     }
+    public void setBackgroundImageUrl(String imageUrl,int width, int height) {
+        loadImage(imageUrl);
+        pageHeight = height;
+        pageWidth = width;
+    }
+
+    private void loadImage(String imageUrl) {
+        Glide.with(getContext())
+                .asBitmap()
+                .load(imageUrl)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        // Set the loaded bitmap as the background image
+                        prescriptionBg = resource;
+                        invalidate(); // Redraw the view
+                    }
+                });
+    }
+
 
     private Bitmap getPrescriptionBMP(){
         Drawable d = getContext().getDrawable(R.drawable.bg_prescription);
@@ -72,9 +102,19 @@ public class NotepadView extends View {
 
         Path path = new Path();
         Paint bgPaint = new Paint();
-        bgPaint.setColor(Color.LTGRAY);
-        bgPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(getLeft() + 25, getTop() + 5, 65*scaleFactor, 100* scaleFactor, bgPaint);
+
+//        bgPaint.setColor(Color.LTGRAY);
+//        bgPaint.setStyle(Paint.Style.FILL);
+//        canvas.drawRect(getLeft() + 25, getTop() + 5, 65*scaleFactor, 100* scaleFactor, bgPaint);
+
+
+        //TODO: adjust the scale factor
+        Rect src = null;
+        Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth*scaleFactor) - 32, (int)(pageHeight*scaleFactor)-32);
+
+        if (prescriptionBg != null) {
+            canvas.drawBitmap(prescriptionBg, src,dst, new Paint());
+        }
 
         for (ArrayList<Point> points: mStrokes) {
 

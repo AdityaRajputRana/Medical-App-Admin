@@ -3,6 +3,7 @@ package com.example.medicalappadmin;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.medicalappadmin.Models.Guide;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.GuidesAdapter;
+import com.example.medicalappadmin.components.WebVideoPlayer;
+import com.example.medicalappadmin.components.YTVideoPlayer;
 import com.example.medicalappadmin.databinding.ActivityVideoSettingsBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -180,10 +183,14 @@ public class VideoSettingsActivity extends AppCompatActivity {
         binding.llFirstGuide.setVisibility(View.VISIBLE);
         binding.tvFirstGuideName.setText(guidesVideosRP.getAllGuides().get(0).getName());
         binding.tvFirstGuideDesc.setText(guidesVideosRP.getAllGuides().get(0).getDescription());
+        binding.llFirstGuide.setOnClickListener(view -> playGuideVideo(guidesVideosRP.getAllGuides().get(0)));
+
         if(guidesVideosRP.getAllGuides().size() > 1){
             binding.llSecondGuide.setVisibility(View.VISIBLE);
             binding.tvSecondGuideName.setText(guidesVideosRP.getAllGuides().get(1).getName());
             binding.tvSecondGuideDesc.setText(guidesVideosRP.getAllGuides().get(1).getDescription());
+            binding.llSecondGuide.setOnClickListener(view -> playGuideVideo(guidesVideosRP.getAllGuides().get(1)));
+
         }
         Log.i(TAG, "setUI: removing "+ guidesVideosRP.getAllGuides().get(0).getName());
         guidesVideosRP.getAllGuides().remove(0);
@@ -192,9 +199,8 @@ public class VideoSettingsActivity extends AppCompatActivity {
             guidesVideosRP.getAllGuides().remove(0);
             Log.i(TAG, "setUI: remaining size "+ guidesVideosRP.getAllGuides().size());
             Log.i(TAG, "setUI: remaining first element  "+ guidesVideosRP.getAllGuides().get(0).getName());
-
-
         }
+
     }
 
     private void setGuidePosition(SetGuidePosReq req){
@@ -228,5 +234,18 @@ public class VideoSettingsActivity extends AppCompatActivity {
         });
         binding.rcvGuides.setAdapter(adapter);
 
+    }
+    private  YTVideoPlayer ytVideoPlayer;
+    private  WebVideoPlayer webVideoPlayer;
+    private void playGuideVideo(Guide guide) {
+
+        Toast.makeText(VideoSettingsActivity.this,"Loading Video...", Toast.LENGTH_SHORT).show();
+        if(guide.getMime().equals("link/youtube")){
+            ytVideoPlayer = new YTVideoPlayer(VideoSettingsActivity.this);
+            ytVideoPlayer.playVideo(guide.getUrl());
+        } else {
+            webVideoPlayer = new WebVideoPlayer(VideoSettingsActivity.this);
+            webVideoPlayer.playVideo(guide.getUrl());
+        }
     }
 }
