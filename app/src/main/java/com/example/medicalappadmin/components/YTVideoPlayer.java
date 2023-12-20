@@ -8,12 +8,15 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.TextView;
+
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 
 public class YTVideoPlayer {
 
     private Dialog youtubePopupDialog;
     private YouTubePlayerView youTubePlayerView;
+    private TextView tvError;
     private Context context;
 
     public YTVideoPlayer(Context context) {
@@ -27,6 +30,7 @@ public class YTVideoPlayer {
         );
 
         youTubePlayerView = youtubePopupDialog.findViewById(R.id.youtubePlayerView);
+        tvError = youtubePopupDialog.findViewById(R.id.tvError);
         ImageButton btnClose = youtubePopupDialog.findViewById(R.id.btnClose);
 
         // Set a listener to close the popup when the close button is clicked
@@ -64,14 +68,18 @@ public class YTVideoPlayer {
         String videoId = extractVideoId(videoUrl);
 
         if (videoId != null) {
+            youTubePlayerView.setVisibility(View.VISIBLE);
+            tvError.setVisibility(View.GONE);
             youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
                 youTubePlayer.loadVideo(videoId, 0);
                 youtubePopupDialog.show();
             });
         } else {
             // Handle invalid URL or unable to extract video ID
-            WebVideoPlayer player = new WebVideoPlayer(context);
-            player.playVideo(videoUrl);
+            youTubePlayerView.setVisibility(View.INVISIBLE);
+
+            tvError.setVisibility(View.VISIBLE);
+            youtubePopupDialog.show();
         }
     }
 

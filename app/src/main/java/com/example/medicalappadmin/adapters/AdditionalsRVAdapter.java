@@ -2,6 +2,7 @@ package com.example.medicalappadmin.adapters;
 
 
 import android.content.Context;
+import android.health.connect.datatypes.Metadata;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.Models.Additional;
+import com.example.medicalappadmin.Models.MetaData;
 import com.example.medicalappadmin.R;
 
 import java.util.ArrayList;
@@ -56,7 +58,7 @@ public class AdditionalsRVAdapter extends RecyclerView.Adapter<AdditionalsRVAdap
         if (Objects.equals(response.get(position).getMetaData().getType(), "Voice")) {
             ivAdditionalIcon.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.baseline_audiotrack_24));
             tvAdditionalDescription.setText("VOICE");
-        } else if (Objects.equals(response.get(position).getMetaData().getType(), "Video")) {
+        } else if (Objects.equals(response.get(position).getMetaData().getType(), "Link")) {
             tvAdditionalDescription.setText("VIDEO");
             ivAdditionalIcon.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.baseline_videocam_24));
         } else {
@@ -70,9 +72,9 @@ public class AdditionalsRVAdapter extends RecyclerView.Adapter<AdditionalsRVAdap
             @Override
             public void onClick(View v) {
                 if (Objects.equals(response.get(position).getMetaData().getType(), "Voice")) {
-                    listener.onItemClicked("Voice", response.get(position).getPublicUrl());
-                } else if (Objects.equals(response.get(position).getMetaData().getType(), "Video")) {
-                    listener.onItemClicked("Video", response.get(position).getPublicUrl());
+                    listener.onItemClicked(response.get(position).getMetaData(),"Voice", response.get(position).getPublicUrl());
+                } else if (Objects.equals(response.get(position).getMetaData().getType(), "Link")) {
+                    listener.onItemClicked(response.get(position).getMetaData(),"Link", response.get(position).getPublicUrl());
                 } else {
                     Toast.makeText(context, "Additional type is other", Toast.LENGTH_SHORT).show();
                 }
@@ -86,7 +88,7 @@ public class AdditionalsRVAdapter extends RecyclerView.Adapter<AdditionalsRVAdap
     }
 
     public interface AdditionItemListener {
-        default void onItemClicked(String type, String url) {
+        default void onItemClicked(MetaData metaData,String type, String url) {
         }
     }
 
