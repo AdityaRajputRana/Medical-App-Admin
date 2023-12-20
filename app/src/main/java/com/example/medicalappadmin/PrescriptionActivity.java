@@ -1,6 +1,7 @@
 package com.example.medicalappadmin;
 
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -675,8 +676,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     private void offlineData(){
         if (driver != null && driver.isOfflineDataAvailable()){
             //Todo: Show UI for offline Data
+            new AlertDialog.Builder(PrescriptionActivity.this).setTitle("Offline data found. Want to transfer?")
+                    .setPositiveButton("YES",(dialogInterface, i) -> driver.transferOfflineData())
+                    .setNegativeButton("NO",(dialogInterface,i) -> dialogInterface.dismiss()).show();
             Log.i("pen-msg-log", "transferring offline data");
-            driver.transferOfflineData();
         }
     }
 
