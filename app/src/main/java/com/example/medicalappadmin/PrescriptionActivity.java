@@ -302,8 +302,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
 
         binding.actionBtn.setOnLongClickListener(view -> {
-            showOtherGuidesBS();
+//            showOtherGuidesBS();
+            showRecordVoiceSheet();
+            startRecording();
             return true;
+
         });
 
         intialiseControls();
@@ -1351,7 +1354,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             Log.i(TAG, "startRecording: " + currentPage.get_id());
 
             //todo:  make path dynamic
-            outputFile = getExternalCacheDir().getAbsolutePath() + "/recordingTest.3gp";
+            outputFile = getExternalCacheDir().getAbsolutePath() + "/recordingTest.mp3";
             bsAVActionText.setVisibility(View.VISIBLE);
             bsAVActionText.setTextColor(getColor(R.color.colorCta));
             bsAVActionText.setText("Recording...");
@@ -1362,9 +1365,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             if (mediaRecorder == null) {
                 mediaRecorder = new MediaRecorder();
                 mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
                 mediaRecorder.setOutputFile(outputFile);
-                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
 
                 try {
