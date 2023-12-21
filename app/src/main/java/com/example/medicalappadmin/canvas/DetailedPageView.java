@@ -1,28 +1,19 @@
 package com.example.medicalappadmin.canvas;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-
-import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -30,13 +21,12 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class NotepadView extends View {
+public class DetailedPageView extends View {
     private Paint paint;
-    float scaleFactor = 12.25f;
+    float scaleFactor = 14f;
     ScaleGestureDetector scaleGestureDetector;
     GestureDetector gestureDetector;
     private float translateX = 0;
@@ -48,12 +38,12 @@ public class NotepadView extends View {
 
     ArrayList<ArrayList<Point>> mStrokes;
 
-    public NotepadView(Context context) {
+    public DetailedPageView(Context context) {
         super(context);
         init();
     }
 
-    public NotepadView(Context context, AttributeSet attrs) {
+    public DetailedPageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
@@ -108,7 +98,7 @@ public class NotepadView extends View {
 //        canvas.drawRect(getLeft() + 25, getTop() + 5, 65*scaleFactor, 100* scaleFactor, bgPaint);
 
 
-        Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth*scaleFactor) - 32, (int)(pageHeight*scaleFactor)-32);
+        Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth*(scaleFactor-2)) - 32, (int)(pageHeight*(scaleFactor+2))-32);
 
         if (prescriptionBg != null) {
             canvas.drawBitmap(prescriptionBg, null,dst, new Paint());
