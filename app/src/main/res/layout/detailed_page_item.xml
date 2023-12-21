@@ -6,10 +6,10 @@
     android:orientation="vertical">
 
 
-    <com.example.medicalappadmin.canvas.NotepadView
+    <com.example.medicalappadmin.canvas.DetailedPageView
         android:id="@+id/detailedPage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_marginTop="16dp" />
 
