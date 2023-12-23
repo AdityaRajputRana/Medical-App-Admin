@@ -45,6 +45,9 @@ public class AddDetailsRP {
     }
 
     public String getGender() {
+        if (gender == null && patient != null){
+            return patient.getGender();
+        }
         return gender;
     }
 

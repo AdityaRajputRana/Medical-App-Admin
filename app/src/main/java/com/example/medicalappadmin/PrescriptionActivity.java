@@ -788,7 +788,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             Toast.makeText(this, "Connected pen successfully", Toast.LENGTH_SHORT).show();
 
             showDrawView();
-
+            offlineData();
 
         } else showError("Connection failed", null);
 
@@ -870,6 +870,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                             showAddMobileNoLayout();
                         }
 
+                        Log.i("Optimiz", "adding coords");
                         binding.canvasView.addCoordinates(response.getPage().getPoints());
                     } else {
                         showAddMobileNoLayout();
@@ -1364,10 +1365,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
             if (mediaRecorder == null) {
                 mediaRecorder = new MediaRecorder();
-                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
                 mediaRecorder.setOutputFile(outputFile);
-                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 
 
                 try {

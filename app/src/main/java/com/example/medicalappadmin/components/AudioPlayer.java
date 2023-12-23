@@ -2,6 +2,7 @@ package com.example.medicalappadmin.components;
 
 import android.content.Context;
 import android.media.AudioAttributes;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,6 +61,32 @@ public class AudioPlayer {
         alertDialog.show();
     }
 
+//    public void showAudioPopup(String audioUrl){
+//        MediaPlayer mediaPlayer = new MediaPlayer();
+//        try {
+//            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+//                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+//                    .build());
+//
+//            // Set the data source to stream the audio
+//            mediaPlayer.setDataSource(context, Uri.parse(audioUrl));
+//
+//            // Prepare the MediaPlayer asynchronously
+//            mediaPlayer.prepareAsync();
+//
+//            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                @Override
+//                public void onPrepared(MediaPlayer mp) {
+//                    // Start streaming the audio when prepared
+//                    mediaPlayer.start();
+//                }
+//            });
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            Log.i("AudioError", e.getMessage());
+//        }
+//    }
     public void dismissAudioPopup() {
         if (alertDialog != null && alertDialog.isShowing()) {
             alertDialog.dismiss();
