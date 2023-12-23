@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,15 +17,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.Models.Additional;
+import com.example.medicalappadmin.Models.Guide;
+import com.example.medicalappadmin.Models.MetaData;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.adapters.AdditionalsRVAdapter;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
+import com.example.medicalappadmin.components.AudioPlayer;
+import com.example.medicalappadmin.components.WebVideoPlayer;
+import com.example.medicalappadmin.components.YTVideoPlayer;
 import com.example.medicalappadmin.databinding.ActivityPatientDetailedHistoryBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -119,7 +126,9 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
             binding.tvDiagnosis.setText(response.getDiagnosis());
             binding.tvLastUpdated.setText(response.getUpdatedAt());
             setUpRCV(response);
-            setUpAdditionalsRCV(response.getAdditionals());
+            if(response.getAdditionals() != null && response.getAdditionals().size() != 0){
+                setUpAdditionalsRCV(response.getAdditionals());
+            }
 
         } else {
             finish();
@@ -131,58 +140,63 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     }
 
     private void setUpAdditionalsRCV(ArrayList<Additional> additionalsList) {
-
+        binding.llAdditionals.setVisibility(View.VISIBLE);
         binding.rcvAdditionals.setLayoutManager(new LinearLayoutManager(this));
 
         binding.rcvAdditionals.setAdapter(new AdditionalsRVAdapter(additionalsList, PatientDetailedHistoryActivity.this, new AdditionalsRVAdapter.AdditionItemListener() {
             @Override
-            public void onItemClicked(String type, String url) {
+            public void onItemClicked(MetaData metaData,String type, String url) {
                 if(Objects.equals(type, "Voice")){
-                   if(!isPlaying){
-                       playAudio(url);
-                   } else {
-                       stopAudio();
-                   }
-                } else if(Objects.equals(type,"Video")){
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(url), "video/*");
-                    startActivity(intent);
+//                   if(!isPlaying){
+//                       playAudio(url);
+//                   } else {
+//                       stopAudio();
+//                   }
+                    playAudio(url);
+                } else if(type.equals("Link")){
+                    playVideo(metaData,url);
                 }
             }
         }));
 
     }
 
+    private void playVideo(MetaData metaData, String url) {
+        Toast.makeText(PatientDetailedHistoryActivity.this, "Loading video. Please wait...", Toast.LENGTH_SHORT).show();
+        if(metaData.getMime().equals("link/youtube")){
+            YTVideoPlayer ytVideoPlayer = new YTVideoPlayer(PatientDetailedHistoryActivity.this);
+            Log.i(TAG, "onLinkGuideClicked: url "+url );
+            ytVideoPlayer.playVideo(url);
+        } else {
+            WebVideoPlayer webVideoPlayer = new WebVideoPlayer(PatientDetailedHistoryActivity.this);
+            webVideoPlayer.playVideo(url);
+        }
+    }
+
     private String TAG = "add";
-    private boolean isPlaying = false;
 
     private void playAudio(String audioUrl) {
         Log.i(TAG, "playAudio: url "+ audioUrl);
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-            mediaPlayer.setDataSource(audioUrl);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
+//        if(mediaPlayer == null)
+//            mediaPlayer = new MediaPlayer();
+////        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//        try {
+//            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//            Log.i(TAG, "playAudio:setting url "+audioUrl);
+//            mediaPlayer.setDataSource(audioUrl);
+//            mediaPlayer.prepare();
+//            mediaPlayer.start();
+//            Log.i(TAG, "playAudio: started");
+//            Toast.makeText(this, "Playing..", Toast.LENGTH_SHORT).show();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            Log.i(TAG, "playAudio: error "+ e.getMessage());
+//        }
+        
+//
+        AudioPlayer player = new AudioPlayer(PatientDetailedHistoryActivity.this);
+        player.showAudioPopup(audioUrl);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Toast.makeText(this, "Playing..", Toast.LENGTH_SHORT).show();
-        isPlaying = true;
-    }
-
-    private void stopAudio() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-            mediaPlayer.release();
-            Toast.makeText(PatientDetailedHistoryActivity.this, "Audio has been stopped", Toast.LENGTH_SHORT).show();
-            isPlaying = false;
-
-        } else {
-            Toast.makeText(PatientDetailedHistoryActivity.this, "Audio has not played", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void setUpRCV(ViewCaseRP response) {
@@ -198,7 +212,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
 //                    i.putExtra("PAGES_LIST", response );
                     i.putExtra("CASE_ID", caseId);
                     i.putExtra("CURRENT_PAGE_NUMBER", String.valueOf(currentPosition) );
-                    Log.i("lol", "sent: " + currentPosition);
+                    Log.i(TAG, "sent: " + currentPosition);
                     startActivity(i);
 //                    Toast.makeText(PatientDetailedHistoryActivity.this, "Clicked " + pageNumber, Toast.LENGTH_SHORT).show();
                 }

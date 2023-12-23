@@ -164,9 +164,9 @@
             <com.example.medicalappadmin.canvas.NotepadView
                 android:id="@+id/canvasView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="8dp"
-                android:visibility="visible" />
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                />
 
             <RelativeLayout
                 android:visibility="gone"
@@ -199,10 +199,6 @@
             </RelativeLayout>
 
         </FrameLayout>
-
-
-
-
 
     </LinearLayout>
 

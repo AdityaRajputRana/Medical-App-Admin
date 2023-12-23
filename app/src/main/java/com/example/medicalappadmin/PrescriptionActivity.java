@@ -1,6 +1,7 @@
 package com.example.medicalappadmin;
 
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -44,7 +45,10 @@ import com.example.medicalappadmin.PenDriver.SmartPenListener;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
+import com.example.medicalappadmin.canvas.NotepadView;
 import com.example.medicalappadmin.components.LoginSheet;
+import com.example.medicalappadmin.components.WebVideoPlayer;
+import com.example.medicalappadmin.components.YTVideoPlayer;
 import com.example.medicalappadmin.databinding.ActivityPrescriptionBinding;
 import com.example.medicalappadmin.databinding.BsheetAddMobileNoBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
@@ -293,11 +297,16 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         //todo: remove it
         binding.actionBtn.setOnClickListener(view -> {
 //            drawEvent(0, 0, 46, 0);
+            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,49,0,false));
+
         });
 
         binding.actionBtn.setOnLongClickListener(view -> {
-            showOtherGuidesBS();
+//            showOtherGuidesBS();
+            showRecordVoiceSheet();
+            startRecording();
             return true;
+
         });
 
         intialiseControls();
@@ -671,8 +680,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     private void offlineData(){
         if (driver != null && driver.isOfflineDataAvailable()){
             //Todo: Show UI for offline Data
+            new AlertDialog.Builder(PrescriptionActivity.this).setTitle("Offline data found. Want to transfer?")
+                    .setPositiveButton("YES",(dialogInterface, i) -> driver.transferOfflineData())
+                    .setNegativeButton("NO",(dialogInterface,i) -> dialogInterface.dismiss()).show();
             Log.i("pen-msg-log", "transferring offline data");
-            driver.transferOfflineData();
         }
     }
 
@@ -946,29 +957,40 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             });
 
-        } else if(id == 31 || id == 32 || id == 33 || id ==34 || id == 38){
+        } else if(id == 31 || id == 32 || id == 33 || id ==34 || id == 38 || id == 39){
             //31 -> play 1,   32 -> share 1,  33 -> play 2, 34 -> share 2
 
             switch (id) {
                 case 31: {
-                    Log.i(TAG, "onPaperButtonPress: 31");
+                    playGuideVideo(guidesList.get(0));
                     break;
                 }
                 case 32: {
+                    hideGuideVideo();
                     linkGuideToPatient(guidesList.get(0));
                     break;
                 }
                 case 33: {
-                    // todo: play guide video
+                    playGuideVideo(guidesList.get(0));
                     Log.i(TAG, "onPaperButtonPress: 33");
                     break;
                 }
                 case 34: {
+                    hideGuideVideo();
                     linkGuideToPatient(guidesList.get(1));
                     break;
                 }
                 case 38:{
                     showOtherGuidesBS();
+                    break;
+                }
+                case 39:{
+                    if(selectedOtherGuide == null){
+                        Toast.makeText(this, "Select a guide first.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    hideGuideVideo();
+                    linkGuideToPatient(selectedOtherGuide);
                     break;
                 }
                 default:{
@@ -979,10 +1001,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
         }
-
-
-
-
         else if (id == 100) {
             if (currentPage == null) {
                 Toast.makeText(this, "Please initialise the page before submitting", Toast.LENGTH_SHORT).show();
@@ -992,13 +1010,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         }
 
         Log.i("eta-symbol ", name);
-//        Toast.makeText(PrescriptionActivity.this, "got symbol - " + id + name, Toast.LENGTH_SHORT).show();
     }
 
     private void showLoginSheet(int id) {
         LoginSheet.getInstance(this,currentPageNumber)
                 .inputCharacter(id);
-
     }
 
 
@@ -1058,6 +1074,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
                 Log.i(TAG, "success: other guides list size "+ otherGuidesList.size());
 
+                binding.canvasView.setBackgroundImageUrl(pageConfigurations.getPageDetails().getPageBackground(),
+                        pageConfigurations.getPageDetails().getPageWidth(),pageConfigurations.getPageDetails().getPageHeight());
+
 
 //                binding.canvasView.getPrescriptionBMP()
 
@@ -1088,6 +1107,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     BottomSheetDialog  otherGuidesBSDialog;
      RecyclerView rcvOtherGuides;
 
+     private Guide selectedOtherGuide;
+
     private void showOtherGuidesBS(){
         Log.i(TAG, "showOtherGuidesBS: guides size "+guidesList.size());
         if(guidesList == null || guidesList.size() <= 2 ){
@@ -1103,7 +1124,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             rcvOtherGuides.setAdapter(new OtherGuidesAdapterBS(otherGuidesList, PrescriptionActivity.this, new OtherGuidesAdapterBS.GuideLinkListener() {
                 @Override
                 public void onLinkGuideClicked(Guide guide) {
-                    linkGuideToPatient(guide);
+//                    linkGuideToPatient(guide);
+                    selectedOtherGuide = guide;
+                    Log.i(TAG, "onLinkGuideClicked: selectedGuide is "+selectedOtherGuide.getName());
+                    playGuideVideo(guide);
                 }
             }));
 
@@ -1114,6 +1138,28 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
 
+    }
+
+    private  YTVideoPlayer ytVideoPlayer;
+    private  WebVideoPlayer webVideoPlayer;
+    private void playGuideVideo(Guide guide) {
+        Toast.makeText(PrescriptionActivity.this, "Loading "+guide.getName()+"'s video. Please wait...", Toast.LENGTH_SHORT).show();
+        if(guide.getMime().equals("link/youtube")){
+            ytVideoPlayer = new YTVideoPlayer(PrescriptionActivity.this);
+            Log.i(TAG, "onLinkGuideClicked: url "+ guide.getUrl());
+            ytVideoPlayer.playVideo(guide.getUrl());
+        } else {
+            webVideoPlayer = new WebVideoPlayer(PrescriptionActivity.this);
+            webVideoPlayer.playVideo(guide.getUrl());
+        }
+    }
+    private void hideGuideVideo(){
+        if(ytVideoPlayer != null){
+            ytVideoPlayer.dismissPopup();
+        }
+        if(webVideoPlayer != null){
+            webVideoPlayer.dismissPopup();
+        }
     }
 
 
@@ -1309,7 +1355,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             Log.i(TAG, "startRecording: " + currentPage.get_id());
 
             //todo:  make path dynamic
-            outputFile = getExternalCacheDir().getAbsolutePath() + "/recordingTest.3gp";
+            outputFile = getExternalCacheDir().getAbsolutePath() + "/recordingTest.mp3";
             bsAVActionText.setVisibility(View.VISIBLE);
             bsAVActionText.setTextColor(getColor(R.color.colorCta));
             bsAVActionText.setText("Recording...");
@@ -1320,9 +1366,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             if (mediaRecorder == null) {
                 mediaRecorder = new MediaRecorder();
                 mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
                 mediaRecorder.setOutputFile(outputFile);
-                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
 
                 try {

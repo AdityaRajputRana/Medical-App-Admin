@@ -34,7 +34,7 @@
             android:fontFamily="@font/poppins_medium"
             android:textSize="16sp"/>
         <TextView
-            android:visibility="gone"
+            android:visibility="visible"
             android:id="@+id/tvDescOfAdditional"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
