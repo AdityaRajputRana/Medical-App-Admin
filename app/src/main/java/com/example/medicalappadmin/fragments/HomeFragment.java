@@ -5,11 +5,13 @@ import static android.content.Context.MODE_PRIVATE;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -19,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.medicalappadmin.ActivityCaseHistory;
@@ -29,8 +32,14 @@ import com.example.medicalappadmin.PrescriptionActivity;
 import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Transformations.CircleTransformation;
 import com.example.medicalappadmin.databinding.ActivityPatientHistoryBinding;
+import com.example.medicalappadmin.rest.api.APIMethods;
+import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
+import com.example.medicalappadmin.rest.response.HomePageRP;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
+
+import org.eazegraph.lib.charts.PieChart;
+import org.eazegraph.lib.models.PieModel;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -49,8 +58,21 @@ public class HomeFragment extends Fragment {
     private ImageButton penButton;
     private TextView tvGreeting;
     private TextView tvDoctorName;
+    private TextView tvTotal;
+    private TextView tvTotalMale;
+    private TextView tvTotalFemale;
+    private TextView tvTodayTotal;
+    private TextView tvTodayMale;
+    private TextView tvTodayFemale;
     private ImageView ivProfilePic;
+    private PieChart pieChartTotal;
+    private PieChart pieChartToday;
     private User user;
+    private ConstraintLayout clHome;
+    private LinearLayout llAnalytics;
+    private LinearLayout llToday;
+    private ProgressBar pbHome;
+    private  HomePageRP homePageRP;
 
 
 
@@ -75,6 +97,18 @@ public class HomeFragment extends Fragment {
         tvDoctorName = view.findViewById(R.id.tvDoctorName);
         tvGreeting = view.findViewById(R.id.tvGreeting);
         ivProfilePic = view.findViewById(R.id.ivProfilePic);
+        pieChartTotal = view.findViewById(R.id.pieChartTotal);
+        tvTotal = view.findViewById(R.id.tvTotal);
+        tvTotalMale = view.findViewById(R.id.tvTotalMale);
+        tvTotalFemale= view.findViewById(R.id.tvTotalFemale);
+        tvTodayTotal = view.findViewById(R.id.tvTotalToday);
+        tvTodayMale = view.findViewById(R.id.tvTodayMale);
+        tvTodayFemale = view.findViewById(R.id.tvTodayFemale);
+        pieChartToday= view.findViewById(R.id.pieChartToday);
+        clHome= view.findViewById(R.id.clHome);
+        pbHome= view.findViewById(R.id.pbHome);
+        llAnalytics= view.findViewById(R.id.llAnalytics);
+        llToday= view.findViewById(R.id.llTodayAnalytics);
 
         return  view;
     }
@@ -118,43 +152,101 @@ public class HomeFragment extends Fragment {
                     int colorCodeID = isConnected?R.color.colorActiveGreen:R.color.colorInactiveGray;
                     penButton.setColorFilter(getActivity().getColor(colorCodeID));
                 });
-        loadData();
 
 
+        if(homePageRP == null){
+            loadHomePage();
+        }
+        else {
+            setUpUI();
+        }
 
     }
 
 
-    private void loadData() {
-        user = new Gson().fromJson(
-                getActivity().getSharedPreferences("MY_PREF", MODE_PRIVATE).getString("MY_USER", "{}"),
-                User.class
-        );
-        if(user != null){
-            tvDoctorName.setText("Dr. " + user.getName());
-            if(!user.getDisplayPicture().equals("") || user.getDisplayPicture() != null){
-                Picasso.get().load(user.getDisplayPicture()).transform(new CircleTransformation()).into(ivProfilePic);
-            }
-        } else {
-            tvDoctorName.setVisibility(View.GONE);
-        }
+    private void setGreeting() {
         Calendar calendar = Calendar.getInstance();
         int hours = calendar.get(Calendar.HOUR_OF_DAY);
         Log.i("time", "loadData:hours "+ hours);
         String greeting = null;
         if(hours>=1 && hours<12){
-            greeting = "Good Morning,";
+            greeting = "Good morning,";
         } else if(hours>=12 && hours<16){
-            greeting = "Good Afternoon,";
+            greeting = "Good afternoon,";
         } else if(hours>=16 && hours<21){
-            greeting = "Good Evening,";
+            greeting = "Good evening,";
         } else if(hours>=21 && hours<=24){
-            greeting = "Good Night,";
+            greeting = "Good night,";
         } else {
             greeting = "Hello";
         }
         Log.i("time", "loadData: gre "+greeting);
         tvGreeting.setText(greeting);
+    }
+
+    private void loadHomePage(){
+        APIMethods.homePage(getContext(), new APIResponseListener<HomePageRP>() {
+            @Override
+            public void success(HomePageRP response) {
+                setGreeting();
+                homePageRP = response;
+
+                setUpUI();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                tvDoctorName.setVisibility(View.GONE);
+                setGreeting();
+                clHome.setVisibility(View.VISIBLE);
+                llAnalytics.setVisibility(View.GONE);
+                Log.i("Home", "fail: "+ message);
+            }
+        });
+    }
+
+    private void setUpUI() {
+
+        if(homePageRP != null){
+            pbHome.setVisibility(View.GONE);
+            clHome.setVisibility(View.VISIBLE);
+            tvDoctorName.setText(homePageRP.getStaffDetails().getFullName());
+            tvTotal.setText("Total Patients : "+homePageRP.getAnalytics().getTotal().getCount());
+            tvTotalMale.setText("Males : "+homePageRP.getAnalytics().getTotal().getMale());
+            tvTotalFemale.setText("Females : "+homePageRP.getAnalytics().getTotal().getFemale());
+            pieChartTotal.addPieSlice(
+                    new PieModel(
+                            "Male",homePageRP.getAnalytics().getTotal().getMale(), Color.parseColor("#90ee90")
+                    )
+            );
+            pieChartTotal.addPieSlice(
+                    new PieModel(
+                            "Female",homePageRP.getAnalytics().getTotal().getFemale() , Color.parseColor("#FFB6C1")
+                    )
+            );
+            pieChartTotal.animate();
+            pieChartTotal.setInnerPaddingColor(getActivity().getColor(R.color.colorBackground));
+
+            if(homePageRP.getAnalytics().getTodaySoFar().getCount() != 0){
+                llToday.setVisibility(View.VISIBLE);
+                tvTodayTotal.setText("Total Patients : " + homePageRP.getAnalytics().getTodaySoFar().getCount());
+                tvTodayMale.setText("Males : " +homePageRP.getAnalytics().getTodaySoFar().getMale());
+                tvTodayFemale.setText("Females :"+ homePageRP.getAnalytics().getTodaySoFar().getFemale());
+                pieChartTotal.addPieSlice(
+                        new PieModel(
+                                "Male",homePageRP.getAnalytics().getTodaySoFar().getMale(), Color.parseColor("#90ee90")
+                        )
+                );
+                pieChartTotal.addPieSlice(
+                        new PieModel(
+                                "Female",homePageRP.getAnalytics().getTodaySoFar().getFemale(), Color.parseColor("#FFB6C1")
+                        )
+                );
+                pieChartTotal.animate();
+                pieChartTotal.setInnerPaddingColor(getActivity().getColor(R.color.colorBackground));
+
+            }
+        }
     }
 
 }

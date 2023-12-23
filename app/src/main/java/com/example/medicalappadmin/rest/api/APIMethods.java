@@ -34,6 +34,7 @@ import com.example.medicalappadmin.rest.response.CaseSubmitRP;
 import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.GuidesVideosRP;
+import com.example.medicalappadmin.rest.response.HomePageRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkGuideRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
@@ -52,7 +53,9 @@ import java.util.Objects;
 
 public class APIMethods {
 
-
+    public static void homePage(Context context, APIResponseListener<HomePageRP> listener){
+        API.postData(listener,new EmptyReq(), EndPoints.homePage, HomePageRP.class, context);
+    }
     public static void configurePage(Context context, EmptyReq req, APIResponseListener<ConfigurePageRP> listener){
         API.postData(listener,req, EndPoints.configurePage, ConfigurePageRP.class, context);
     }
