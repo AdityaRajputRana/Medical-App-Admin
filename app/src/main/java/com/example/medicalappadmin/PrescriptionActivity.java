@@ -777,7 +777,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             Toast.makeText(this, "Connected pen successfully", Toast.LENGTH_SHORT).show();
 
             showDrawView();
-
+            offlineData();
 
         } else showError("Connection failed", null);
 
@@ -859,6 +859,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                             showAddMobileNoLayout();
                         }
 
+                        Log.i("Optimiz", "adding coords");
                         binding.canvasView.addCoordinates(response.getPage().getPoints());
                     } else {
                         showAddMobileNoLayout();

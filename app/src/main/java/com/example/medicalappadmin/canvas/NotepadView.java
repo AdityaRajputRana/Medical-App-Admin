@@ -75,6 +75,10 @@ public class NotepadView extends View {
         bgPaint.setColor(Color.LTGRAY);
         bgPaint.setStyle(Paint.Style.FILL);
         canvas.drawRect(getLeft() + 25, getTop() + 5, 65*scaleFactor, 100* scaleFactor, bgPaint);
+        if (backgroundBitmap != null)
+            canvas.drawBitmap(backgroundBitmap, 0, 0, null);
+
+
 
         for (ArrayList<Point> points: mStrokes) {
 
@@ -124,21 +128,45 @@ public class NotepadView extends View {
 
     //Todo: Shift Both Functions to BG Thread to generate a bmp and send that back to our thread
     public void addCoordinates(ArrayList<Point> points) {
-        for(Point p:points){
-            float x = p.getX();
-            float y = p.getY();
-            int actionType = p.getActionType();
-            x = x*scaleFactor + getLeft();
-            y = y*scaleFactor + getTop();
-            if(actionType == 1){
-                mStrokes.add(new ArrayList<>());
-            } else if(actionType == 3){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i("Optimiz", "Thread started running");
+                Bitmap bmp = Bitmap.createBitmap((int)(65*scaleFactor), (int)(100*scaleFactor), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bmp);
+                Path path = new Path();
+                float prevX, prevY;
+                prevX = points.get(0).getX();
+                prevY = points.get(0).getY();
 
-                mStrokes.get(mStrokes.size()-1).add(new Point(x, y));
+                path.moveTo(prevX, prevY);
+                for(Point p:points){
+                    float x = p.getX();
+                    float y = p.getY();
+                    int actionType = p.getActionType();
+                    x = x*scaleFactor + getLeft();
+                    y = y*scaleFactor + getTop();
+                    if(actionType == 1){
+                        path.moveTo(x, y);
+                    } else if(actionType == 3){
+                        path.quadTo(prevX, prevY, (prevX + x)/2, (prevY + y)/2);
+                    }
+                    prevX = x;
+                    prevY = y;
+                }
+                canvas.drawPath(path, paint);
+                backgroundBitmap = bmp;
+                Log.i("Optimiz", "Calling Invalidated");
+                invalidate();
+                Log.i("Optimiz", "Stoping thread");
             }
-        }
-        invalidate();
+        });
+        Log.i("Optimiz", "starting thread");
+        thread.start();
+        Log.i("Optimiz", "post thread start");
     }
+
+    private Bitmap backgroundBitmap;
     public void addActions(ArrayList<DrawLiveDataBuffer.DrawAction> points){
         for(DrawLiveDataBuffer.DrawAction p:points){
             float x = p.x;
