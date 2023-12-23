@@ -1365,10 +1365,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
             if (mediaRecorder == null) {
                 mediaRecorder = new MediaRecorder();
-                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
                 mediaRecorder.setOutputFile(outputFile);
-                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 
 
                 try {
