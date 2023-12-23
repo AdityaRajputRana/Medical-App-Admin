@@ -88,17 +88,19 @@
         </LinearLayout>
 
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearchBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/rounded_white_bg"
-            android:drawableLeft="@drawable/search"
+            android:drawableStart="@drawable/search"
             android:drawablePadding="8dp"
             android:hint="Search Reports , Patient name"
+            android:maxLines="2"
             android:padding="10dp"
+            android:imeOptions="actionDone"
             android:textColor="@color/colorSecTxt"
             android:textColorHint="@color/colorSecTxt"
             app:layout_constraintEnd_toEndOf="parent"

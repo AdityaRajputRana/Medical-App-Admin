@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,18 +140,20 @@ public class HomeFragment extends Fragment {
         }
         Calendar calendar = Calendar.getInstance();
         int hours = calendar.get(Calendar.HOUR_OF_DAY);
+        Log.i("time", "loadData:hours "+ hours);
         String greeting = null;
-        if(hours>=1 && hours<=12){
+        if(hours>=1 && hours<12){
             greeting = "Good Morning,";
-        } else if(hours>=12 && hours<=16){
+        } else if(hours>=12 && hours<16){
             greeting = "Good Afternoon,";
-        } else if(hours>=16 && hours<=21){
+        } else if(hours>=16 && hours<21){
             greeting = "Good Evening,";
         } else if(hours>=21 && hours<=24){
             greeting = "Good Night,";
         } else {
             greeting = "Hello";
         }
+        Log.i("time", "loadData: gre "+greeting);
         tvGreeting.setText(greeting);
     }
 

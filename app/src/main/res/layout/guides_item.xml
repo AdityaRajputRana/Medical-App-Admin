@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:padding="16dp"
-        android:src="@drawable/baseline_position_24"
+        android:src="@drawable/rearrange"
 />
 
 
