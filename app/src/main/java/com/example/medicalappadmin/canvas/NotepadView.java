@@ -95,47 +95,28 @@ public class NotepadView extends View {
         return bitmap;
     }
 
-
+    Path previousDrawPath;
+    Path currentLivePath;
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Path path = new Path();
+        Log.i("Optimiz", "onDraw() called");
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.LTGRAY);
         bgPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(getLeft() + 25, getTop() + 5, 65*scaleFactor, 100* scaleFactor, bgPaint);
-        if (backgroundBitmap != null)
-            canvas.drawBitmap(backgroundBitmap, 0, 0, null);
-
-
-
-//        bgPaint.setColor(Color.LTGRAY);
-//        bgPaint.setStyle(Paint.Style.FILL);
-//        canvas.drawRect(getLeft() + 25, getTop() + 5, 65*scaleFactor, 100* scaleFactor, bgPaint);
-
 
         Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth*scaleFactor) - 32, (int)(pageHeight*scaleFactor)-32);
-
         if (prescriptionBg != null) {
             canvas.drawBitmap(prescriptionBg, null,dst, new Paint());
         }
 
-        for (ArrayList<Point> points: mStrokes) {
 
-            boolean first = true;
-            for (int i = 0; i < points.size(); i++) {
-                Point point = points.get(i);
-                if (first) {
-                    first = false;
-                    path.moveTo(point.x, point.y);
-                } else {
-                    Point prev = points.get(i - 1);
-                    path.quadTo(prev.x, prev.y, (prev.x + point.x)/2, (prev.y + point.y)/2);
-                }
-            }
-            canvas.drawPath(path, paint);
-            path.reset();
+        if (previousDrawPath != null){
+            canvas.drawPath(previousDrawPath, paint);
+        }
+        if (currentLivePath != null){
+            canvas.drawPath(currentLivePath, paint);
         }
 
     }
@@ -148,15 +129,22 @@ public class NotepadView extends View {
         return true;
     }
 
+    float currentLiveX  =0f;
+    float currentLiveY = 0f;
     public void addCoordinate(float x, float y, int actionType) {
+        Log.i("Optimiz", "Add Co-ordinate called");
+        if (currentLivePath == null)
+            currentLivePath = new Path();
         x = x*scaleFactor + getLeft();
         y = y*scaleFactor + getTop();
         if(actionType == 1){
-          mStrokes.add(new ArrayList<>());
-
-        } else if(actionType == 3){
-            mStrokes.get(mStrokes.size()-1).add(new Point(x,y));
+            currentLivePath.moveTo(x, y);
+        } else {
+            currentLivePath.quadTo(currentLiveX, currentLiveY, (currentLiveX + x)/2, (currentLiveY + y)/2);
         }
+
+        currentLiveX = x;
+        currentLiveY = y;
         invalidate();
     }
 
@@ -164,17 +152,18 @@ public class NotepadView extends View {
 
     public void clearDrawing() {
         mStrokes.clear();
+        previousDrawPath = null;
+        currentLivePath = null;
         invalidate();
     }
 
     //Todo: Shift Both Functions to BG Thread to generate a bmp and send that back to our thread
     public void addCoordinates(ArrayList<Point> points) {
+        Log.i("Optimiz", "Add Co-ordinates executing");
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.i("Optimiz", "Thread started running");
-                Bitmap bmp = Bitmap.createBitmap((int)(65*scaleFactor), (int)(100*scaleFactor), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bmp);
+                Log.i("Optimiz", "BG Thread Running");
                 Path path = new Path();
                 float prevX, prevY;
                 prevX = points.get(0).getX();
@@ -194,12 +183,12 @@ public class NotepadView extends View {
                     }
                     prevX = x;
                     prevY = y;
+
                 }
-                canvas.drawPath(path, paint);
-                backgroundBitmap = bmp;
-                Log.i("Optimiz", "Calling Invalidated");
-                invalidate();
-                Log.i("Optimiz", "Stoping thread");
+                previousDrawPath = path;
+                Log.i("Optimiz", "BG Thread Calling Post Invalidate");
+                postInvalidate();
+                Log.i("Optimiz", "BG Thread Stopping");
             }
         });
         Log.i("Optimiz", "starting thread");
