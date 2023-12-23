@@ -188,9 +188,7 @@ public class HomeFragment extends Fragment {
         APIMethods.homePage(getContext(), new APIResponseListener<HomePageRP>() {
             @Override
             public void success(HomePageRP response) {
-                setGreeting();
                 homePageRP = response;
-
                 setUpUI();
             }
 
@@ -207,6 +205,7 @@ public class HomeFragment extends Fragment {
 
     private void setUpUI() {
 
+        setGreeting();
         if(homePageRP != null){
             pbHome.setVisibility(View.GONE);
             clHome.setVisibility(View.VISIBLE);
