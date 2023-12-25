@@ -196,7 +196,7 @@ public class HomeFragment extends Fragment {
         if (homePageRP != null) {
             shimmerContainer.stopShimmer();
             shimmerContainer.hideShimmer();
-            tvDoctorName.setText(homePageRP.getStaffDetails().getFullName());
+            tvDoctorName.setText("Dr. "+homePageRP.getStaffDetails().getFullName());
             tvTotal.setText("Total Patients : " + homePageRP.getAnalytics().getTotal().getCount());
             tvTotalMale.setText("Males : " + homePageRP.getAnalytics().getTotal().getMale());
             tvTotalFemale.setText("Females : " + homePageRP.getAnalytics().getTotal().getFemale());
@@ -217,7 +217,7 @@ public class HomeFragment extends Fragment {
                 llToday.setVisibility(View.VISIBLE);
                 tvTodayTotal.setText("Total Patients : " + homePageRP.getAnalytics().getTodaySoFar().getCount());
                 tvTodayMale.setText("Males : " + homePageRP.getAnalytics().getTodaySoFar().getMale());
-                tvTodayFemale.setText("Females :" + homePageRP.getAnalytics().getTodaySoFar().getFemale());
+                tvTodayFemale.setText("Females : " + homePageRP.getAnalytics().getTodaySoFar().getFemale());
                 pieChartToday.addPieSlice(
                         new PieModel(
                                 "Male", homePageRP.getAnalytics().getTodaySoFar().getMale(), Color.parseColor("#90ee90")
