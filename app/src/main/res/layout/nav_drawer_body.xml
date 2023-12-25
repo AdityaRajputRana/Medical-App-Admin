@@ -275,44 +275,63 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
-        <TextView
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/poppins_semibold"
-            android:text="Select the case"
-            android:textColor="@color/colorPrimTxt"
-            android:textSize="24sp" />
+            >
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnRelNewCase"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/blue_rounded_bg"
-            android:paddingHorizontal="16dp"
-            android:text="New Case"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="Select the case"
+                    android:textColor="@color/colorPrimTxt"
+                    android:textSize="24sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/poppins_semibold"
-            android:text="or"
-            android:textAlignment="center"
-            android:textColor="@color/colorPrimTxt"
-            android:textSize="16sp" />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnRelNewCase"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/blue_rounded_bg"
+                    android:paddingHorizontal="16dp"
+                    android:text="New Case"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcvRelPrevCases"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="4dp"
-            tools:listitem="@layout/prev_cases" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="or"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimTxt"
+                    android:textSize="16sp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvRelPrevCases"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="4dp"
+                    tools:listitem="@layout/prev_cases" />
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/pbLinkToCase"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+        </FrameLayout>
+
 
 
     </LinearLayout>

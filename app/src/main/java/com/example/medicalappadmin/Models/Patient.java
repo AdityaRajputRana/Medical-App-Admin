@@ -7,7 +7,15 @@ public class Patient {
     String fullName;
     String email;
     String gender;
+    String name;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Patient() {
 

@@ -115,20 +115,31 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     private void updateUI(ViewCaseRP response) {
 
         if (response != null) {
-            if (response.getPatient().getFullName() != null) {
-                binding.tvPatientsName.setText(response.getPatient().getFullName());
+            if (response.getPatient().getName() != null) {
+                binding.tvPatientsName.setText(response.getPatient().getName());
             } else {
                 binding.tvPatientsName.setText("Untitled Case");
-
             }
+
             binding.tvGender.setText(response.getPatient().getGender());
             binding.tvCaseName.setText(response.getTitle());
             binding.tvDiagnosis.setText(response.getDiagnosis());
             binding.tvLastUpdated.setText(response.getUpdatedAt());
+            if(response.getPatient().getMobileNumber() != null || response.getPatient().getMobileNumber() != 0)
+                binding.tvMobileNumber.setText(String.valueOf(response.getPatient().getMobileNumber()));
+            else binding.tvMobileNumber.setVisibility(View.GONE);
             setUpRCV(response);
             if(response.getAdditionals() != null && response.getAdditionals().size() != 0){
                 setUpAdditionalsRCV(response.getAdditionals());
             }
+
+//            binding.llPatient.setOnClickListener(view -> {
+//                Intent i = new Intent(this,ActivityViewPatient.class);
+//                Log.i(TAG, "updateUI: case id "+ response.get_id());
+//                Log.i(TAG, "updateUI: patient id "+ response.getPatient().get_id());
+//                i.putExtra("PATIENT_ID",response.get_id());
+//                startActivity(i);
+//            });
 
         } else {
             finish();

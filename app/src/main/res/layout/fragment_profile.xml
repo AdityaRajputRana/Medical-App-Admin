@@ -102,6 +102,7 @@
                 android:textSize="14sp" />
 
             <com.google.android.material.button.MaterialButton
+                android:visibility="gone"
                 android:id="@+id/editProfileBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -118,6 +119,7 @@
                 android:text="Edit Profile" />
 
             <com.google.android.material.button.MaterialButton
+                android:visibility="gone"
                 android:id="@+id/penSettingsBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -147,7 +149,7 @@
                 android:drawableRight="@drawable/baseline_navigate_next_24"
                 android:drawableTint="@color/colorPrimTxt"
                 android:textColor="@color/colorPrimTxt"
-                android:text="Video Settings" />
+                android:text="Care Guides" />
 
 
 

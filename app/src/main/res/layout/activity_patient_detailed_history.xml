@@ -43,6 +43,7 @@
 
 
                         <LinearLayout
+                            android:id="@+id/llPatient"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginVertical="8dp"
@@ -77,6 +78,16 @@
 
                                 <TextView
                                     android:id="@+id/tvGender"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="@font/poppins_medium"
+                                    android:gravity="center_vertical"
+                                    android:text=""
+                                    android:textColor="@color/colorSecTxt"
+                                    android:textSize="16sp" />
+
+                             <TextView
+                                    android:id="@+id/tvMobileNumber"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:fontFamily="@font/poppins_medium"
