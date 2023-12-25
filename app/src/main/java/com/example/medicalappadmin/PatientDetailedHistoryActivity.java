@@ -133,6 +133,14 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
                 setUpAdditionalsRCV(response.getAdditionals());
             }
 
+//            binding.llPatient.setOnClickListener(view -> {
+//                Intent i = new Intent(this,ActivityViewPatient.class);
+//                Log.i(TAG, "updateUI: case id "+ response.get_id());
+//                Log.i(TAG, "updateUI: patient id "+ response.getPatient().get_id());
+//                i.putExtra("PATIENT_ID",response.get_id());
+//                startActivity(i);
+//            });
+
         } else {
             finish();
         }

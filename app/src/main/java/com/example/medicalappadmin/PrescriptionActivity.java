@@ -841,6 +841,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             final int pageNo = currentPageNumber;
             btnSave.setEnabled(false);
             hideAllLayouts();
+            tvDrawerInit.setText("Please wait. Initialising Page...");
 
             APIMethods.initialisePage(this, currentPageNumber, new APIResponseListener<InitialisePageRP>() {
                 @Override
@@ -898,6 +899,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                     hidePB();
                     Methods.showError(PrescriptionActivity.this, message, true);
+                    tvDrawerInit.setText("Error while initialising page.");
                     pbSyncPage.setVisibility(View.GONE);
                     btnSave.setEnabled(true);
 
