@@ -99,7 +99,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     EditText etMobileNumber;
     EditText etEmail;
     EditText etPageNumber;
-    EditText etBSMobile;
     TextView tvMale;
     TextView tvFemale;
     TextView tvDrawerInit;
@@ -120,6 +119,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     ProgressBar pbSyncPage;
     ProgressBar pbSelectRelative;
     ProgressBar pbSaveNewPatient;
+    ProgressBar pbLinkToCase;
     RadioGroup relativeRadioSelector;
     RecyclerView rcvRelPrevCases;
     AppCompatButton btnRelNewCase;
@@ -254,6 +254,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.llRelPrevCases);
         btnRelNewCase = binding.navView.getHeaderView(0).findViewById(R.id.btnRelNewCase);
         rcvRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.rcvRelPrevCases);
+        pbLinkToCase = binding.navView.getHeaderView(0).findViewById(R.id.pbLinkToCase);
 
 
         //LL new patient
@@ -491,11 +492,15 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         req.setPatientId(relativeId);
         req.setCaseId(caseId);
         final int pageNo =currentPageNumber;
+        pbLinkToCase.setVisibility(View.VISIBLE);
+        btnRelNewCase.setEnabled(false);
+        rcvRelPrevCases.setEnabled(false);
         APIMethods.linkPage(PrescriptionActivity.this, req, new APIResponseListener<LinkPageRP>() {
             @Override
             public void success(LinkPageRP response) {
 
-
+                btnRelNewCase.setEnabled(true);
+                rcvRelPrevCases.setEnabled(true);
                 Toast.makeText(PrescriptionActivity.this, "Page is linked to " + selectedRelative.getFullName(), Toast.LENGTH_SHORT).show();
                 pbSelectRelative.setVisibility(View.GONE);
                 binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
@@ -506,11 +511,15 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
                 clearAllCache();
                 binding.drawerLayout.close();
+                btnRelNewCase.setEnabled(true);
+                rcvRelPrevCases.setEnabled(true);
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 showError(message, null);
+                btnRelNewCase.setEnabled(true);
+                rcvRelPrevCases.setEnabled(true);
             }
         });
     }
@@ -1533,5 +1542,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(pendingPoints.size() != 0){
+            uploadPoints();
+        }
+    }
 }
