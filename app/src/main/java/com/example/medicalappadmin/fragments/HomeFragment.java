@@ -183,7 +183,6 @@ public class HomeFragment extends Fragment {
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 tvDoctorName.setVisibility(View.GONE);
                 setGreeting();
-                clHome.setVisibility(View.VISIBLE);
                 llAnalytics.setVisibility(View.GONE);
                 Log.i("Home", "fail: " + message);
             }
