@@ -11,6 +11,8 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+
+import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.databinding.ActivityLoginBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -28,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        Methods.setStatusBarColor(getColor(R.color.colorCta),LoginActivity.this);
         binding.etPasswordLogin.setOnFocusChangeListener((view, hasFocus) -> {
             if (hasFocus) {
                 binding.passInputLayout.setHint("");
@@ -117,6 +120,7 @@ public class LoginActivity extends AppCompatActivity {
     private void launchSignupScreen() {
         Intent i = new Intent(this, SignupActivity.class);
         startActivity(i);
+        finish();
     }
 
     private void showPB(){
