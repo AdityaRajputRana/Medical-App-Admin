@@ -3,6 +3,8 @@ package com.example.medicalappadmin.rest.api;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -18,6 +20,7 @@ import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
 import com.example.medicalappadmin.rest.requests.App.AppRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -30,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class API {
+
     public static void getData(APIResponseListener listener, Object rawData, String endpoint, Class klass, Context context){
         try {
             String data = HashUtils.getHashedData(rawData, context, endpoint);
@@ -46,10 +50,10 @@ public class API {
 //                                    String decodedData = HashUtils.fromBase64(data);
                                     listener.convertData(new Gson().fromJson(data, klass));
                                 } else {
-                                    listener.fail("2", request.getString("message"), "", true, true);
+                                    listener.sendFail("2", request.getString("message"), "", true, true);
                                 }
                             } catch (Exception e) {
-                                listener.fail("1", "The received response is not good", "", true, true);
+                                listener.sendFail("1", "The received response is not good", "", true, true);
                                 e.printStackTrace();
                             }
                         }
@@ -73,7 +77,7 @@ public class API {
                                 if (error.getMessage() != null && !error.getMessage().isEmpty()) {
                                     message = message + " " + error.getMessage();
                                 }
-                                listener.fail(String.valueOf(error.networkResponse.statusCode), message, "", true, true);
+                                listener.sendFail(String.valueOf(error.networkResponse.statusCode), message, "", true, true);
                             }
                         }
                     }){
@@ -89,6 +93,46 @@ public class API {
 
 
     }
+
+    private static void convertAndSendResponseBack(APIResponseListener listener, JSONObject response, Class klass, Context context){
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(()->Log.i("eta: main", "Got RSP"));
+        try {
+            Boolean successful = response.getBoolean("success");
+            if (successful) {
+                handler.post(()->Log.i("eta: main", "Success Check pass"));
+                String dataStr = response.getString("data");
+                if (dataStr != null
+                        && !dataStr.isEmpty() && !dataStr.trim().isEmpty()) {
+                    handler.post(()->Log.i("eta: main", "Empty Data check pass"));
+//                                    String decodedData = HashUtils.fromBase64(data);
+                    handler.post(()->Log.i("eta: main","Data part decoded"));
+                    Log.i("eta rsp data", dataStr);
+
+                    if (klass == String.class)
+                        listener.sendSuccess(dataStr);
+                    else {
+                        Object rawObj = new Gson().fromJson(dataStr, klass);
+                        handler.post(()->Log.i("eta: main","Data converted to object"));
+                        listener.convertData(rawObj);
+
+                    }
+                } else {
+                    listener.convertData(null);
+                }
+            } else {
+                if (response.getString("message").contains("LOGOUT")) {
+                    Methods.showForceLogOutDialog((Activity) context);
+                }
+                listener.sendFail("2", response.getString("message"), "", true, true);
+            }
+        } catch (Exception e) {
+            Log.i("Lesson Response", response.toString());
+            listener.sendFail("1", "Response Conversion Error: " + e.getMessage().toString(), "", true, true);
+            e.printStackTrace();
+        }
+    }
+
     public static void postData(APIResponseListener listener, Object rawData, String endpoint, Class klass, Context context){
         try {
             String data = HashUtils.getHashedData(rawData, context, endpoint);
@@ -106,44 +150,14 @@ public class API {
             Log.i("eta url", url);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                     (Request.Method.POST, url, request, new Response.Listener<JSONObject>() {
-
                         @Override
                         public void onResponse(JSONObject response) {
-                            try {
-                                Log.i("eta Response", response.toString());
-                                Boolean successful = response.getBoolean("success");
-                                if (successful) {
-                                    if (response.getString("data") != null
-                                    && !response.getString("data").isEmpty() && !response.getString("data").trim().isEmpty()) {
-                                        String data = "";
-                                        if (klass == ArrayList.class){
-                                             data = response.getJSONArray("data").toString();
-                                        } else if (klass ==  String.class){
-                                            data = response.getString("data");
-                                        } else {
-                                             data = response.getJSONObject("data").toString();
-                                         }
-//                                    String decodedData = HashUtils.fromBase64(data);
-                                        Log.i("eta rsp data", data);
-                                        if (klass == String.class)
-                                            listener.success(data);
-                                        else
-                                            listener.convertData(new Gson().fromJson(data, klass));
-                                    } else {
-                                        listener.convertData(null);
-                                    }
-                                } else {
-                                    if (response.getString("message").contains("LOGOUT")) {
-                                        Methods.showForceLogOutDialog((Activity) context);
-                                    }
-                                    listener.fail("2", response.getString("message"), "", true, true);
-                                }
-                            } catch (Exception e) {
-                                Log.i("Lesson Response", response.toString());
-                                listener.fail("1", "Response Conversion Error: " + e.getMessage().toString(), "", true, true);
-                                e.printStackTrace();
-                            }
+                            Thread responseConverterThread = new Thread(() -> {
+                                convertAndSendResponseBack(listener, response, klass, context);
+                            });
+                            responseConverterThread.start();
                         }
+
                     }, new Response.ErrorListener() {
 
                         @Override
@@ -161,7 +175,7 @@ public class API {
                                         }
                                     }
                                     message = message +" " + error.getMessage();
-                                    listener.fail(String.valueOf(error.networkResponse.statusCode), message, "", true, true);
+                                    listener.sendFail(String.valueOf(error.networkResponse.statusCode), message, "", true, true);
                                 }
                             }
                         }
@@ -335,7 +349,7 @@ public class API {
 //                                Log.i("Eta network data", String.valueOf(error.networkResponse.data));
 //                                onNetWorkResponse(listener, error.networkResponse, klass);
 //                            } else {
-//                                listener.fail("VE-1", String.valueOf(error) + " : " + error.getMessage(), "", false, true );
+//                                listener.sendFail("VE-1", String.valueOf(error) + " : " + error.getMessage(), "", false, true );
 //                            }
 //                        }
 //                    }, listener) {

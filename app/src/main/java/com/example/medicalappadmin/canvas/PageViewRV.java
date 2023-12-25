@@ -8,7 +8,10 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -45,7 +48,7 @@ public class PageViewRV extends View {
         paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(3);
         scaleGestureDetector = new ScaleGestureDetector(getContext(),new ScaleListener());
         gestureDetector = new GestureDetector(getContext(), new ScrollListener());
 
@@ -69,23 +72,8 @@ public class PageViewRV extends View {
         bgPaint.setColor(Color.LTGRAY);
         bgPaint.setStyle(Paint.Style.FILL);
         canvas.drawRect(getLeft() + 25, getTop() + 5, 100*scaleFactor, 100* scaleFactor, bgPaint);
-
-        for (ArrayList<Point> points: mStrokes) {
-
-            boolean first = true;
-            for (int i = 0; i < points.size(); i++) {
-                Point point = points.get(i);
-                if (first) {
-                    first = false;
-                    path.moveTo(point.x, point.y);
-                } else {
-                    Point prev = points.get(i - 1);
-                    path.quadTo(prev.x, prev.y, (prev.x + point.x)/2, (prev.y + point.y)/2);
-                }
-            }
-            canvas.drawPath(path, paint);
-            path.reset();
-        }
+        if (previousDrawPath != null)
+            canvas.drawPath(previousDrawPath, paint);
 
     }
 
@@ -117,6 +105,31 @@ public class PageViewRV extends View {
     }
 
     public void addCoordinates(ArrayList<Point> points) {
+        Log.i("Optimiz", "Add Co-ordinates executing");
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        Log.i("Optimiz", "starting thread");
+        new Thread(() -> {
+            Path path = createPathFromPoints(points);
+
+            mainHandler.post(() -> {
+                previousDrawPath = path;
+                invalidate();
+            });
+
+        }).start();
+        Log.i("Optimiz", "post thread start");
+    }
+
+
+    private Path createPathFromPoints(ArrayList<Point> points){
+        if (points == null || points.size() == 0)
+            return null;
+        Path path = new Path();
+        float prevX, prevY;
+        prevX = points.get(0).getX();
+        prevY = points.get(0).getY();
+
+        path.moveTo(prevX, prevY);
         for(Point p:points){
             float x = p.getX();
             float y = p.getY();
@@ -124,14 +137,18 @@ public class PageViewRV extends View {
             x = x*scaleFactor + getLeft();
             y = y*scaleFactor + getTop();
             if(actionType == 1){
-                mStrokes.add(new ArrayList<>());
+                path.moveTo(x, y);
             } else if(actionType == 3){
-
-                mStrokes.get(mStrokes.size()-1).add(new Point(x, y));
+                path.quadTo(prevX, prevY, (prevX + x)/2, (prevY + y)/2);
             }
+            prevX = x;
+            prevY = y;
+
         }
-        invalidate();
+        return path;
     }
+    private Path previousDrawPath;
+
 
     //scaling of screen
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {

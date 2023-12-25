@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -25,6 +27,11 @@ public class Methods {
     private static boolean isLogOutShown = false;
 
     public static void showForceLogOutDialog(Activity context){
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(()->mainUIForceLogoutDialog(context));
+    }
+
+    private static void mainUIForceLogoutDialog(Activity context){
         if (isLogOutShown){
             return;
         }
