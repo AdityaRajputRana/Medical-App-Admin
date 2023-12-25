@@ -119,12 +119,15 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
                 binding.tvPatientsName.setText(response.getPatient().getName());
             } else {
                 binding.tvPatientsName.setText("Untitled Case");
-
             }
+
             binding.tvGender.setText(response.getPatient().getGender());
             binding.tvCaseName.setText(response.getTitle());
             binding.tvDiagnosis.setText(response.getDiagnosis());
             binding.tvLastUpdated.setText(response.getUpdatedAt());
+            if(response.getPatient().getMobileNumber() != null || response.getPatient().getMobileNumber() != 0)
+                binding.tvMobileNumber.setText(String.valueOf(response.getPatient().getMobileNumber()));
+            else binding.tvMobileNumber.setVisibility(View.GONE);
             setUpRCV(response);
             if(response.getAdditionals() != null && response.getAdditionals().size() != 0){
                 setUpAdditionalsRCV(response.getAdditionals());
