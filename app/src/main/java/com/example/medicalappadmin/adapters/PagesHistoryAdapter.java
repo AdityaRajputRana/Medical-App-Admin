@@ -20,14 +20,12 @@ import com.example.medicalappadmin.rest.response.ViewCaseRP;
 
 import java.util.ArrayList;
 
-public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapter.ViewHolder> {
+public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapter.MyViewHolder> {
     ViewCaseRP viewCaseRP;
     Context context;
     PageListener listener;
 
-    PageViewRV notepadView;
-    TextView pageCount;
-    LinearLayout llPage;
+
 
 
     public PagesHistoryAdapter(ViewCaseRP viewCaseRP, Context context, PageListener listener) {
@@ -38,21 +36,16 @@ public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapte
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.pages_item, parent, false);
-        notepadView = view.findViewById(R.id.rcvNotepadView);
-        pageCount = view.findViewById(R.id.tvPageCount);
-        llPage = view.findViewById(R.id.llPage);
-
-
-        return new ViewHolder(view);
+        return new MyViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        notepadView.addCoordinates(viewCaseRP.getPages().get(position).getPoints());
-        pageCount.setText("Page no: " + viewCaseRP.getPages().get(position).getPageNumber());
-        llPage.setOnClickListener(new View.OnClickListener() {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        holder.notepadView.addCoordinates(viewCaseRP.getPages().get(position).getPoints());
+        holder.pageCount.setText("Page no: " + viewCaseRP.getPages().get(position).getPageNumber());
+        holder.llPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.i("lol", "onClick: " + viewCaseRP.getPages().get(holder.getAdapterPosition()).getPageNumber());
@@ -75,9 +68,15 @@ public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapte
     }
 
 
-    class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(@NonNull View itemView) {
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        PageViewRV notepadView;
+        TextView pageCount;
+        LinearLayout llPage;
+        public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.notepadView = itemView.findViewById(R.id.rcvNotepadView);
+            this.pageCount = itemView.findViewById(R.id.tvPageCount);
+            this.llPage = itemView.findViewById(R.id.llPage);
         }
     }
 }

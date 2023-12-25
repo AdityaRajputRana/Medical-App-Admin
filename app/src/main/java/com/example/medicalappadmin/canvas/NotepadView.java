@@ -11,6 +11,9 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -145,7 +148,11 @@ public class NotepadView extends View {
 
         currentLiveX = x;
         currentLiveY = y;
-        invalidate();
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        mainHandler.post(()->{
+            Log.i("Optimi", "Calling invalidate");
+            invalidate();
+        });
     }
 
 
@@ -160,41 +167,47 @@ public class NotepadView extends View {
     //Todo: Shift Both Functions to BG Thread to generate a bmp and send that back to our thread
     public void addCoordinates(ArrayList<Point> points) {
         Log.i("Optimiz", "Add Co-ordinates executing");
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i("Optimiz", "BG Thread Running");
-                Path path = new Path();
-                float prevX, prevY;
-                prevX = points.get(0).getX();
-                prevY = points.get(0).getY();
-
-                path.moveTo(prevX, prevY);
-                for(Point p:points){
-                    float x = p.getX();
-                    float y = p.getY();
-                    int actionType = p.getActionType();
-                    x = x*scaleFactor + getLeft();
-                    y = y*scaleFactor + getTop();
-                    if(actionType == 1){
-                        path.moveTo(x, y);
-                    } else if(actionType == 3){
-                        path.quadTo(prevX, prevY, (prevX + x)/2, (prevY + y)/2);
-                    }
-                    prevX = x;
-                    prevY = y;
-
-                }
-                previousDrawPath = path;
-                Log.i("Optimiz", "BG Thread Calling Post Invalidate");
-                postInvalidate();
-                Log.i("Optimiz", "BG Thread Stopping");
-            }
-        });
+        Handler mainHandler = new Handler(Looper.getMainLooper());
         Log.i("Optimiz", "starting thread");
-        thread.start();
+        new Thread(() -> {
+            Path path = createPathFromPoints(points);
+
+            mainHandler.post(() -> {
+                previousDrawPath = path;
+                invalidate();
+            });
+
+        }).start();
         Log.i("Optimiz", "post thread start");
     }
+
+    private Path createPathFromPoints(ArrayList<Point> points){
+        if (points == null || points.size() == 0)
+            return null;
+        Path path = new Path();
+        float prevX, prevY;
+        prevX = points.get(0).getX();
+        prevY = points.get(0).getY();
+
+        path.moveTo(prevX, prevY);
+        for(Point p:points){
+            float x = p.getX();
+            float y = p.getY();
+            int actionType = p.getActionType();
+            x = x*scaleFactor + getLeft();
+            y = y*scaleFactor + getTop();
+            if(actionType == 1){
+                path.moveTo(x, y);
+            } else if(actionType == 3){
+                path.quadTo(prevX, prevY, (prevX + x)/2, (prevY + y)/2);
+            }
+            prevX = x;
+            prevY = y;
+
+        }
+        return path;
+    }
+
 
     private Bitmap backgroundBitmap;
     public void addActions(ArrayList<DrawLiveDataBuffer.DrawAction> points){
