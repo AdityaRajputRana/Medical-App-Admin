@@ -32,7 +32,6 @@ public class SignupActivity extends AppCompatActivity {
                 if(initialChecks()){
                     showToast(SignupActivity.this, "Fields are correct");
                     String fullName = binding.etFNameSignup.getText().toString()+" "+ binding.etLNameSignup.getText().toString();
-                    Hospital hospital = new Hospital();
                     User user = new User(
 
                     );

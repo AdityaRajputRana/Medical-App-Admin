@@ -392,6 +392,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     }
 
+    private void hideAllLayouts(){
+        llAddMobileNumber.setVisibility(View.GONE);
+        llPrevPatientList.setVisibility(View.GONE);
+        llNewPatient.setVisibility(View.GONE);
+        llExistingPatientDetails.setVisibility(View.GONE);
+        llRelPrevCases.setVisibility(View.GONE);
+    }
     private void showAddNewPatientLayout() {
         llAddMobileNumber.setVisibility(View.GONE);
         llPrevPatientList.setVisibility(View.GONE);
@@ -832,11 +839,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             binding.toolbar.setSubtitle("Initialising Page");
             showPB();
             final int pageNo = currentPageNumber;
+            btnSave.setEnabled(false);
+            hideAllLayouts();
 
             APIMethods.initialisePage(this, currentPageNumber, new APIResponseListener<InitialisePageRP>() {
                 @Override
                 public void success(InitialisePageRP response) {
                     pbSyncPage.setVisibility(View.GONE);
+                    btnSave.setEnabled(true);
 
                     if(recordVoiceDialog != null){
                         recordVoiceDialog.dismiss();
@@ -889,6 +899,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                     hidePB();
                     Methods.showError(PrescriptionActivity.this, message, true);
                     pbSyncPage.setVisibility(View.GONE);
+                    btnSave.setEnabled(true);
 
                 }
             });
