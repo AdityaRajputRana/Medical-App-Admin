@@ -1,19 +1,9 @@
 package com.example.medicalappadmin.fragments;
 
-import static android.content.Context.MODE_PRIVATE;
-
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,32 +14,29 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+
 import com.example.medicalappadmin.ActivityCaseHistory;
 import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.PatientHistoryActivity;
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PrescriptionActivity;
 import com.example.medicalappadmin.R;
-import com.example.medicalappadmin.Transformations.CircleTransformation;
-import com.example.medicalappadmin.databinding.ActivityPatientHistoryBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.HomePageRP;
-import com.google.gson.Gson;
-import com.squareup.picasso.Picasso;
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 import org.eazegraph.lib.charts.PieChart;
 import org.eazegraph.lib.models.PieModel;
 
 import java.util.Calendar;
-import java.util.Date;
 
 
 public class HomeFragment extends Fragment {
-
-    public interface CallBacksListener{
-        void onPenIconClicked();
-    }
 
     private CallBacksListener listener;
     private LinearLayout btnAddNewPatient;
@@ -71,17 +58,16 @@ public class HomeFragment extends Fragment {
     private ConstraintLayout clHome;
     private LinearLayout llAnalytics;
     private LinearLayout llToday;
-    private ProgressBar pbHome;
-    private  HomePageRP homePageRP;
-
-
-
+    private HomePageRP homePageRP;
+    private ShimmerFrameLayout shimmerContainer;
     public HomeFragment(Context context) {
-        if (context instanceof  CallBacksListener){
+        if (context instanceof CallBacksListener) {
             listener = (CallBacksListener) context;
         }
     }
-    public HomeFragment(){
+
+
+    public HomeFragment() {
 
     }
 
@@ -90,9 +76,9 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        btnAddNewPatient  = view.findViewById(R.id.btnAddNewPatient);
-        btnCaseHistory  = view.findViewById(R.id.btnCaseHistory);
-        btnPatientHistory  = view.findViewById(R.id.btnPatientHistory);
+        btnAddNewPatient = view.findViewById(R.id.btnAddNewPatient);
+        btnCaseHistory = view.findViewById(R.id.btnCaseHistory);
+        btnPatientHistory = view.findViewById(R.id.btnPatientHistory);
         penButton = view.findViewById(R.id.penStatusBtn);
         tvDoctorName = view.findViewById(R.id.tvDoctorName);
         tvGreeting = view.findViewById(R.id.tvGreeting);
@@ -100,22 +86,33 @@ public class HomeFragment extends Fragment {
         pieChartTotal = view.findViewById(R.id.pieChartTotal);
         tvTotal = view.findViewById(R.id.tvTotal);
         tvTotalMale = view.findViewById(R.id.tvTotalMale);
-        tvTotalFemale= view.findViewById(R.id.tvTotalFemale);
+        tvTotalFemale = view.findViewById(R.id.tvTotalFemale);
         tvTodayTotal = view.findViewById(R.id.tvTotalToday);
         tvTodayMale = view.findViewById(R.id.tvTodayMale);
         tvTodayFemale = view.findViewById(R.id.tvTodayFemale);
-        pieChartToday= view.findViewById(R.id.pieChartToday);
-        clHome= view.findViewById(R.id.clHome);
-        pbHome= view.findViewById(R.id.pbHome);
-        llAnalytics= view.findViewById(R.id.llAnalytics);
-        llToday= view.findViewById(R.id.llTodayAnalytics);
+        pieChartToday = view.findViewById(R.id.pieChartToday);
+        clHome = view.findViewById(R.id.clHome);
+        shimmerContainer = view.findViewById(R.id.shimmerContainer);
+        llAnalytics = view.findViewById(R.id.llAnalytics);
+        llToday = view.findViewById(R.id.llTodayAnalytics);
 
-        return  view;
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setListeners();
+
+        if (homePageRP == null) {
+            loadHomePage();
+        } else {
+            setUpUI();
+        }
+
+    }
+
+    private void setListeners() {
         btnAddNewPatient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,7 +125,7 @@ public class HomeFragment extends Fragment {
         btnCaseHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i =new Intent(getContext(), ActivityCaseHistory.class);
+                Intent i = new Intent(getContext(), ActivityCaseHistory.class);
                 startActivity(i);
             }
         });
@@ -136,55 +133,45 @@ public class HomeFragment extends Fragment {
         btnPatientHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i =new Intent(getContext(), PatientHistoryActivity.class);
+                Intent i = new Intent(getContext(), PatientHistoryActivity.class);
                 startActivity(i);
             }
         });
 
-        penButton.setOnClickListener(v->{
-            if (listener != null){
+        penButton.setOnClickListener(v -> {
+            if (listener != null) {
                 listener.onPenIconClicked();
             }
         });
 
         PenStatusLiveData.getPenStatusLiveData().getIsConnected()
-                .observe(getViewLifecycleOwner(), isConnected->{
-                    int colorCodeID = isConnected?R.color.colorActiveGreen:R.color.colorInactiveGray;
+                .observe(getViewLifecycleOwner(), isConnected -> {
+                    int colorCodeID = isConnected ? R.color.colorActiveGreen : R.color.colorInactiveGray;
                     penButton.setColorFilter(getActivity().getColor(colorCodeID));
                 });
-
-
-        if(homePageRP == null){
-            loadHomePage();
-        }
-        else {
-            setUpUI();
-        }
-
     }
-
 
     private void setGreeting() {
         Calendar calendar = Calendar.getInstance();
         int hours = calendar.get(Calendar.HOUR_OF_DAY);
-        Log.i("time", "loadData:hours "+ hours);
+        Log.i("time", "loadData:hours " + hours);
         String greeting = null;
-        if(hours>=1 && hours<12){
+        if (hours >= 1 && hours < 12) {
             greeting = "Good morning,";
-        } else if(hours>=12 && hours<16){
+        } else if (hours >= 12 && hours < 16) {
             greeting = "Good afternoon,";
-        } else if(hours>=16 && hours<21){
+        } else if (hours >= 16 && hours < 21) {
             greeting = "Good evening,";
-        } else if(hours>=21 && hours<=24){
+        } else if (hours >= 21 && hours <= 24) {
             greeting = "Good night,";
         } else {
             greeting = "Hello";
         }
-        Log.i("time", "loadData: gre "+greeting);
+        Log.i("time", "loadData: gre " + greeting);
         tvGreeting.setText(greeting);
     }
 
-    private void loadHomePage(){
+    private void loadHomePage() {
         APIMethods.homePage(getContext(), new APIResponseListener<HomePageRP>() {
             @Override
             public void success(HomePageRP response) {
@@ -198,7 +185,7 @@ public class HomeFragment extends Fragment {
                 setGreeting();
                 clHome.setVisibility(View.VISIBLE);
                 llAnalytics.setVisibility(View.GONE);
-                Log.i("Home", "fail: "+ message);
+                Log.i("Home", "fail: " + message);
             }
         });
     }
@@ -206,46 +193,52 @@ public class HomeFragment extends Fragment {
     private void setUpUI() {
 
         setGreeting();
-        if(homePageRP != null){
-            pbHome.setVisibility(View.GONE);
-            clHome.setVisibility(View.VISIBLE);
+        if (homePageRP != null) {
+            shimmerContainer.stopShimmer();
+            shimmerContainer.hideShimmer();
             tvDoctorName.setText(homePageRP.getStaffDetails().getFullName());
-            tvTotal.setText("Total Patients : "+homePageRP.getAnalytics().getTotal().getCount());
-            tvTotalMale.setText("Males : "+homePageRP.getAnalytics().getTotal().getMale());
-            tvTotalFemale.setText("Females : "+homePageRP.getAnalytics().getTotal().getFemale());
+            tvTotal.setText("Total Patients : " + homePageRP.getAnalytics().getTotal().getCount());
+            tvTotalMale.setText("Males : " + homePageRP.getAnalytics().getTotal().getMale());
+            tvTotalFemale.setText("Females : " + homePageRP.getAnalytics().getTotal().getFemale());
             pieChartTotal.addPieSlice(
                     new PieModel(
-                            "Male",homePageRP.getAnalytics().getTotal().getMale(), Color.parseColor("#90ee90")
+                            "Male", homePageRP.getAnalytics().getTotal().getMale(), Color.parseColor("#90ee90")
                     )
             );
             pieChartTotal.addPieSlice(
                     new PieModel(
-                            "Female",homePageRP.getAnalytics().getTotal().getFemale() , Color.parseColor("#FFB6C1")
+                            "Female", homePageRP.getAnalytics().getTotal().getFemale(), Color.parseColor("#FFB6C1")
                     )
             );
             pieChartTotal.animate();
             pieChartTotal.setInnerPaddingColor(getActivity().getColor(R.color.colorBackground));
 
-            if(homePageRP.getAnalytics().getTodaySoFar().getCount() != 0){
+            if (homePageRP.getAnalytics().getTodaySoFar().getCount() != 0) {
                 llToday.setVisibility(View.VISIBLE);
                 tvTodayTotal.setText("Total Patients : " + homePageRP.getAnalytics().getTodaySoFar().getCount());
-                tvTodayMale.setText("Males : " +homePageRP.getAnalytics().getTodaySoFar().getMale());
-                tvTodayFemale.setText("Females :"+ homePageRP.getAnalytics().getTodaySoFar().getFemale());
-                pieChartTotal.addPieSlice(
+                tvTodayMale.setText("Males : " + homePageRP.getAnalytics().getTodaySoFar().getMale());
+                tvTodayFemale.setText("Females :" + homePageRP.getAnalytics().getTodaySoFar().getFemale());
+                pieChartToday.addPieSlice(
                         new PieModel(
-                                "Male",homePageRP.getAnalytics().getTodaySoFar().getMale(), Color.parseColor("#90ee90")
+                                "Male", homePageRP.getAnalytics().getTodaySoFar().getMale(), Color.parseColor("#90ee90")
                         )
                 );
-                pieChartTotal.addPieSlice(
+                pieChartToday.addPieSlice(
                         new PieModel(
-                                "Female",homePageRP.getAnalytics().getTodaySoFar().getFemale(), Color.parseColor("#FFB6C1")
+                                "Female", homePageRP.getAnalytics().getTodaySoFar().getFemale(), Color.parseColor("#FFB6C1")
                         )
                 );
                 pieChartTotal.animate();
                 pieChartTotal.setInnerPaddingColor(getActivity().getColor(R.color.colorBackground));
 
             }
+        } else {
+            llAnalytics.setVisibility(View.GONE);
         }
+    }
+
+    public interface CallBacksListener {
+        void onPenIconClicked();
     }
 
 }
