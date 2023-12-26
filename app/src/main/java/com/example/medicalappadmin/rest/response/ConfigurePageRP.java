@@ -11,6 +11,8 @@ public class ConfigurePageRP {
     PageDetails pageDetails;
 
     public ArrayList<Guide> getGuides() {
+        if (guides == null)
+            guides = new ArrayList<>();
         return guides;
     }
 

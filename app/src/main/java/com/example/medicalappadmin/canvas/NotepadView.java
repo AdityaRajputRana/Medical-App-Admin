@@ -109,7 +109,7 @@ public class NotepadView extends View {
         bgPaint.setColor(Color.LTGRAY);
         bgPaint.setStyle(Paint.Style.FILL);
 
-        Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth*scaleFactor) - 32, (int)(pageHeight*scaleFactor)-32);
+        Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth*scaleFactor) + getLeft(), (int)(pageHeight*scaleFactor)+ getTop());
         if (prescriptionBg != null) {
             canvas.drawBitmap(prescriptionBg, null,dst, new Paint());
         }

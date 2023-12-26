@@ -1087,6 +1087,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 pageConfigurations = response;
                 guidesList = response.getGuides();
                 Log.i(TAG, "success: guides list size "+ guidesList.size());
+                otherGuidesList = new ArrayList<>();
                 if(guidesList.size() > 2){
                     otherGuidesList =  new ArrayList<>();
                     for(int i=2; i<guidesList.size(); i++){
