@@ -210,7 +210,8 @@ public class HomeFragment extends Fragment {
                     )
             );
             pieChartTotal.animate();
-            pieChartTotal.setInnerPaddingColor(getActivity().getColor(R.color.colorBackground));
+            if (getActivity() != null)
+                pieChartTotal.setInnerPaddingColor(getActivity().getColor(R.color.colorBackground));
 
             if (homePageRP.getAnalytics().getTodaySoFar().getCount() != 0) {
                 llToday.setVisibility(View.VISIBLE);

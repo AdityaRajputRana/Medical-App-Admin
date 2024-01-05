@@ -7,7 +7,7 @@ import android.os.Looper;
 public interface APIResponseListener<K> {
     default void sendFail(String code, String message, String redirectLink, boolean retry, boolean cancellabl){
         Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(()->sendFail(code, message, redirectLink, retry, cancellabl));
+        handler.post(()->fail(code, message, redirectLink, retry, cancellabl));
     }
 
     default void sendSuccess(K response){

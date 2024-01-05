@@ -141,6 +141,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
     }
 
 
+
     private void searchPens() {
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
@@ -164,51 +165,64 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
                 isPenSearchRunning =false;
             }
 
-            private void connectToSmartPen(SmartPen selectedPen) {
-
-                dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
-                dialogPenBinding.titleTxt.setVisibility(View.VISIBLE);
-                dialogPenBinding.bodyTxt.setVisibility(View.VISIBLE);
-                dialogPenBinding.imageView.setVisibility(View.GONE);
-                dialogPenBinding.actionBtn.setVisibility(View.GONE);
-                dialogPenBinding.radioSelector.setVisibility(View.GONE);
-
-                dialogPenBinding.titleTxt.setText("Connecting to selected pen");
-                dialogPenBinding.bodyTxt.setText("Please wait");
-
-                driver.connectToPen(selectedPen);
-
-
-            }
 
 
             @Override
             public void onSmartPen(SmartPen smartPen) {
-                if (smartPens == null) {
-                    smartPens = new ArrayList<>();
-                    dialogPenBinding.actionBtn.setOnClickListener(view->{
-                        isPenSearchRunning = false;
-                        connectToSmartPen(selectedPen);
-                    });
-                }
-                dialogPenBinding.radioSelector.setVisibility(View.VISIBLE);
-                dialogPenBinding.actionBtn.setVisibility(View.VISIBLE);
-                RadioButton button = new RadioButton(DashboardActivity.this);
-                button.setText(smartPen.getName());
-                button.setTag(String.valueOf(smartPens.size()));
-                dialogPenBinding.radioSelector.addView(button);
-                button.setChecked(true);
-                selectedPen = smartPen;
-                button.setOnCheckedChangeListener((compoundButton, b) -> {
-                    if (b){
-                        selectedPen = smartPen;
+                Log.i("Connections", "Adding to View");
+
+            }
+        });
+
+        SmartPenDriver.observeSmartPens(dialog, new Observer<ArrayList<SmartPen>>() {
+            @Override
+            public void onChanged(ArrayList<SmartPen> mPens) {
+                for (SmartPen smartPen: mPens){
+                    if (smartPens == null) {
+                        smartPens = new ArrayList<>();
+                        dialogPenBinding.actionBtn.setOnClickListener(view->{
+                            isPenSearchRunning = false;
+                            connectToSmartPen(selectedPen);
+                        });
                     }
-                });
-                smartPens.add(smartPen);
+                    dialogPenBinding.radioSelector.setVisibility(View.VISIBLE);
+                    dialogPenBinding.actionBtn.setVisibility(View.VISIBLE);
+                    RadioButton button = new RadioButton(DashboardActivity.this);
+                    button.setText(smartPen.getName());
+                    button.setTag(String.valueOf(smartPens.size()));
+                    dialogPenBinding.radioSelector.addView(button);
+                    button.setChecked(true);
+                    selectedPen = smartPen;
+                    button.setOnCheckedChangeListener((compoundButton, b) -> {
+                        if (b){
+                            selectedPen = smartPen;
+                        }
+                    });
+                    smartPens.add(smartPen);
+                }
             }
         });
 
     }
+
+    private void connectToSmartPen(SmartPen selectedPen) {
+
+        dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
+        dialogPenBinding.titleTxt.setVisibility(View.VISIBLE);
+        dialogPenBinding.bodyTxt.setVisibility(View.VISIBLE);
+        dialogPenBinding.imageView.setVisibility(View.GONE);
+        dialogPenBinding.actionBtn.setVisibility(View.GONE);
+        dialogPenBinding.radioSelector.setVisibility(View.GONE);
+
+        dialogPenBinding.titleTxt.setText("Connecting to selected pen");
+        dialogPenBinding.bodyTxt.setText("Please wait");
+
+        driver.connectToPen(selectedPen);
+
+
+    }
+
+
 
     private void initialisePenConnectionControls() {
         driver.setListener(smartPenListener);
@@ -218,7 +232,9 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
                 .setView(dialogPenBinding.getRoot())
                 .create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.setCancelable(false);
+//        dialog.setCancelable(false);
+        dialogPenBinding.hideBtn.setOnClickListener(view -> dialog.dismiss());
+        dialogPenBinding.hideBtn.setVisibility(View.VISIBLE);
         dialog.show();
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);

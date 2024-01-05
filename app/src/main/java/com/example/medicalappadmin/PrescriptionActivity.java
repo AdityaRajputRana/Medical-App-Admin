@@ -28,6 +28,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -678,7 +679,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             dialogPenBinding = DialogPenBinding.inflate(getLayoutInflater());
             dialog = new AlertDialog.Builder(this).setView(dialogPenBinding.getRoot()).create();
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            dialog.setCancelable(false);
+//            dialog.setCancelable(false);
+            dialogPenBinding.hideBtn.setOnClickListener(view -> {
+                dialog.dismiss();
+                dialogPenBinding = null;
+                onBackPressed();
+            });
+            dialogPenBinding.hideBtn.setText("Go Back");
+            dialogPenBinding.hideBtn.setVisibility(View.VISIBLE);
             dialog.show();
 
             dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
@@ -716,6 +724,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         dialogPenBinding.titleTxt.setText("Searching for pens");
 
 
+
         isPenSearchRunning = true;
         driver.getSmartPenList(new ConnectionsHandler.PenConnectionsListener() {
             @Override
@@ -732,27 +741,35 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
             @Override
             public void onSmartPen(SmartPen smartPen) {
-                if (smartPens == null) {
-                    smartPens = new ArrayList<>();
-                    dialogPenBinding.actionBtn.setOnClickListener(view -> {
-                        isPenSearchRunning = false;
-                        connectToSmartPen(selectedPen);
-                    });
-                }
-                dialogPenBinding.radioSelector.setVisibility(View.VISIBLE);
-                dialogPenBinding.actionBtn.setVisibility(View.VISIBLE);
-                RadioButton button = new RadioButton(PrescriptionActivity.this);
-                button.setText(smartPen.getName());
-                button.setTag(String.valueOf(smartPens.size()));
-                dialogPenBinding.radioSelector.addView(button);
-                button.setChecked(true);
-                selectedPen = smartPen;
-                button.setOnCheckedChangeListener((compoundButton, b) -> {
-                    if (b) {
-                        selectedPen = smartPen;
+
+            }
+        });
+        SmartPenDriver.observeSmartPens(dialog, new Observer<ArrayList<SmartPen>>() {
+            @Override
+            public void onChanged(ArrayList<SmartPen> mPens) {
+                for (SmartPen smartPen: mPens){
+                    if (smartPens == null) {
+                        smartPens = new ArrayList<>();
+                        dialogPenBinding.actionBtn.setOnClickListener(view -> {
+                            isPenSearchRunning = false;
+                            connectToSmartPen(selectedPen);
+                        });
                     }
-                });
-                smartPens.add(smartPen);
+                    dialogPenBinding.radioSelector.setVisibility(View.VISIBLE);
+                    dialogPenBinding.actionBtn.setVisibility(View.VISIBLE);
+                    RadioButton button = new RadioButton(PrescriptionActivity.this);
+                    button.setText(smartPen.getName());
+                    button.setTag(String.valueOf(smartPens.size()));
+                    dialogPenBinding.radioSelector.addView(button);
+                    button.setChecked(true);
+                    selectedPen = smartPen;
+                    button.setOnCheckedChangeListener((compoundButton, b) -> {
+                        if (b) {
+                            selectedPen = smartPen;
+                        }
+                    });
+                    smartPens.add(smartPen);
+                }
             }
         });
 
@@ -1274,7 +1291,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             dialogPenBinding = DialogPenBinding.inflate(getLayoutInflater());
             dialog = new AlertDialog.Builder(this).setView(dialogPenBinding.getRoot()).create();
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            dialog.setCancelable(false);
         }
 
 

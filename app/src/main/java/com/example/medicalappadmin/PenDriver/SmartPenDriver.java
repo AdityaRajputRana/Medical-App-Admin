@@ -7,6 +7,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
@@ -21,6 +23,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import kr.neolab.sdk.ink.structure.Dot;
 import kr.neolab.sdk.ink.structure.DotType;
@@ -48,7 +51,8 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
     private ConnectionsHandler connectionsHandler;
     private SymbolController symbolController;
     private SmartPen selectedSmartPen;
-    private ArrayList<SmartPen> smartPens;
+    private ArrayList<SmartPen> smartPens = new ArrayList<>();
+    private HashSet<String> searchedPens = new HashSet<>();
 
 
     private SharedPreferences mPref;
@@ -64,20 +68,45 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
         DrawLiveDataBuffer.removeObserver(observer);
     }
 
+
+
+
+    private static MutableLiveData<ArrayList<SmartPen>> smartPensLiveData = new MutableLiveData<>(new ArrayList<>());
+    public static void observeSmartPens(@NonNull LifecycleOwner owner, @NonNull Observer<ArrayList<SmartPen>> observer){
+        smartPensLiveData.observe(owner, observer);
+    }
+
     public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener){
+
+        if (smartPens != null){
+            for (SmartPen smartPen: smartPens){
+                connectionsListener.onSmartPen(smartPen);
+            }
+        }
+
         ConnectionsHandler.PenConnectionsListener mConListener = new ConnectionsHandler.PenConnectionsListener() {
             @Override
             public void onSmartPens(ArrayList<SmartPen> pens) {
                 smartPens = new ArrayList<>();
                 smartPens.addAll(pens);
-                connectionsListener.onSmartPens(smartPens);
+                smartPensLiveData.setValue(smartPens);
+                if (connectionsListener != null) connectionsListener.onSmartPens(smartPens);
             }
 
             @Override
             public void onSmartPen(SmartPen smartPen) {
-                connectionsListener.onSmartPen(smartPen);
+                Log.i("Connections", "onSmartPen Called");
+                if (searchedPens.contains(smartPen.getMacAddress())){
+                    return;
+                }
+                searchedPens.add(smartPen.getMacAddress());
+                smartPens.add(smartPen);
+                smartPensLiveData.setValue(smartPens);
+                if (connectionsListener!= null) connectionsListener.onSmartPen(smartPen);
             }
         };
+
+
         connectionsHandler.getSmartPenList(activity, mConListener);
     }
 
