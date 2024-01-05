@@ -400,6 +400,7 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
             return  CONNECT_MESSAGE.CONFIG_SUCCESS;
         } else {
             PermissionsHelper.requestPermission(activity, isPermitted -> {
+                Log.i("Connections", "SmartPenListenerVal:"+String.valueOf(smartPenListener));
                     if (smartPenListener != null){
                         smartPenListener.onPermissionsResult(isPermitted);
                         if (!isPermitted){

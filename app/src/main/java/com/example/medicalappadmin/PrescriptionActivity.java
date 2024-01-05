@@ -222,6 +222,59 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         actionBarDrawerToggle.syncState();
 
 
+        findViews();
+        handleGender();
+        setListeners();
+
+        intialiseControls();
+
+    }
+
+    private void setListeners() {
+        //initialise page
+        btnSyncPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pbSyncPage.setVisibility(View.VISIBLE);
+                hideKeyboard(view);
+                Log.i(TAG, "onClick: current page no " + currentPageNumber);
+//                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
+            }
+        });
+
+        btnCheckRelatives.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideKeyboard(view);
+                tempMobile = Long.parseLong(etMobileNumber.getText().toString());
+                if (etMobileNumber.getText() == null ||
+                        etMobileNumber.getText().toString().isEmpty() ||
+                        etMobileNumber.getText().toString().equals("")) {
+                    etMobileNumber.setError("Required");
+                } else {
+                    linkMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
+                }
+            }
+        });
+
+
+        //todo: remove it
+        binding.actionBtn.setOnClickListener(view -> {
+//            drawEvent(0, 0, 46, 0);
+            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,49,0,false));
+
+        });
+
+        binding.actionBtn.setOnLongClickListener(view -> {
+//            showOtherGuidesBS();
+            showRecordVoiceSheet();
+            startRecording();
+            return true;
+
+        });
+    }
+
+    private void findViews() {
         //Initial drawer layout
         tvDrawerInit = binding.navView.getHeaderView(0).findViewById(R.id.tvDrawerInit);
 
@@ -266,53 +319,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         tvFemale = binding.navView.getHeaderView(0).findViewById(R.id.tvFemale);
         btnSave = binding.navView.getHeaderView(0).findViewById(R.id.btnSave);
         pbSaveNewPatient = binding.navView.getHeaderView(0).findViewById(R.id.pbSaveNewPatient);
-        handleGender();
-
-
-        //initialise page
-        btnSyncPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pbSyncPage.setVisibility(View.VISIBLE);
-                hideKeyboard(view);
-                Log.i(TAG, "onClick: current page no " + currentPageNumber);
-//                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
-            }
-        });
-
-        btnCheckRelatives.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hideKeyboard(view);
-                tempMobile = Long.parseLong(etMobileNumber.getText().toString());
-                if (etMobileNumber.getText() == null ||
-                        etMobileNumber.getText().toString().isEmpty() ||
-                        etMobileNumber.getText().toString().equals("")) {
-                    etMobileNumber.setError("Required");
-                } else {
-                    linkMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
-                }
-            }
-        });
-
-
-        //todo: remove it
-        binding.actionBtn.setOnClickListener(view -> {
-//            drawEvent(0, 0, 46, 0);
-            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,49,0,false));
-
-        });
-
-        binding.actionBtn.setOnLongClickListener(view -> {
-//            showOtherGuidesBS();
-            showRecordVoiceSheet();
-            startRecording();
-            return true;
-
-        });
-
-        intialiseControls();
-
     }
 
 
@@ -799,6 +805,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     @Override
     public void onPermissionsResult(boolean granted) {
+        Log.i("Connections", "Perm Result:" + String.valueOf(granted));
         if (granted) {
             searchPens();
         } else {

@@ -61,6 +61,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
         @Override
         public void onPermissionsResult(boolean granted) {
+            Log.i("Connections", "Perm Result: " + granted);
             if(granted){
                 searchPens();
             } else {
@@ -226,7 +227,6 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
     private void initialisePenConnectionControls() {
         driver.setListener(smartPenListener);
-        driver.initialize();
         dialogPenBinding = DialogPenBinding.inflate(getLayoutInflater());
         dialog = new AlertDialog.Builder(this)
                 .setView(dialogPenBinding.getRoot())
@@ -247,7 +247,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
             searchPens();
         else if(message == SmartPenDriver.CONNECT_MESSAGE.REQUESTING_PERMS){
             dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
-            dialogPenBinding.bodyTxt.setText("Searching");
+            dialogPenBinding.bodyTxt.setText("Requesting Permissions");
         } else
             showError(String.valueOf(message), null);
     }
