@@ -239,7 +239,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
         dialogPenBinding.titleTxt.setVisibility(View.VISIBLE);
-        dialogPenBinding.titleTxt.setText("Intialising Pen Driver");
+        dialogPenBinding.titleTxt.setText("Intialisiextenng Pen Driver");
 
         SmartPenDriver.CONNECT_MESSAGE message = driver.initialize();//driverStep3
 

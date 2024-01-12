@@ -125,7 +125,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
             binding.tvCaseName.setText(response.getTitle());
             binding.tvDiagnosis.setText(response.getDiagnosis());
             binding.tvLastUpdated.setText(response.getUpdatedAt());
-            if(response.getPatient().getMobileNumber() != null || response.getPatient().getMobileNumber() != 0)
+            if(response.getPatient().getMobileNumber() != null && response.getPatient().getMobileNumber() != 0)
                 binding.tvMobileNumber.setText(String.valueOf(response.getPatient().getMobileNumber()));
             else binding.tvMobileNumber.setVisibility(View.GONE);
             setUpRCV(response);
