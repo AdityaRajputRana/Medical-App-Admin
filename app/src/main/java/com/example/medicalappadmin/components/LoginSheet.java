@@ -75,6 +75,10 @@ public class LoginSheet {
         }
         if (binding.etBSMobile.getText().length() >= 10) return;
         if (character == 10){
+            if (binding.etBSMobile.getText().length() == 0) {
+                Toast.makeText(context, "All Values cleared", Toast.LENGTH_SHORT).show();
+                return;
+            };
             String text = binding.etBSMobile.getText().toString();
             text = text.substring(0, text.length()-1);
             binding.etBSMobile.setText(text);

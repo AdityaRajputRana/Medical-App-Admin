@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.ParcelUuid;
 import android.util.Log;
 
@@ -93,7 +94,7 @@ public class ConnectionsHandler {
                 @SuppressLint("MissingPermission")
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    Log.i("ConnectionHelper:", "OnReceiver");
+                    Log.i("ConnectionHelper:", "OnReceiver: Worker Thread");
                     String action = intent.getAction();
 
                     // When discovery finds a device
@@ -137,64 +138,66 @@ public class ConnectionsHandler {
                 @SuppressLint("MissingPermission")
                 @Override
                 public void onScanResult(int callbackType, ScanResult result) {
-                    Log.i("ConnectionHelper:", "OnScan Result");
-                    super.onScanResult(callbackType, result);
-                    BluetoothDevice device = result.getDevice();
-                    if ( device != null )
-                    {
-                        String sppAddress = UuidUtil.changeAddressFromLeToSpp(result.getScanRecord().getBytes());
-                        @SuppressLint("MissingPermission") String msg = device.getName() + "\n" +"[RSSI : " + result.getRssi() + "dBm]" + sppAddress;
-                        NLog.d( "onLeScan " + msg );
-                        if( !deviceMap.containsKey( sppAddress ) )
+                    Handler looper = new Handler(Looper.getMainLooper());
+                    Thread worker = new Thread(()->{
+                        super.onScanResult(callbackType, result);
+                        BluetoothDevice device = result.getDevice();
+                        if ( device != null )
                         {
-                            NLog.d( "ACTION_FOUND onLeScan : " + device.getName() + " sppAddress : " + sppAddress + ", COD:" + device.getBluetoothClass() );
-
-                            PenCtrl.getInstance().setLeMode( true );
-                            if( PenCtrl.getInstance().isAvailableDevice( result.getScanRecord().getBytes() ) )
+                            String sppAddress = UuidUtil.changeAddressFromLeToSpp(result.getScanRecord().getBytes());
+                            @SuppressLint("MissingPermission") String msg = device.getName() + "\n" +"[RSSI : " + result.getRssi() + "dBm]" + sppAddress;
+                            if( !deviceMap.containsKey( sppAddress ) )
                             {
-                                DeviceInfo info = new DeviceInfo();
-                                info.sppAddress = sppAddress;
-                                info.leAddress = device.getAddress();
-                                info.deviceName = device.getName();
-                                info.uuidVer = BTLEAdt.UUID_VER.VER_2;
-                                info.colorCode = -1;
 
-                                List<ParcelUuid> parcelUuids = result.getScanRecord().getServiceUuids();
-                                for(ParcelUuid uuid:parcelUuids)
+                                PenCtrl.getInstance().setLeMode( true );
+                                if( PenCtrl.getInstance().isAvailableDevice( result.getScanRecord().getBytes() ) )
                                 {
-                                    if( uuid.toString().equals(Const.ServiceUuidV5.toString()))
+                                    DeviceInfo info = new DeviceInfo();
+                                    info.sppAddress = sppAddress;
+                                    info.leAddress = device.getAddress();
+                                    info.deviceName = device.getName();
+                                    info.uuidVer = BTLEAdt.UUID_VER.VER_2;
+                                    info.colorCode = -1;
+
+                                    List<ParcelUuid> parcelUuids = result.getScanRecord().getServiceUuids();
+                                    for(ParcelUuid uuid:parcelUuids)
                                     {
-                                        info.uuidVer = BTLEAdt.UUID_VER.VER_5;
-                                        info.colorCode = UuidUtil.getColorCodeFromUUID(result.getScanRecord().getBytes());
-                                        info.companyCode = UuidUtil.getCompanyCodeFromUUID(result.getScanRecord().getBytes());
-                                        info.productCode = UuidUtil.getProductCodeFromUUID(result.getScanRecord().getBytes());
-                                        break;
-                                    }
-                                    else if(uuid.toString().equals(Const.ServiceUuidV2.toString()))
-                                    {
-                                        info.uuidVer = BTLEAdt.UUID_VER.VER_2;
-                                        info.colorCode = UuidUtil.getColorCodeFromUUID(result.getScanRecord().getBytes());
-                                        info.companyCode = UuidUtil.getCompanyCodeFromUUID(result.getScanRecord().getBytes());
-                                        info.productCode = UuidUtil.getProductCodeFromUUID(result.getScanRecord().getBytes());
-                                        break;
+                                        if( uuid.toString().equals(Const.ServiceUuidV5.toString()))
+                                        {
+                                            info.uuidVer = BTLEAdt.UUID_VER.VER_5;
+                                            info.colorCode = UuidUtil.getColorCodeFromUUID(result.getScanRecord().getBytes());
+                                            info.companyCode = UuidUtil.getCompanyCodeFromUUID(result.getScanRecord().getBytes());
+                                            info.productCode = UuidUtil.getProductCodeFromUUID(result.getScanRecord().getBytes());
+                                            break;
+                                        }
+                                        else if(uuid.toString().equals(Const.ServiceUuidV2.toString()))
+                                        {
+                                            info.uuidVer = BTLEAdt.UUID_VER.VER_2;
+                                            info.colorCode = UuidUtil.getColorCodeFromUUID(result.getScanRecord().getBytes());
+                                            info.companyCode = UuidUtil.getCompanyCodeFromUUID(result.getScanRecord().getBytes());
+                                            info.productCode = UuidUtil.getProductCodeFromUUID(result.getScanRecord().getBytes());
+                                            break;
+
+                                        }
 
                                     }
 
+                                    SmartPen smartPen = new SmartPen(device.getAddress(), device.getName() + "(Av device)", device.getAddress());
+                                    smartPen.setSppAddress(info.sppAddress);
+                                    smartPen.setLeAddress(info.leAddress);
+                                    smartPen.setUuidVer(info.uuidVer);
+                                    smartPen.setLe(true);
+                                    smartPen.setColorCode(info.colorCode);
+                                    smartPen.setProductCode(info.productCode);
+                                    deviceMap.put( sppAddress, true );
+                                    Log.i("Connections", "found device");
+                                    looper.post(()->listener.onSmartPen(smartPen));
+                                    smartPens.add(smartPen);
                                 }
-
-                                SmartPen smartPen = new SmartPen(device.getAddress(), device.getName() + "(Av device)", device.getAddress());
-                                smartPen.setSppAddress(info.sppAddress);
-                                smartPen.setLeAddress(info.leAddress);
-                                smartPen.setUuidVer(info.uuidVer);
-                                smartPen.setLe(true);
-                                smartPen.setColorCode(info.colorCode);
-                                smartPen.setProductCode(info.productCode);
-                                deviceMap.put( sppAddress, true );
-                                listener.onSmartPen(smartPen);
-                                smartPens.add(smartPen);
                             }
                         }
-                    }
+                    });
+                    worker.start();
                 }
 
                 @Override

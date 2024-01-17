@@ -1,7 +1,6 @@
 package com.example.medicalappadmin;
 
 
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -28,6 +27,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,7 +45,6 @@ import com.example.medicalappadmin.PenDriver.SmartPenListener;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
-import com.example.medicalappadmin.canvas.NotepadView;
 import com.example.medicalappadmin.components.LoginSheet;
 import com.example.medicalappadmin.components.WebVideoPlayer;
 import com.example.medicalappadmin.components.YTVideoPlayer;
@@ -62,12 +61,13 @@ import com.example.medicalappadmin.rest.requests.LinkGuideReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
-import com.example.medicalappadmin.rest.response.CaseSubmitRP;
+import com.example.medicalappadmin.rest.response.GeneratePDFLinkRP;
 import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkGuideRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
+import com.example.medicalappadmin.rest.response.SubmitCaseRP;
 import com.example.medicalappadmin.rest.response.UploadVoiceRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -221,6 +221,59 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         actionBarDrawerToggle.syncState();
 
 
+        findViews();
+        handleGender();
+        setListeners();
+
+        intialiseControls();
+
+    }
+
+    private void setListeners() {
+        //initialise page
+        btnSyncPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pbSyncPage.setVisibility(View.VISIBLE);
+                hideKeyboard(view);
+                Log.i(TAG, "onClick: current page no " + currentPageNumber);
+//                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
+            }
+        });
+
+        btnCheckRelatives.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideKeyboard(view);
+                tempMobile = Long.parseLong(etMobileNumber.getText().toString());
+                if (etMobileNumber.getText() == null ||
+                        etMobileNumber.getText().toString().isEmpty() ||
+                        etMobileNumber.getText().toString().equals("")) {
+                    etMobileNumber.setError("Required");
+                } else {
+                    linkMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
+                }
+            }
+        });
+
+
+        //todo: remove it
+        binding.actionBtn.setOnClickListener(view -> {
+//            drawEvent(0, 0, 46, 0);
+            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,49,0,false));
+
+        });
+
+        binding.actionBtn.setOnLongClickListener(view -> {
+//            showOtherGuidesBS();
+            showRecordVoiceSheet();
+            startRecording();
+            return true;
+
+        });
+    }
+
+    private void findViews() {
         //Initial drawer layout
         tvDrawerInit = binding.navView.getHeaderView(0).findViewById(R.id.tvDrawerInit);
 
@@ -265,53 +318,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         tvFemale = binding.navView.getHeaderView(0).findViewById(R.id.tvFemale);
         btnSave = binding.navView.getHeaderView(0).findViewById(R.id.btnSave);
         pbSaveNewPatient = binding.navView.getHeaderView(0).findViewById(R.id.pbSaveNewPatient);
-        handleGender();
-
-
-        //initialise page
-        btnSyncPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pbSyncPage.setVisibility(View.VISIBLE);
-                hideKeyboard(view);
-                Log.i(TAG, "onClick: current page no " + currentPageNumber);
-//                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
-            }
-        });
-
-        btnCheckRelatives.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hideKeyboard(view);
-                tempMobile = Long.parseLong(etMobileNumber.getText().toString());
-                if (etMobileNumber.getText() == null ||
-                        etMobileNumber.getText().toString().isEmpty() ||
-                        etMobileNumber.getText().toString().equals("")) {
-                    etMobileNumber.setError("Required");
-                } else {
-                    linkMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
-                }
-            }
-        });
-
-
-        //todo: remove it
-        binding.actionBtn.setOnClickListener(view -> {
-//            drawEvent(0, 0, 46, 0);
-            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,49,0,false));
-
-        });
-
-        binding.actionBtn.setOnLongClickListener(view -> {
-//            showOtherGuidesBS();
-            showRecordVoiceSheet();
-            startRecording();
-            return true;
-
-        });
-
-        intialiseControls();
-
     }
 
 
@@ -678,7 +684,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             dialogPenBinding = DialogPenBinding.inflate(getLayoutInflater());
             dialog = new AlertDialog.Builder(this).setView(dialogPenBinding.getRoot()).create();
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            dialog.setCancelable(false);
+//            dialog.setCancelable(false);
+            dialogPenBinding.hideBtn.setOnClickListener(view -> {
+                dialog.dismiss();
+                dialogPenBinding = null;
+                onBackPressed();
+            });
+            dialogPenBinding.hideBtn.setText("Go Back");
+            dialogPenBinding.hideBtn.setVisibility(View.VISIBLE);
             dialog.show();
 
             dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
@@ -716,6 +729,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         dialogPenBinding.titleTxt.setText("Searching for pens");
 
 
+
         isPenSearchRunning = true;
         driver.getSmartPenList(new ConnectionsHandler.PenConnectionsListener() {
             @Override
@@ -732,27 +746,35 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
             @Override
             public void onSmartPen(SmartPen smartPen) {
-                if (smartPens == null) {
-                    smartPens = new ArrayList<>();
-                    dialogPenBinding.actionBtn.setOnClickListener(view -> {
-                        isPenSearchRunning = false;
-                        connectToSmartPen(selectedPen);
-                    });
-                }
-                dialogPenBinding.radioSelector.setVisibility(View.VISIBLE);
-                dialogPenBinding.actionBtn.setVisibility(View.VISIBLE);
-                RadioButton button = new RadioButton(PrescriptionActivity.this);
-                button.setText(smartPen.getName());
-                button.setTag(String.valueOf(smartPens.size()));
-                dialogPenBinding.radioSelector.addView(button);
-                button.setChecked(true);
-                selectedPen = smartPen;
-                button.setOnCheckedChangeListener((compoundButton, b) -> {
-                    if (b) {
-                        selectedPen = smartPen;
+
+            }
+        });
+        SmartPenDriver.observeSmartPens(dialog, new Observer<ArrayList<SmartPen>>() {
+            @Override
+            public void onChanged(ArrayList<SmartPen> mPens) {
+                for (SmartPen smartPen: mPens){
+                    if (smartPens == null) {
+                        smartPens = new ArrayList<>();
+                        dialogPenBinding.actionBtn.setOnClickListener(view -> {
+                            isPenSearchRunning = false;
+                            connectToSmartPen(selectedPen);
+                        });
                     }
-                });
-                smartPens.add(smartPen);
+                    dialogPenBinding.radioSelector.setVisibility(View.VISIBLE);
+                    dialogPenBinding.actionBtn.setVisibility(View.VISIBLE);
+                    RadioButton button = new RadioButton(PrescriptionActivity.this);
+                    button.setText(smartPen.getName());
+                    button.setTag(String.valueOf(smartPens.size()));
+                    dialogPenBinding.radioSelector.addView(button);
+                    button.setChecked(true);
+                    selectedPen = smartPen;
+                    button.setOnCheckedChangeListener((compoundButton, b) -> {
+                        if (b) {
+                            selectedPen = smartPen;
+                        }
+                    });
+                    smartPens.add(smartPen);
+                }
             }
         });
 
@@ -782,6 +804,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     @Override
     public void onPermissionsResult(boolean granted) {
+        Log.i("Connections", "Perm Result:" + String.valueOf(granted));
         if (granted) {
             searchPens();
         } else {
@@ -1087,6 +1110,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 pageConfigurations = response;
                 guidesList = response.getGuides();
                 Log.i(TAG, "success: guides list size "+ guidesList.size());
+                otherGuidesList = new ArrayList<>();
                 if(guidesList.size() > 2){
                     otherGuidesList =  new ArrayList<>();
                     for(int i=2; i<guidesList.size(); i++){
@@ -1273,7 +1297,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             dialogPenBinding = DialogPenBinding.inflate(getLayoutInflater());
             dialog = new AlertDialog.Builder(this).setView(dialogPenBinding.getRoot()).create();
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            dialog.setCancelable(false);
         }
 
 
@@ -1317,10 +1340,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void submitCase(String caseId) {
         
-        APIMethods.submitCase(PrescriptionActivity.this, caseId, new APIResponseListener<CaseSubmitRP>() {
+        APIMethods.submitCase(PrescriptionActivity.this, caseId, new APIResponseListener<SubmitCaseRP>() {
             @Override
-            public void success(CaseSubmitRP response) {
-                Toast.makeText(PrescriptionActivity.this, "Case submitted", Toast.LENGTH_SHORT).show();
+            public void success(SubmitCaseRP response) {
+                Toast.makeText(PrescriptionActivity.this, "Case Submitted and would be shared with patient", Toast.LENGTH_SHORT).show();
                 finish();
             }
 

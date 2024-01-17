@@ -194,6 +194,12 @@ public class API {
 
             };
 
+            if (EndPoints.generateCasePDF.equals(endpoint))
+                jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*7,
+                    3,
+                    1.5f));
+
             VolleyClient.getRequestQueue().add(jsonObjectRequest);
 
         } catch (Exception e){

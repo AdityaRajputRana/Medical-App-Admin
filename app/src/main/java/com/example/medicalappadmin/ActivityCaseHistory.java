@@ -16,14 +16,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.CaseHistoryRVAdapter;
 import com.example.medicalappadmin.databinding.ActivityCaseHistoryBinding;
-import com.example.medicalappadmin.databinding.DialogPenBinding;
 import com.example.medicalappadmin.databinding.LoadingDialogBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
-import com.example.medicalappadmin.rest.response.CaseSubmitRP;
+import com.example.medicalappadmin.rest.response.GeneratePDFLinkRP;
+import com.example.medicalappadmin.rest.response.SubmitCaseRP;
 
 public class ActivityCaseHistory extends AppCompatActivity {
 
@@ -141,7 +142,7 @@ public class ActivityCaseHistory extends AppCompatActivity {
                     adapter = new CaseHistoryRVAdapter(response, ActivityCaseHistory.this, new CaseHistoryRVAdapter.CaseListener() {
                         @Override
                         public void onShareClicked(String caseId) {
-                            generateShareLink(caseId);
+                            generateAndSharePDFLink(caseId);
                         }
 
                         @Override
@@ -149,6 +150,11 @@ public class ActivityCaseHistory extends AppCompatActivity {
                             Intent i = new Intent(ActivityCaseHistory.this, PatientDetailedHistoryActivity.class);
                             i.putExtra("CASE_ID", caseId);
                             startActivity(i);
+                        }
+
+                        @Override
+                        public void submitCaseToPatient(String caseId) {
+                            shareCaseToPatient(caseId);
                         }
                     });
                     binding.rcvCaseHistory.setLayoutManager(manager);
@@ -175,7 +181,7 @@ public class ActivityCaseHistory extends AppCompatActivity {
     }
 
 
-    private void generateShareLink(String caseId) {
+    private void generateAndSharePDFLink(String caseId) {
         AlertDialog dialog;
         LoadingDialogBinding loadingDialogBinding;
         loadingDialogBinding = LoadingDialogBinding.inflate(getLayoutInflater(), null, false);
@@ -185,18 +191,44 @@ public class ActivityCaseHistory extends AppCompatActivity {
                 .show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCancelable(false);
-        APIMethods.submitCase(ActivityCaseHistory.this, caseId, new APIResponseListener<CaseSubmitRP>() {
+        APIMethods.generatePDFonServer(ActivityCaseHistory.this, caseId, new APIResponseListener<GeneratePDFLinkRP>() {
             @Override
-            public void success(CaseSubmitRP response) {
+            public void success(GeneratePDFLinkRP response) {
                 dialog.dismiss();
                 saveToClipBoard(ActivityCaseHistory.this, response.getPdfUrl());
                 Toast.makeText(ActivityCaseHistory.this, "Link copied to clipboard", Toast.LENGTH_SHORT).show();
+                Methods.shareText(ActivityCaseHistory.this, "Hi here is your prescription. Download चिकित्सा नुस्खे पर्ची App for detailed reports.\n\n"+response.getPdfUrl());
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 dialog.dismiss();
                 Toast.makeText(ActivityCaseHistory.this, "Some error occurred while fetching case, Try again", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void shareCaseToPatient(String caseId) {
+        AlertDialog dialog;
+        LoadingDialogBinding loadingDialogBinding;
+        loadingDialogBinding = LoadingDialogBinding.inflate(getLayoutInflater(), null, false);
+        loadingDialogBinding.tvTitleAD.setText("Requesting to Shared with patient");
+        dialog = new AlertDialog.Builder(this)
+                .setView(loadingDialogBinding.getRoot())
+                .show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
+        APIMethods.submitCase(ActivityCaseHistory.this, caseId, new APIResponseListener<SubmitCaseRP>() {
+            @Override
+            public void success(SubmitCaseRP response) {
+                dialog.dismiss();
+                Toast.makeText(ActivityCaseHistory.this, "Prescription will be shared with patient soon!", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                dialog.dismiss();
+                Toast.makeText(ActivityCaseHistory.this, "Some error sharing prescription, " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }
