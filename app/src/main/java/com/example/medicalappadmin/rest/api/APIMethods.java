@@ -13,7 +13,6 @@ import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
 import com.example.medicalappadmin.rest.requests.CaseHistoryReq;
 import com.example.medicalappadmin.rest.requests.CaseSubmitReq;
 import com.example.medicalappadmin.rest.requests.EmptyReq;
-import com.example.medicalappadmin.rest.requests.HomeReq;
 import com.example.medicalappadmin.rest.requests.InitialisePageReq;
 import com.example.medicalappadmin.rest.requests.LinkGuideReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
@@ -30,7 +29,7 @@ import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddGuideVideoRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.CaseHistoryRP;
-import com.example.medicalappadmin.rest.response.CaseSubmitRP;
+import com.example.medicalappadmin.rest.response.GeneratePDFLinkRP;
 import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.GuidesVideosRP;
@@ -42,13 +41,13 @@ import com.example.medicalappadmin.rest.response.LoginRP;
 import com.example.medicalappadmin.rest.response.PatientListRP;
 import com.example.medicalappadmin.rest.response.SetGuidePosRP;
 import com.example.medicalappadmin.rest.response.SignupRP;
+import com.example.medicalappadmin.rest.response.SubmitCaseRP;
 import com.example.medicalappadmin.rest.response.UploadVoiceRP;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Objects;
 
 
 public class APIMethods {
@@ -115,9 +114,14 @@ public class APIMethods {
 
     //submit case
 
-    public static void submitCase(Context context, String caseId, APIResponseListener<CaseSubmitRP> listener) {
+    public static void submitCase(Context context, String caseId, APIResponseListener<SubmitCaseRP> listener) {
         CaseSubmitReq req = new CaseSubmitReq(caseId);
-        API.postData(listener, req, EndPoints.submitCase, CaseSubmitRP.class, context);
+        API.postData(listener, req, EndPoints.submitCaseToPatient, SubmitCaseRP.class, context);
+    }
+
+    public static void generatePDFonServer(Context context, String caseId, APIResponseListener<GeneratePDFLinkRP> listener) {
+        CaseSubmitReq req = new CaseSubmitReq(caseId);
+        API.postData(listener, req, EndPoints.generateCasePDF, GeneratePDFLinkRP.class, context);
     }
 
     //view case

@@ -1,9 +1,9 @@
 package com.example.medicalappadmin.rest.response;
 
-public class CaseSubmitRP {
+public class GeneratePDFLinkRP {
     String pdfUrl;
 
-    public CaseSubmitRP() {
+    public GeneratePDFLinkRP() {
     }
 
     public String getPdfUrl() {

@@ -1,7 +1,6 @@
 package com.example.medicalappadmin;
 
 
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -46,7 +45,6 @@ import com.example.medicalappadmin.PenDriver.SmartPenListener;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
-import com.example.medicalappadmin.canvas.NotepadView;
 import com.example.medicalappadmin.components.LoginSheet;
 import com.example.medicalappadmin.components.WebVideoPlayer;
 import com.example.medicalappadmin.components.YTVideoPlayer;
@@ -63,12 +61,13 @@ import com.example.medicalappadmin.rest.requests.LinkGuideReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
-import com.example.medicalappadmin.rest.response.CaseSubmitRP;
+import com.example.medicalappadmin.rest.response.GeneratePDFLinkRP;
 import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkGuideRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
+import com.example.medicalappadmin.rest.response.SubmitCaseRP;
 import com.example.medicalappadmin.rest.response.UploadVoiceRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -1341,10 +1340,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void submitCase(String caseId) {
         
-        APIMethods.submitCase(PrescriptionActivity.this, caseId, new APIResponseListener<CaseSubmitRP>() {
+        APIMethods.submitCase(PrescriptionActivity.this, caseId, new APIResponseListener<SubmitCaseRP>() {
             @Override
-            public void success(CaseSubmitRP response) {
-                Toast.makeText(PrescriptionActivity.this, "Case submitted", Toast.LENGTH_SHORT).show();
+            public void success(SubmitCaseRP response) {
+                Toast.makeText(PrescriptionActivity.this, "Case Submitted and would be shared with patient", Toast.LENGTH_SHORT).show();
                 finish();
             }
 

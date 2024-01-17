@@ -26,6 +26,19 @@ public class Methods {
 
     private static boolean isLogOutShown = false;
 
+    public static void shareText(Context context, String text) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, text);
+        sendIntent.setType("text/plain");
+
+        if (sendIntent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(Intent.createChooser(sendIntent, "Share using"));
+        } else {
+            Toast.makeText(context, "No app can handle this action", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public static void showForceLogOutDialog(Activity context){
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(()->mainUIForceLogoutDialog(context));
