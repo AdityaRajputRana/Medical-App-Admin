@@ -194,7 +194,7 @@ public class API {
 
             };
 
-            if (EndPoints.generateCasePDF.equals(endpoint))
+            if (EndPoints.generateCasePDF.equals(endpoint) || EndPoints.viewCase.equals(endpoint))
                 jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
                     DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*7,
                     3,
