@@ -1,6 +1,7 @@
 package com.example.medicalappadmin;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -14,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,6 +45,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 
 import kr.neolab.sdk.metadata.structure.Symbol;
+import kr.neolab.sdk.pen.PenCtrl;
 
 public class DashboardActivity extends AppCompatActivity implements HomeFragment.CallBacksListener, ProfileFragment.CallBacksListener {
     private ActivityDashboardBinding binding;
@@ -224,6 +227,28 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001){
+            if (resultCode == RESULT_OK){
+                driver.getSmartPenList(new ConnectionsHandler.PenConnectionsListener() {
+                    @Override
+                    public void onSmartPens(ArrayList<SmartPen> smartPens) {
+                        if (smartPens.size() > 0 )
+                            dialogPenBinding.titleTxt.setText("Found all nearby pens");
+                        else
+                            showError("No Nearby pens found! Try refreshing bluetooth or turning on the power of smart pen", null);
+                    }
+
+                    @Override
+                    public void onSmartPen(SmartPen smartPen) {
+
+                    }
+                });
+            }
+        }
+    }
 
     private void initialisePenConnectionControls() {
         driver.setListener(smartPenListener);

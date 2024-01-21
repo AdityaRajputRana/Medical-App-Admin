@@ -1,6 +1,7 @@
 package com.example.medicalappadmin.PenDriver;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -63,12 +64,34 @@ public class ConnectionsHandler {
         void onSmartPen(SmartPen smartPen);
     }
 
+    public void getSmartPenList(Context context, PenConnectionsListener listener){
+        getSmartPenList(context, listener, false, 0);
+    }
+
     //Todo: 1. Currently only handling LE connections and not saving paired pen for automatic connection
     @SuppressLint("MissingPermission")
-    public void getSmartPenList(Context context, PenConnectionsListener listener) {
+    public void getSmartPenList(Context context, PenConnectionsListener listener, boolean alreadyRequestedToEnable, int count){
+        Log.i("ConnectionHelper: ", "Getting SmartPen List");
         if (isScanning){
             return;
         }
+
+        //check if bluetooth is enabled, if not then request to enable that when the bluetooth is turned back on restart search
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            listener.onSmartPens(new ArrayList<>());
+            return;
+        }
+        if (!mBluetoothAdapter.isEnabled()) {
+            if (!alreadyRequestedToEnable) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                ((Activity) context).startActivityForResult(enableBtIntent, 1);
+            }
+            if (count < 10)
+                new Handler().postDelayed(() -> getSmartPenList(context, listener, true, count+1), 2500);
+            return;
+        }
+
         isScanning = true;
         Log.i("ConnectionHelper: ", "Getting SmartPen List");
         if (!PermissionsHelper.haveRequiredPermissions(context)){

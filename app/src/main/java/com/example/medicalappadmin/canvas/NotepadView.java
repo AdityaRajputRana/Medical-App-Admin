@@ -49,6 +49,8 @@ public class NotepadView extends View {
     private int pageHeight ;
     private int pageWidth;
 
+    private Bitmap cachedBitmap;
+
     ArrayList<ArrayList<Point>> mStrokes;
 
     public NotepadView(Context context) {
@@ -208,8 +210,6 @@ public class NotepadView extends View {
         return path;
     }
 
-
-    private Bitmap backgroundBitmap;
     public void addActions(ArrayList<DrawLiveDataBuffer.DrawAction> points){
         for(DrawLiveDataBuffer.DrawAction p:points){
             float x = p.x;
