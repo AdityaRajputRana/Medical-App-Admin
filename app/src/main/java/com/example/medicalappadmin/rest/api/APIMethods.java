@@ -1,6 +1,7 @@
 package com.example.medicalappadmin.rest.api;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.example.medicalappadmin.Models.FileMetadata;
 import com.example.medicalappadmin.Models.Point;
@@ -56,7 +57,7 @@ public class APIMethods {
         API.postData(listener,new EmptyReq(), EndPoints.homePage, HomePageRP.class, context);
     }
     public static void configurePage(Context context, EmptyReq req, APIResponseListener<ConfigurePageRP> listener){
-        API.postData(listener,req, EndPoints.configurePage, ConfigurePageRP.class, context);
+        API.postData(listener,req, EndPoints.configurePage, ConfigurePageRP.class, context, true);
     }
     public static void linkAdditionalGuide(Context context, LinkGuideReq req, APIResponseListener<LinkGuideRP> listener){
         API.postData(listener,req, EndPoints.linkAdditionalGuide, LinkGuideRP.class, context);

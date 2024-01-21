@@ -16,6 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.medicalappadmin.Tools.CacheUtils;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
@@ -94,7 +95,7 @@ public class API {
 
     }
 
-    private static void convertAndSendResponseBack(APIResponseListener listener, JSONObject response, Class klass, Context context){
+    private static void convertAndSendResponseBack(APIResponseListener listener, JSONObject response, Class klass, Context context, boolean cache, String endpoint){
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(()->Log.i("eta: main", "Got RSP"));
         try {
@@ -117,6 +118,11 @@ public class API {
                         listener.convertData(rawObj);
 
                     }
+
+
+                    if (cache){
+                        CacheUtils.cache(context, endpoint, dataStr, 24*90);
+                    }
                 } else {
                     listener.convertData(null);
                 }
@@ -134,6 +140,16 @@ public class API {
     }
 
     public static void postData(APIResponseListener listener, Object rawData, String endpoint, Class klass, Context context){
+        postData(listener, rawData, endpoint, klass, context, false);
+    }
+    public static void postData(APIResponseListener listener, Object rawData, String endpoint, Class klass, Context context, boolean cache){
+        if (cache) {
+            String cachedValue = CacheUtils.getCached(context, endpoint);
+            if (cachedValue != null) {
+                Log.i("eta-response", "Got cached value");
+                listener.success(new Gson().fromJson(cachedValue, klass));
+            }
+        }
         try {
             String data = HashUtils.getHashedData(rawData, context, endpoint);
             JSONObject request;
@@ -153,7 +169,7 @@ public class API {
                         @Override
                         public void onResponse(JSONObject response) {
                             Thread responseConverterThread = new Thread(() -> {
-                                convertAndSendResponseBack(listener, response, klass, context);
+                                convertAndSendResponseBack(listener, response, klass, context, cache, endpoint);
                             });
                             responseConverterThread.start();
                         }
