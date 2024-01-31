@@ -97,7 +97,7 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
                 smartPenListener.message("Smart Pen", "Connected - " + iPenCtrl.getConnectedDevice());
                 activity.getSharedPreferences("PEN_CONFIG", Context.MODE_PRIVATE)
                         .edit()
-                        .putString("SavePenMac", selectedSmartPen.getId())
+                        .putString("SavePenMac", selectedSmartPen.getMacAddress())
                         .putBoolean("isPenSaved", true)
                         .apply();
                 selectedSmartPen.setConnected(true);

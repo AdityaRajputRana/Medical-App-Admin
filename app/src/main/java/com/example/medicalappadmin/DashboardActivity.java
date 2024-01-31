@@ -298,8 +298,17 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
             @Override
             public void onSmartPen(SmartPen smartPen) {
-                if (smartPen.getMacAddress().equals(autoConnMacAdd)){
-                    driver.connectToPen(smartPen);
+
+            }
+        });
+        SmartPenDriver.observeSmartPens(this, new Observer<ArrayList<SmartPen>>() {
+            @Override
+            public void onChanged(ArrayList<SmartPen> smartPens) {
+                for (SmartPen smartPen: smartPens){
+                    if (smartPen.getMacAddress().equals(autoConnMacAdd)){
+                        driver.connectToPen(smartPen);
+                        break;
+                    }
                 }
             }
         });

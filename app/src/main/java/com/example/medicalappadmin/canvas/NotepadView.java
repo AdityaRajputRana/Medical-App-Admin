@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 public class NotepadView extends View {
     private Paint paint;
-    float scaleFactor = 12.25f;
+    float scaleFactor = 0.03f;
     ScaleGestureDetector scaleGestureDetector;
     GestureDetector gestureDetector;
     private float translateX = 0;
@@ -132,6 +132,8 @@ public class NotepadView extends View {
             currentLivePath = new Path();
         x = x*scaleFactor + getLeft();
         y = y*scaleFactor + getTop();
+
+        Log.i("drawingCoordinate", "x: " + x + " y: " + y + " actionType: " + actionType);
         if(actionType == 1){
             currentLivePath.moveTo(x, y);
         } else {
