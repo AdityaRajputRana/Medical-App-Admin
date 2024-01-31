@@ -1,31 +1,22 @@
 package com.example.medicalappadmin.canvas;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-
-import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -33,7 +24,6 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 

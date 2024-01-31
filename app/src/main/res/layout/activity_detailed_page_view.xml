@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -35,7 +36,7 @@
             android:background="@drawable/bg_main"
             android:gravity="center"
             android:padding="8dp"
-            android:src="@drawable/baseline_arrow_back_24" />
+            app:srcCompat="@drawable/baseline_arrow_back_24" />
 
         <ImageButton
             android:id="@+id/nextPage"
@@ -46,7 +47,7 @@
             android:background="@drawable/bg_main"
             android:gravity="center"
             android:padding="8dp"
-            android:src="@drawable/baseline_arrow_forward_24" />
+            app:srcCompat="@drawable/baseline_arrow_forward_24" />
 
 
     </LinearLayout>
@@ -57,7 +58,7 @@
         android:padding="8dp"
         android:layout_margin="8dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/baseline_arrow_back_24"/>
+        app:srcCompat="@drawable/baseline_arrow_back_24"/>
 
 
 

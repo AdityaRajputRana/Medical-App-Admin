@@ -2,18 +2,16 @@ package com.example.medicalappadmin.fragments;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.example.medicalappadmin.LoginActivity;
 import com.example.medicalappadmin.Models.User;
@@ -25,8 +23,6 @@ import com.example.medicalappadmin.VideoSettingsActivity;
 import com.example.medicalappadmin.databinding.FragmentProfileBinding;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
-
-import java.lang.reflect.Method;
 
 public class ProfileFragment extends Fragment {
 
@@ -55,7 +51,7 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         if (binding == null){
             binding = FragmentProfileBinding.inflate(inflater);
-            Methods.setStatusBarColor(requireActivity().getColor(R.color.colorStatusBar),requireActivity());
+            Methods.setStatusBarColor(requireActivity().getColor(R.color.colorStatusBar), (AppCompatActivity) requireActivity());
             loadData();
             loadUI();
             setListeners();

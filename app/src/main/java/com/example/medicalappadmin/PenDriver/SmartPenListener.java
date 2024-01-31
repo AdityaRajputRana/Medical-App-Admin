@@ -1,6 +1,5 @@
 package com.example.medicalappadmin.PenDriver;
 
-import kr.neolab.sdk.metadata.structure.Symbol;
 
 public interface SmartPenListener {
     void onPermissionsDenied();

@@ -44,8 +44,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-import kr.neolab.sdk.metadata.structure.Symbol;
-import kr.neolab.sdk.pen.PenCtrl;
+
 
 public class DashboardActivity extends AppCompatActivity implements HomeFragment.CallBacksListener, ProfileFragment.CallBacksListener {
     private ActivityDashboardBinding binding;

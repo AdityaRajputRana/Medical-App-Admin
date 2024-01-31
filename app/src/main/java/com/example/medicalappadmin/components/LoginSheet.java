@@ -2,12 +2,12 @@ package com.example.medicalappadmin.components;
 
 import static com.example.medicalappadmin.Tools.Methods.hideKeyboard;
 
-import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.medicalappadmin.Models.LinkedPatient;
@@ -33,12 +33,12 @@ public class LoginSheet {
     private static LoginSheet instance;
     BottomSheetDialog dialog;
     BsheetAddMobileNoBinding binding;
-    Activity context;
+    AppCompatActivity context;
     private int pageNo;
     private String gender = "M";
     private PatientDetailsListener listener;
 
-    private LoginSheet(Activity context, int pageNo) {
+    private LoginSheet(AppCompatActivity context, int pageNo) {
         this.context = context;
         this.pageNo = pageNo;
         if (context instanceof PatientDetailsListener) {
@@ -62,7 +62,7 @@ public class LoginSheet {
         handleGender();
     }
 
-    public static LoginSheet getInstance(Activity context, int pageNo) {
+    public static LoginSheet getInstance(AppCompatActivity context, int pageNo) {
         if (instance == null || instance.pageNo != pageNo || instance.context != context) {
             instance = new LoginSheet(context, pageNo);
         }

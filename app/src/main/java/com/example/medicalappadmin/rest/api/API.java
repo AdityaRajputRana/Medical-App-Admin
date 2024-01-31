@@ -7,13 +7,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
-import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.medicalappadmin.Tools.CacheUtils;
@@ -21,10 +21,8 @@ import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
 import com.example.medicalappadmin.rest.requests.App.AppRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -128,7 +126,7 @@ public class API {
                 }
             } else {
                 if (response.getString("message").contains("LOGOUT")) {
-                    Methods.showForceLogOutDialog((Activity) context);
+                    Methods.showForceLogOutDialog((AppCompatActivity) context);
                 }
                 listener.sendFail("2", response.getString("message"), "", true, true);
             }
