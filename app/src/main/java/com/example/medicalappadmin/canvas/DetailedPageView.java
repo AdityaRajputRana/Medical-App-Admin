@@ -9,7 +9,10 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -53,15 +56,18 @@ public class DetailedPageView extends View {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
-        scaleGestureDetector = new ScaleGestureDetector(getContext(),new ScaleListener());
-        gestureDetector = new GestureDetector(getContext(), new ScrollListener());
-        mStrokes = new ArrayList<>();
-
     }
     public void setBackgroundImageUrl(String imageUrl,int width, int height) {
         loadImage(imageUrl);
         pageHeight = height;
         pageWidth = width;
+
+        scaleFactor = Math.min((float)getWidth()/width, (float)getHeight()/height);
+        paint.setStrokeWidth(4f/scaleFactor);
+
+        Log.i("ScaleFactor", "width: " + getWidth() + " height: " + getHeight() + " pageWidth: " + pageWidth + " pageHeight: " + pageHeight);
+        Log.i("ScaleFactor", "scaleFactor: " + scaleFactor);
+        invalidate();
     }
 
     private void loadImage(String imageUrl) {
@@ -90,121 +96,77 @@ public class DetailedPageView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Path path = new Path();
+        canvas.scale(scaleFactor, scaleFactor);
+
         Paint bgPaint = new Paint();
+        bgPaint.setColor(Color.LTGRAY);
+        bgPaint.setStyle(Paint.Style.FILL);
 
-//        bgPaint.setColor(Color.LTGRAY);
-//        bgPaint.setStyle(Paint.Style.FILL);
-//        canvas.drawRect(getLeft() + 25, getTop() + 5, 65*scaleFactor, 100* scaleFactor, bgPaint);
-
-
-        Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth*(scaleFactor-2)) - 32, (int)(pageHeight*(scaleFactor+2))-32);
-
+        Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth), (int)(pageHeight));
         if (prescriptionBg != null) {
             canvas.drawBitmap(prescriptionBg, null,dst, new Paint());
         }
 
-        for (ArrayList<Point> points: mStrokes) {
-
-            boolean first = true;
-            for (int i = 0; i < points.size(); i++) {
-                Point point = points.get(i);
-                if (first) {
-                    first = false;
-                    path.moveTo(point.x, point.y);
-                } else {
-                    Point prev = points.get(i - 1);
-                    path.quadTo(prev.x, prev.y, (prev.x + point.x)/2, (prev.y + point.y)/2);
-                }
-            }
-            canvas.drawPath(path, paint);
-            path.reset();
+        if (previousDrawPath != null) {
+            Log.i("Drawing", "Drawing previous path");
+            canvas.drawPath(previousDrawPath, paint);
         }
 
+        Log.i("Drawing", "Drawn Canvas");
+
     }
 
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        scaleGestureDetector.onTouchEvent(event);
-        gestureDetector.onTouchEvent(event);
-        return true;
-    }
 
-    public void addCoordinate(float x, float y, int actionType) {
-        x = x*scaleFactor + getLeft();
-        y = y*scaleFactor + getTop();
-        if(actionType == 1){
-          mStrokes.add(new ArrayList<>());
-
-        } else if(actionType == 3){
-            mStrokes.get(mStrokes.size()-1).add(new Point(x,y));
-        }
-        invalidate();
-    }
 
 
 
     public void clearDrawing() {
-        mStrokes.clear();
+        previousDrawPath = null;
         invalidate();
     }
 
-    //Todo: Shift Both Functions to BG Thread to generate a bmp and send that back to our thread
+    Path previousDrawPath;
     public void addCoordinates(ArrayList<Point> points) {
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        new Thread(() -> {
+            Path path = createPathFromPoints(points);
+
+            mainHandler.post(() -> {
+                previousDrawPath = path;
+                Log.i("Drawing", "Updating Previous Path, pathLength = ");
+                invalidate();
+            });
+
+        }).start();
+        Log.i("Adding Coordinates", "to Detailed Page View thread start");
+    }
+    private Path createPathFromPoints(ArrayList<Point> points){
+        Log.i("Drawing", "Path Size: " + points.size());
+        if (points == null || points.size() == 0)
+            return null;
+        Path path = new Path();
+        float prevX, prevY;
+        prevX = points.get(0).getX();
+        prevY = points.get(0).getY();
+
+        path.moveTo(prevX, prevY);
         for(Point p:points){
             float x = p.getX();
             float y = p.getY();
             int actionType = p.getActionType();
-            x = x*scaleFactor + getLeft();
-            y = y*scaleFactor + getTop();
             if(actionType == 1){
-                mStrokes.add(new ArrayList<>());
+                path.moveTo(x, y);
             } else if(actionType == 3){
-
-                mStrokes.get(mStrokes.size()-1).add(new Point(x, y));
+                path.quadTo(prevX, prevY, (prevX + x)/2, (prevY + y)/2);
             }
-        }
-        invalidate();
-    }
-    public void addActions(ArrayList<DrawLiveDataBuffer.DrawAction> points){
-        for(DrawLiveDataBuffer.DrawAction p:points){
-            float x = p.x;
-            float y = p.y;
-            int actionType = p.actionType;
-            x = x*scaleFactor + getLeft();
-            y = y*scaleFactor + getTop();
-            if(actionType == 1){
-                mStrokes.add(new ArrayList<>());
-            } else if(actionType == 3){
+            prevX = x;
+            prevY = y;
 
-                mStrokes.get(mStrokes.size()-1).add(new Point(x, y));
-            }
         }
-        invalidate();
+        return path;
     }
 
-    //scaling of screen
-    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-//            scaleFactor *= detector.getScaleFactor();
-//            scaleFactor = Math.max(1f, Math.min(scaleFactor, 10.0f));
-            invalidate();
-            return true;
-        }
-    }
 
-    //scrolling the screen
-    private class ScrollListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            translateX -= distanceX / scaleFactor;
-            translateY -= distanceY / scaleFactor;
-
-            invalidate();
-            return true;
-        }
-    }
 }
 

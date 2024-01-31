@@ -48,14 +48,16 @@ public class PageAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
 
-        View view = LayoutInflater.from(context).inflate(R.layout.detailed_page_item, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.detailed_page_item, container, false);
         notepadView = view.findViewById(R.id.detailedPage);
         tvPageNumber = view.findViewById(R.id.tvPageNumber);
 
         tvPageNumber.setText("Page No: " + viewCaseRP.getPages().get(position).getPageNumber());
         notepadView.clearDrawing();
         if(configurePageRP != null){
-            notepadView.setBackgroundImageUrl(configurePageRP.getPageDetails().getPageBackground(),configurePageRP.getPageDetails().getPageWidth(),configurePageRP.getPageDetails().getPageWidth());
+            view.post(()->{
+                notepadView.setBackgroundImageUrl(configurePageRP.getPageDetails().getPageBackground(),configurePageRP.getPageDetails().getPageWidth(),configurePageRP.getPageDetails().getPageHeight());
+            });
         }
         notepadView.addCoordinates(viewCaseRP.getPages().get(position).getPoints());
 

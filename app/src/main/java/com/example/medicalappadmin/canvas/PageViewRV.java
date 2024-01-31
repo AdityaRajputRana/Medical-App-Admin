@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -17,22 +18,25 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.example.medicalappadmin.Models.PageDetails;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.rest.api.APIMethods;
+import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
+import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 
 import java.util.ArrayList;
 
 public class PageViewRV extends View {
     private Paint paint;
-    float scaleFactor = 7.5f;
-    ScaleGestureDetector scaleGestureDetector;
-    GestureDetector gestureDetector;
-    private float translateX = 0;
-    private float translateY = 0;
+    float scaleFactor = 1f;
     private Bitmap prescriptionBg;
+    private float pageHeight, pageWidth;
 
 
-    ArrayList<ArrayList<Point>> mStrokes;
 
     public PageViewRV(Context context) {
         super(context);
@@ -49,75 +53,97 @@ public class PageViewRV extends View {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(3);
-        scaleGestureDetector = new ScaleGestureDetector(getContext(),new ScaleListener());
-        gestureDetector = new GestureDetector(getContext(), new ScrollListener());
 
-        mStrokes = new ArrayList<>();
-        prescriptionBg = getPrescriptionBMP();
+        startDynamicConfigFetch();
     }
 
-    private Bitmap getPrescriptionBMP(){
-        Drawable d = getContext().getDrawable(R.drawable.bg_prescription);
-        Bitmap bitmap = ((BitmapDrawable)d).getBitmap();
-        return bitmap;
+    private void startDynamicConfigFetch() {
+        APIMethods.configurePageForceCache(getContext(), new APIResponseListener<ConfigurePageRP>() {
+            @Override
+            public void success(ConfigurePageRP response) {
+                if (response.getPageDetails() != null) {
+                    configurePageBG(response.getPageDetails());
+                }
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+
+            }
+        });
+    }
+
+    private void configurePageBG(PageDetails pageDetails) {
+
+        this.post(()->{
+            loadImage(pageDetails.getPageBackground());
+            pageWidth = pageDetails.getPageWidth();
+            pageHeight = pageDetails.getPageHeight();
+            scaleFactor = Math.min((float) getWidth()/pageDetails.getPageWidth(), (float) getHeight()/pageDetails.getPageHeight());
+            paint.setStrokeWidth(2f/scaleFactor);
+            invalidate();
+        });
+    }
+
+    private void loadImage(String imageUrl) {
+        Glide.with(getContext())
+                .asBitmap()
+                .load(imageUrl)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        // Set the loaded bitmap as the background image
+                        prescriptionBg = resource;
+                        invalidate(); // Redraw the view
+                    }
+                });
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        canvas.scale(scaleFactor, scaleFactor);
 
-        Path path = new Path();
+        Log.i("ScaleFactor", "Called On Draw, scalefactor = " + scaleFactor);
+
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.LTGRAY);
         bgPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(getLeft() + 25, getTop() + 5, 100*scaleFactor, 100* scaleFactor, bgPaint);
-        if (previousDrawPath != null)
-            canvas.drawPath(previousDrawPath, paint);
 
-    }
-
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        scaleGestureDetector.onTouchEvent(event);
-        gestureDetector.onTouchEvent(event);
-        return true;
-    }
-
-    public void addCoordinate(float x, float y, int actionType) {
-        x = x*scaleFactor + getLeft();
-        y = y*scaleFactor + getTop();
-        if(actionType == 1){
-          mStrokes.add(new ArrayList<>());
-
-        } else if(actionType == 3){
-            mStrokes.get(mStrokes.size()-1).add(new Point(x,y));
+        Rect dst = new Rect(getLeft(), getRight(), (int)(pageWidth), (int)(pageHeight));
+        if (prescriptionBg != null) {
+            Log.i("ScaleFactor", "Drawing BG" + getLeft() + " " + getRight() + " " + pageWidth + " " + pageHeight);
+            canvas.drawBitmap(prescriptionBg, null,dst, new Paint());
+        } else {
+            canvas.drawRect(dst, bgPaint);
         }
-        invalidate();
+
+        if (previousDrawPath != null) {
+            Log.i("ScaleFactor", "Called On Draw previousDrawPath: ");
+            canvas.drawPath(previousDrawPath, paint);
+        }
+
     }
+
 
 
 
     public void clearDrawing() {
-        mStrokes.clear();
+        previousDrawPath = null;
         invalidate();
     }
 
     public void addCoordinates(ArrayList<Point> points) {
-        Log.i("Optimiz", "Add Co-ordinates executing");
         Handler mainHandler = new Handler(Looper.getMainLooper());
-        Log.i("Optimiz", "starting thread");
         new Thread(() -> {
             Path path = createPathFromPoints(points);
-
             mainHandler.post(() -> {
                 previousDrawPath = path;
                 invalidate();
             });
 
         }).start();
-        Log.i("Optimiz", "post thread start");
     }
 
 
@@ -134,8 +160,6 @@ public class PageViewRV extends View {
             float x = p.getX();
             float y = p.getY();
             int actionType = p.getActionType();
-            x = x*scaleFactor + getLeft();
-            y = y*scaleFactor + getTop();
             if(actionType == 1){
                 path.moveTo(x, y);
             } else if(actionType == 3){
@@ -149,28 +173,5 @@ public class PageViewRV extends View {
     }
     private Path previousDrawPath;
 
-
-    //scaling of screen
-    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-//            scaleFactor *= detector.getScaleFactor();
-//            scaleFactor = Math.max(1f, Math.min(scaleFactor, 10.0f));
-            invalidate();
-            return true;
-        }
-    }
-
-    //scrolling the screen
-    private class ScrollListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            translateX -= distanceX / scaleFactor;
-            translateY -= distanceY / scaleFactor;
-
-            invalidate();
-            return true;
-        }
-    }
 }
 

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 public class NotepadView extends View {
     private Paint paint;
-    float scaleFactor = 0.03f;
+    float scaleFactor = 1f;
     ScaleGestureDetector scaleGestureDetector;
     GestureDetector gestureDetector;
     private float translateX = 0;
@@ -58,15 +58,15 @@ public class NotepadView extends View {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
-        scaleGestureDetector = new ScaleGestureDetector(getContext(),new ScaleListener());
-        gestureDetector = new GestureDetector(getContext(), new ScrollListener());
-        mStrokes = new ArrayList<>();
 
     }
     public void setBackgroundImageUrl(String imageUrl,int width, int height) {
         loadImage(imageUrl);
         pageHeight = height;
         pageWidth = width;
+        scaleFactor = Math.min((float)getWidth()/width, (float)getHeight()/height);
+        paint.setStrokeWidth(4f/scaleFactor);
+        invalidate();
     }
 
     private void loadImage(String imageUrl) {
@@ -96,12 +96,13 @@ public class NotepadView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Log.i("Optimiz", "onDraw() called");
+        canvas.scale(scaleFactor, scaleFactor);
+
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.LTGRAY);
         bgPaint.setStyle(Paint.Style.FILL);
 
-        Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth*scaleFactor) + getLeft(), (int)(pageHeight*scaleFactor)+ getTop());
+        Rect dst = new Rect(getLeft(), getTop(), (int)(pageWidth), (int)(pageHeight));
         if (prescriptionBg != null) {
             canvas.drawBitmap(prescriptionBg, null,dst, new Paint());
         }
@@ -114,15 +115,10 @@ public class NotepadView extends View {
             canvas.drawPath(currentLivePath, paint);
         }
 
+        Log.i("Canvas", "Scaled to " + scaleFactor);
+
     }
 
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        scaleGestureDetector.onTouchEvent(event);
-        gestureDetector.onTouchEvent(event);
-        return true;
-    }
 
     float currentLiveX  =0f;
     float currentLiveY = 0f;
@@ -130,8 +126,6 @@ public class NotepadView extends View {
         Log.i("Optimiz", "Add Co-ordinate called");
         if (currentLivePath == null)
             currentLivePath = new Path();
-        x = x*scaleFactor + getLeft();
-        y = y*scaleFactor + getTop();
 
         Log.i("drawingCoordinate", "x: " + x + " y: " + y + " actionType: " + actionType);
         if(actionType == 1){
@@ -152,7 +146,6 @@ public class NotepadView extends View {
 
 
     public void clearDrawing() {
-        mStrokes.clear();
         previousDrawPath = null;
         currentLivePath = null;
         invalidate();
@@ -160,9 +153,7 @@ public class NotepadView extends View {
 
     //Todo: Shift Both Functions to BG Thread to generate a bmp and send that back to our thread
     public void addCoordinates(ArrayList<Point> points) {
-        Log.i("Optimiz", "Add Co-ordinates executing");
         Handler mainHandler = new Handler(Looper.getMainLooper());
-        Log.i("Optimiz", "starting thread");
         new Thread(() -> {
             Path path = createPathFromPoints(points);
 
@@ -188,8 +179,6 @@ public class NotepadView extends View {
             float x = p.getX();
             float y = p.getY();
             int actionType = p.getActionType();
-            x = x*scaleFactor + getLeft();
-            y = y*scaleFactor + getTop();
             if(actionType == 1){
                 path.moveTo(x, y);
             } else if(actionType == 3){
@@ -202,44 +191,6 @@ public class NotepadView extends View {
         return path;
     }
 
-    public void addActions(ArrayList<DrawLiveDataBuffer.DrawAction> points){
-        for(DrawLiveDataBuffer.DrawAction p:points){
-            float x = p.x;
-            float y = p.y;
-            int actionType = p.actionType;
-            x = x*scaleFactor + getLeft();
-            y = y*scaleFactor + getTop();
-            if(actionType == 1){
-                mStrokes.add(new ArrayList<>());
-            } else if(actionType == 3){
 
-                mStrokes.get(mStrokes.size()-1).add(new Point(x, y));
-            }
-        }
-        invalidate();
-    }
-
-    //scaling of screen
-    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-//            scaleFactor *= detector.getScaleFactor();
-//            scaleFactor = Math.max(1f, Math.min(scaleFactor, 10.0f));
-            invalidate();
-            return true;
-        }
-    }
-
-    //scrolling the screen
-    private class ScrollListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            translateX -= distanceX / scaleFactor;
-            translateY -= distanceY / scaleFactor;
-
-            invalidate();
-            return true;
-        }
-    }
 }
 

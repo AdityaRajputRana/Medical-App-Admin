@@ -59,6 +59,10 @@ public class APIMethods {
     public static void configurePage(Context context, EmptyReq req, APIResponseListener<ConfigurePageRP> listener){
         API.postData(listener,req, EndPoints.configurePage, ConfigurePageRP.class, context, true);
     }
+
+    public static void configurePageForceCache(Context context, APIResponseListener<ConfigurePageRP> listener){
+        API.postData(listener,new EmptyReq(), EndPoints.configurePage, ConfigurePageRP.class, context, true, true);
+    }
     public static void linkAdditionalGuide(Context context, LinkGuideReq req, APIResponseListener<LinkGuideRP> listener){
         API.postData(listener,req, EndPoints.linkAdditionalGuide, LinkGuideRP.class, context);
     }

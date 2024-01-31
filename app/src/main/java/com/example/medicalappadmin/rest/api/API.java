@@ -140,6 +140,19 @@ public class API {
     public static void postData(APIResponseListener listener, Object rawData, String endpoint, Class klass, Context context){
         postData(listener, rawData, endpoint, klass, context, false);
     }
+
+    public static void postData(APIResponseListener listener, Object rawData, String endpoint, Class klass, Context context, boolean cache, boolean forceCache){
+        if (cache && forceCache){
+                String cachedValue = CacheUtils.getCached(context, endpoint);
+                if (cachedValue != null) {
+                    Log.i("eta-response", "Got cached value");
+                    listener.success(new Gson().fromJson(cachedValue, klass));
+                    return;
+                }
+        }
+        postData(listener, rawData, endpoint, klass, context, cache);
+    }
+
     public static void postData(APIResponseListener listener, Object rawData, String endpoint, Class klass, Context context, boolean cache){
         if (cache) {
             String cachedValue = CacheUtils.getCached(context, endpoint);
