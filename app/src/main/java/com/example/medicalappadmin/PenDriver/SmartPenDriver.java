@@ -132,12 +132,9 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
                     else
                         rssi = -100;
 
+
                     SmartPen smartPen = new SmartPen(rssi, penName, macAddress);
-                    if (searchedPens.contains(smartPen.getMacAddress())){
-                        return;
-                    }
-                    searchedPens.add(smartPen.getMacAddress());
-                    smartPens.add(smartPen);
+                    addSmartPenToList(smartPen);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -145,6 +142,15 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
                 break;
 
         }
+    }
+
+    private void addSmartPenToList(SmartPen smartPen) {
+        if (searchedPens.contains(smartPen.getMacAddress())){
+            return;
+        }
+        searchedPens.add(smartPen.getMacAddress());
+        smartPens.add(smartPen);
+        smartPensLiveData.setValue(smartPens);
     }
 
     int prevActionType = -1;
