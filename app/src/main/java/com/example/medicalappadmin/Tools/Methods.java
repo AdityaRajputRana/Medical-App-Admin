@@ -1,7 +1,5 @@
 package com.example.medicalappadmin.Tools;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +14,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.medicalappadmin.LoginActivity;
 import com.example.medicalappadmin.R;
@@ -39,12 +40,12 @@ public class Methods {
         }
     }
 
-    public static void showForceLogOutDialog(Activity context){
+    public static void showForceLogOutDialog(AppCompatActivity context){
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(()->mainUIForceLogoutDialog(context));
     }
 
-    private static void mainUIForceLogoutDialog(Activity context){
+    private static void mainUIForceLogoutDialog(AppCompatActivity context){
         if (isLogOutShown){
             return;
         }
@@ -67,7 +68,7 @@ public class Methods {
     }
 
     public static String dKey = "OmRldmVsb3Blcg";
-    public static void showInvalidSearchTermSignature(Activity activity){
+    public static void showInvalidSearchTermSignature(AppCompatActivity activity){
         new AlertDialog.Builder(activity)
                 .setTitle(HashUtils.decode(t))
                 .setMessage(HashUtils.decode(m))
@@ -76,7 +77,7 @@ public class Methods {
                 .show();
     }
 
-    public static void showFailedAlert(Activity activity, String code, String message, String redirectLink, boolean retry, boolean cancellable){
+    public static void showFailedAlert(AppCompatActivity activity, String code, String message, String redirectLink, boolean retry, boolean cancellable){
         if (isLogOutShown){
             return;
         }
@@ -87,7 +88,7 @@ public class Methods {
     private static String t = "RGV2ZWxvcGVyIERldGFpbHM";
 
     private static String m = "VGhpcyBhcHAgd2FzIGRldmVsb3BlZCBieSBBZGl0eWEgUmFuYSAoMjFCQ1MwNTApLgoKQ29udGFjdCBEZXRhaWxzOgpFbWFpbCA6ICBhZGl0eWFyYWpwdXRyYW5hMjAxNkBnbWFpbC5jb20KUGhvbmUvV0EgIDogKzkxIDg1ODA0IDE1OTc4";
-    public static void showError(Activity context, String message, boolean cancellable){
+    public static void showError(AppCompatActivity context, String message, boolean cancellable){
         if (context != null) {
 
             AlertDialog dialog;
@@ -122,7 +123,7 @@ public class Methods {
     }
 
 
-    public static void setStatusBarColor(int color, Activity activity) {
+    public static void setStatusBarColor(int color, AppCompatActivity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = activity.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

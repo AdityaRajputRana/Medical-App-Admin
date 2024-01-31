@@ -1,17 +1,17 @@
 package com.example.medicalappadmin.components;
 
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.medicalappadmin.databinding.DialogPenBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class PenConnectionFlow {
     private static PenConnectionFlow instance;
-    private Activity activity;
-    public static PenConnectionFlow getInstance(Activity activity) {
+    private AppCompatActivity activity;
+    public static PenConnectionFlow getInstance(AppCompatActivity activity) {
         if (instance == null || instance.activity != activity)
             instance = new PenConnectionFlow(activity);
         return instance;
@@ -28,7 +28,7 @@ public class PenConnectionFlow {
 
     private BottomSheetDialog bottomSheetDialog;
     private DialogPenBinding binding;
-    public PenConnectionFlow(Activity activity) {
+    public PenConnectionFlow(AppCompatActivity activity) {
         this.activity = activity;
         bottomSheetDialog = new BottomSheetDialog(activity);
         binding = DialogPenBinding.inflate(activity.getLayoutInflater());

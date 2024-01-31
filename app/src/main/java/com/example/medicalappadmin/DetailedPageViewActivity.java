@@ -52,6 +52,7 @@ public class DetailedPageViewActivity extends AppCompatActivity {
         APIMethods.configurePage(DetailedPageViewActivity.this, new EmptyReq(), new APIResponseListener<ConfigurePageRP>() {
             @Override
             public void success(ConfigurePageRP response) {
+                Log.i("eta act rsp", "Got");
 
                 if (response != null) {
                     pageConfigurations = response;
@@ -68,6 +69,13 @@ public class DetailedPageViewActivity extends AppCompatActivity {
 
 
     private void loadPage(int finalCurrPageNo, String caseID) {
+        if (PatientDetailedHistoryActivity.viewCaseRP != null && PatientDetailedHistoryActivity.viewCaseRP.get_id().equals(caseID)) {
+            viewCaseRP = PatientDetailedHistoryActivity.viewCaseRP;
+            page = viewCaseRP.getPages().get(finalCurrPageNo);
+            loadDoctorConfigurations();
+            return;
+        }
+
         APIMethods.viewCase(DetailedPageViewActivity.this, caseID, new APIResponseListener<ViewCaseRP>() {
             @Override
             public void success(ViewCaseRP response) {

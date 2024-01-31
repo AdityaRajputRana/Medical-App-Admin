@@ -210,9 +210,12 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
 
     }
 
+    public static ViewCaseRP viewCaseRP;
+
     private void setUpRCV(ViewCaseRP response) {
 
         binding.rcvPages.setLayoutManager(manager);
+        viewCaseRP = response;
 //        binding.rcvPages.setLayoutManager(new LinearLayoutManager(PatientDetailedHistoryActivity.this));
         if (adapter == null) {
             adapter = new PagesHistoryAdapter(response, PatientDetailedHistoryActivity.this, new PagesHistoryAdapter.PageListener() {

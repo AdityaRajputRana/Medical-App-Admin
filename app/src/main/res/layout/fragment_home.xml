@@ -20,7 +20,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:padding="8dp"
-            android:src="@drawable/profile"
+            app:srcCompat="@drawable/profile"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +51,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:padding="8dp"
-            android:src="@drawable/pencil"
+            app:srcCompat="@drawable/pencil"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/colorInactiveGray" />
@@ -293,7 +293,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingVertical="10dp"
-                    android:src="@drawable/previous_case_img" />
+                    app:srcCompat="@drawable/previous_case_img" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -327,7 +327,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingVertical="10dp"
-                        android:src="@drawable/add_patient_img" />
+                        app:srcCompat="@drawable/add_patient_img" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -352,7 +352,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingVertical="10dp"
-                        android:src="@drawable/add_patient_img" />
+                        app:srcCompat="@drawable/add_patient_img" />
 
                     <TextView
                         android:layout_width="wrap_content"

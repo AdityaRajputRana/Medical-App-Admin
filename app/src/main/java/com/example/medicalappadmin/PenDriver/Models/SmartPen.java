@@ -2,18 +2,17 @@ package com.example.medicalappadmin.PenDriver.Models;
 
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 
-import kr.neolab.sdk.pen.bluetooth.BTLEAdt;
 
 public class SmartPen {
     String id;
     String name;
     String macAddress;
+    int rssi = -100;
 
     String sppAddress = "";
     String leAddress = "";
     String deviceName = "";
     boolean isLe = false;
-    BTLEAdt.UUID_VER uuidVer;
     int colorCode = 0;
     int productCode = 0;
     int companyCode = 0;
@@ -48,9 +47,6 @@ public class SmartPen {
         this.password = password;
     }
 
-    public BTLEAdt.UUID_VER getUuidVer() {
-        return uuidVer;
-    }
 
     public void setId(String id) {
         this.id = id;
@@ -98,9 +94,6 @@ public class SmartPen {
         isLe = le;
     }
 
-    public void setUuidVer(BTLEAdt.UUID_VER uuidVer) {
-        this.uuidVer = uuidVer;
-    }
 
     public int getColorCode() {
         return colorCode;
@@ -130,6 +123,16 @@ public class SmartPen {
         this.id = id;
         this.name = name;
         this.macAddress = macAddress;
+    }
+
+    public SmartPen(int rssi, String name, String macAddress) {
+        this.rssi = rssi;
+        this.name = name;
+        this.macAddress = macAddress;
+    }
+
+    public int getRssi() {
+        return rssi;
     }
 
     public String getId() {

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -141,7 +142,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
                 recyclerView.getAdapter().notifyItemInserted(fromPosition);
                 response.getCases().get(toPosition).setPageCount(beforeCount);
                 recyclerView.getAdapter().notifyItemChanged(toPosition);
-                Methods.showError((Activity) context,message,true);
+                Methods.showError((AppCompatActivity) context,message,true);
                 isMerging = false;
             }
         });

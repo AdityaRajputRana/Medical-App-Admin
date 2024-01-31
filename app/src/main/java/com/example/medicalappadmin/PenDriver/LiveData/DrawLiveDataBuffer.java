@@ -1,5 +1,7 @@
 package com.example.medicalappadmin.PenDriver.LiveData;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -29,7 +31,10 @@ public class DrawLiveDataBuffer {
     public static void insertAction(DrawAction action){
         ArrayList<DrawAction> bufferInstance = getDrawBufferInstance().getValue();
         bufferInstance.add(action);
-        getDrawBufferInstance().setValue(bufferInstance);
+        if (Looper.myLooper() == Looper.getMainLooper())
+            getDrawBufferInstance().setValue(bufferInstance);
+        else
+            getDrawBufferInstance().postValue(bufferInstance);
 
         Log.i("lv-data", "insert val");
         //Todo: setValue

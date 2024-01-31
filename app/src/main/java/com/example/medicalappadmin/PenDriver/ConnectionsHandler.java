@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,8 +13,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.ParcelUuid;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,10 +23,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import kr.neolab.sdk.pen.PenCtrl;
-import kr.neolab.sdk.pen.bluetooth.BTLEAdt;
-import kr.neolab.sdk.util.NLog;
-import kr.neolab.sdk.util.UuidUtil;
+//import kr.neolab.sdk.pen.PenCtrl;
+//import kr.neolab.sdk.pen.bluetooth.BTLEAdt;
+//import kr.neolab.sdk.util.NLog;
+//import kr.neolab.sdk.util.UuidUtil;
 
 public class ConnectionsHandler {
 
@@ -51,7 +48,7 @@ public class ConnectionsHandler {
         String leAddress = "";
         String deviceName = "";
         boolean isLe = false;
-        BTLEAdt.UUID_VER uuidVer;
+//        BTLEAdt.UUID_VER uuidVer;
         int colorCode = 0;
         int productCode = 0;
         int companyCode = 0;
@@ -63,12 +60,34 @@ public class ConnectionsHandler {
         void onSmartPen(SmartPen smartPen);
     }
 
+    public void getSmartPenList(Context context, PenConnectionsListener listener){
+        getSmartPenList(context, listener, false, 0);
+    }
+
     //Todo: 1. Currently only handling LE connections and not saving paired pen for automatic connection
     @SuppressLint("MissingPermission")
-    public void getSmartPenList(Context context, PenConnectionsListener listener) {
+    public void getSmartPenList(Context context, PenConnectionsListener listener, boolean alreadyRequestedToEnable, int count){
+        Log.i("ConnectionHelper: ", "Getting SmartPen List");
         if (isScanning){
             return;
         }
+
+        //check if bluetooth is enabled, if not then request to enable that when the bluetooth is turned back on restart search
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            listener.onSmartPens(new ArrayList<>());
+            return;
+        }
+        if (!mBluetoothAdapter.isEnabled()) {
+            if (!alreadyRequestedToEnable) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                ((AppCompatActivity) context).startActivityForResult(enableBtIntent, 1);
+            }
+            if (count < 10)
+                new Handler().postDelayed(() -> getSmartPenList(context, listener, true, count+1), 2500);
+            return;
+        }
+
         isScanning = true;
         Log.i("ConnectionHelper: ", "Getting SmartPen List");
         if (!PermissionsHelper.haveRequiredPermissions(context)){
@@ -109,17 +128,16 @@ public class ConnectionsHandler {
                             info.sppAddress = device.getAddress();
                             info.leAddress = "";
                             info.deviceName = device.getName();
-                            info.uuidVer = BTLEAdt.UUID_VER.VER_2;
+//                            info.uuidVer = BTLEAdt.UUID_VER.VER_2;
                             info.colorCode = -1;
 
 
-                            NLog.d("ACTION_FOUND SPP : " + device.getName() + " address : " + device.getAddress() + ", COD:" + device.getBluetoothClass());
 
                             SmartPen smartPen = new SmartPen(device.getAddress(), device.getName(), device.getAddress());
                             smartPen.setLe(false);
                             smartPen.setLeAddress(info.leAddress);
                             smartPen.setSppAddress(info.sppAddress);
-                            smartPen.setUuidVer(info.uuidVer);
+//                            smartPen.setUuidVer(info.uuidVer);
                             info.colorCode = info.colorCode;
                             listener.onSmartPen(smartPen);
                             smartPens.add(smartPen);
@@ -134,86 +152,86 @@ public class ConnectionsHandler {
                 }
             };
 
-            mScanCallback = new ScanCallback() {
-                @SuppressLint("MissingPermission")
-                @Override
-                public void onScanResult(int callbackType, ScanResult result) {
-                    Handler looper = new Handler(Looper.getMainLooper());
-                    Thread worker = new Thread(()->{
-                        super.onScanResult(callbackType, result);
-                        BluetoothDevice device = result.getDevice();
-                        if ( device != null )
-                        {
-                            String sppAddress = UuidUtil.changeAddressFromLeToSpp(result.getScanRecord().getBytes());
-                            @SuppressLint("MissingPermission") String msg = device.getName() + "\n" +"[RSSI : " + result.getRssi() + "dBm]" + sppAddress;
-                            if( !deviceMap.containsKey( sppAddress ) )
-                            {
-
-                                PenCtrl.getInstance().setLeMode( true );
-                                if( PenCtrl.getInstance().isAvailableDevice( result.getScanRecord().getBytes() ) )
-                                {
-                                    DeviceInfo info = new DeviceInfo();
-                                    info.sppAddress = sppAddress;
-                                    info.leAddress = device.getAddress();
-                                    info.deviceName = device.getName();
-                                    info.uuidVer = BTLEAdt.UUID_VER.VER_2;
-                                    info.colorCode = -1;
-
-                                    List<ParcelUuid> parcelUuids = result.getScanRecord().getServiceUuids();
-                                    for(ParcelUuid uuid:parcelUuids)
-                                    {
-                                        if( uuid.toString().equals(Const.ServiceUuidV5.toString()))
-                                        {
-                                            info.uuidVer = BTLEAdt.UUID_VER.VER_5;
-                                            info.colorCode = UuidUtil.getColorCodeFromUUID(result.getScanRecord().getBytes());
-                                            info.companyCode = UuidUtil.getCompanyCodeFromUUID(result.getScanRecord().getBytes());
-                                            info.productCode = UuidUtil.getProductCodeFromUUID(result.getScanRecord().getBytes());
-                                            break;
-                                        }
-                                        else if(uuid.toString().equals(Const.ServiceUuidV2.toString()))
-                                        {
-                                            info.uuidVer = BTLEAdt.UUID_VER.VER_2;
-                                            info.colorCode = UuidUtil.getColorCodeFromUUID(result.getScanRecord().getBytes());
-                                            info.companyCode = UuidUtil.getCompanyCodeFromUUID(result.getScanRecord().getBytes());
-                                            info.productCode = UuidUtil.getProductCodeFromUUID(result.getScanRecord().getBytes());
-                                            break;
-
-                                        }
-
-                                    }
-
-                                    SmartPen smartPen = new SmartPen(device.getAddress(), device.getName() + "(Av device)", device.getAddress());
-                                    smartPen.setSppAddress(info.sppAddress);
-                                    smartPen.setLeAddress(info.leAddress);
-                                    smartPen.setUuidVer(info.uuidVer);
-                                    smartPen.setLe(true);
-                                    smartPen.setColorCode(info.colorCode);
-                                    smartPen.setProductCode(info.productCode);
-                                    deviceMap.put( sppAddress, true );
-                                    Log.i("Connections", "found device");
-                                    looper.post(()->listener.onSmartPen(smartPen));
-                                    smartPens.add(smartPen);
-                                }
-                            }
-                        }
-                    });
-                    worker.start();
-                }
-
-                @Override
-                public void onBatchScanResults(List<ScanResult> results) {
-                    super.onBatchScanResults(results);
-                    for ( ScanResult scanResult : results ) {
-                        Log.i("Connection Helper - Results", scanResult.toString());
-                    }
-                }
-
-                @Override
-                public void onScanFailed(int errorCode) {
-                    super.onScanFailed(errorCode);
-                    Log.i("Connection Helper Failed", "Error Code : " + errorCode);
-                }
-            };
+//            mScanCallback = new ScanCallback() {
+//                @SuppressLint("MissingPermission")
+//                @Override
+//                public void onScanResult(int callbackType, ScanResult result) {
+//                    Handler looper = new Handler(Looper.getMainLooper());
+//                    Thread worker = new Thread(()->{
+//                        super.onScanResult(callbackType, result);
+//                        BluetoothDevice device = result.getDevice();
+//                        if ( device != null )
+//                        {
+////                            String sppAddress = UuidUtil.changeAddressFromLeToSpp(result.getScanRecord().getBytes());
+//                            @SuppressLint("MissingPermission") String msg = device.getName() + "\n" +"[RSSI : " + result.getRssi() + "dBm]" + sppAddress;
+//                            if( !deviceMap.containsKey( sppAddress ) )
+//                            {
+//
+////                                PenCtrl.getInstance().setLeMode( true );
+////                                if( PenCtrl.getInstance().isAvailableDevice( result.getScanRecord().getBytes() ) )
+//                                {
+//                                    DeviceInfo info = new DeviceInfo();
+//                                    info.sppAddress = sppAddress;
+//                                    info.leAddress = device.getAddress();
+//                                    info.deviceName = device.getName();
+//                                    info.uuidVer = BTLEAdt.UUID_VER.VER_2;
+//                                    info.colorCode = -1;
+//
+//                                    List<ParcelUuid> parcelUuids = result.getScanRecord().getServiceUuids();
+//                                    for(ParcelUuid uuid:parcelUuids)
+//                                    {
+//                                        if( uuid.toString().equals(Const.ServiceUuidV5.toString()))
+//                                        {
+//                                            info.uuidVer = BTLEAdt.UUID_VER.VER_5;
+//                                            info.colorCode = UuidUtil.getColorCodeFromUUID(result.getScanRecord().getBytes());
+//                                            info.companyCode = UuidUtil.getCompanyCodeFromUUID(result.getScanRecord().getBytes());
+//                                            info.productCode = UuidUtil.getProductCodeFromUUID(result.getScanRecord().getBytes());
+//                                            break;
+//                                        }
+//                                        else if(uuid.toString().equals(Const.ServiceUuidV2.toString()))
+//                                        {
+//                                            info.uuidVer = BTLEAdt.UUID_VER.VER_2;
+//                                            info.colorCode = UuidUtil.getColorCodeFromUUID(result.getScanRecord().getBytes());
+//                                            info.companyCode = UuidUtil.getCompanyCodeFromUUID(result.getScanRecord().getBytes());
+//                                            info.productCode = UuidUtil.getProductCodeFromUUID(result.getScanRecord().getBytes());
+//                                            break;
+//
+//                                        }
+//
+//                                    }
+//
+//                                    SmartPen smartPen = new SmartPen(device.getAddress(), device.getName() + "(Av device)", device.getAddress());
+//                                    smartPen.setSppAddress(info.sppAddress);
+//                                    smartPen.setLeAddress(info.leAddress);
+//                                    smartPen.setUuidVer(info.uuidVer);
+//                                    smartPen.setLe(true);
+//                                    smartPen.setColorCode(info.colorCode);
+//                                    smartPen.setProductCode(info.productCode);
+//                                    deviceMap.put( sppAddress, true );
+//                                    Log.i("Connections", "found device");
+//                                    looper.post(()->listener.onSmartPen(smartPen));
+//                                    smartPens.add(smartPen);
+//                                }
+//                            }
+//                        }
+//                    });
+//                    worker.start();
+//                }
+//
+//                @Override
+//                public void onBatchScanResults(List<ScanResult> results) {
+//                    super.onBatchScanResults(results);
+//                    for ( ScanResult scanResult : results ) {
+//                        Log.i("Connection Helper - Results", scanResult.toString());
+//                    }
+//                }
+//
+//                @Override
+//                public void onScanFailed(int errorCode) {
+//                    super.onScanFailed(errorCode);
+//                    Log.i("Connection Helper Failed", "Error Code : " + errorCode);
+//                }
+//            };
 
 
 

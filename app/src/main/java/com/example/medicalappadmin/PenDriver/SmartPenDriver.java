@@ -3,6 +3,7 @@ package com.example.medicalappadmin.PenDriver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +12,16 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import com.afpensdk.pen.DPenCtrl;
+import com.afpensdk.pen.penmsg.IAFPenDotListener;
+import com.afpensdk.pen.penmsg.IAFPenMsgListener;
+import com.afpensdk.pen.penmsg.IAFPenOfflineDataListener;
+import com.afpensdk.pen.penmsg.JsonTag;
+import com.afpensdk.pen.penmsg.PenGripStyle;
+import com.afpensdk.pen.penmsg.PenMsg;
+import com.afpensdk.pen.penmsg.PenMsgType;
+import com.afpensdk.structure.AFDot;
+import com.afpensdk.structure.DotType;
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.PenDriver.Models.NoteModel;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
@@ -24,31 +35,15 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
-import kr.neolab.sdk.ink.structure.Dot;
-import kr.neolab.sdk.ink.structure.DotType;
-import kr.neolab.sdk.ink.structure.Stroke;
-import kr.neolab.sdk.metadata.IMetadataCtrl;
-import kr.neolab.sdk.metadata.IMetadataListener;
-import kr.neolab.sdk.metadata.MetadataCtrl;
-import kr.neolab.sdk.pen.IPenCtrl;
-import kr.neolab.sdk.pen.PenCtrl;
-import kr.neolab.sdk.pen.bluetooth.BTLEAdt;
-import kr.neolab.sdk.pen.bluetooth.lib.ProtocolNotSupportedException;
-import kr.neolab.sdk.pen.penmsg.IOfflineDataListener;
-import kr.neolab.sdk.pen.penmsg.IPenDotListener;
-import kr.neolab.sdk.pen.penmsg.IPenMsgListener;
-import kr.neolab.sdk.pen.penmsg.JsonTag;
-import kr.neolab.sdk.pen.penmsg.PenMsg;
-import kr.neolab.sdk.pen.penmsg.PenMsgType;
-import kr.neolab.sdk.util.NLog;
 
-public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
+
+public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAFPenOfflineDataListener {
 
     private static SmartPenDriver smartPenDriver;
     private SmartPenListener smartPenListener;
     private AppCompatActivity activity;
-    private ConnectionsHandler connectionsHandler;
     private SymbolController symbolController;
     private SmartPen selectedSmartPen;
     private ArrayList<SmartPen> smartPens = new ArrayList<>();
@@ -84,75 +79,45 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
             }
         }
 
-        ConnectionsHandler.PenConnectionsListener mConListener = new ConnectionsHandler.PenConnectionsListener() {
-            @Override
-            public void onSmartPens(ArrayList<SmartPen> pens) {
-                smartPens = new ArrayList<>();
-                smartPens.addAll(pens);
-                smartPensLiveData.setValue(smartPens);
-                if (connectionsListener != null) connectionsListener.onSmartPens(smartPens);
-            }
-
-            @Override
-            public void onSmartPen(SmartPen smartPen) {
-                Log.i("Connections", "onSmartPen Called");
-                if (searchedPens.contains(smartPen.getMacAddress())){
-                    return;
-                }
-                searchedPens.add(smartPen.getMacAddress());
-                smartPens.add(smartPen);
-                smartPensLiveData.setValue(smartPens);
-                if (connectionsListener!= null) connectionsListener.onSmartPen(smartPen);
-            }
-        };
-
-
-        connectionsHandler.getSmartPenList(activity, mConListener);
+        Context context = activity;
+        try {
+            iPenCtrl.btStartForPeripheralsList(context);
+        } catch (Exception e){
+            Toast.makeText(context, "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
+    boolean isOfflineDataAvailable = false;
+
     @Override
-    public void onReceiveMessage(String s, PenMsg penMsg) {
+    public void onReceiveMessage(PenMsg penMsg) {
         Log.i("pen-msg-type", String.valueOf(penMsg.penMsgType));
-        Log.i("pen-msg-head", String.valueOf(s));
         Log.i("pen-msg-body", new Gson().toJson(penMsg));
-        switch ( penMsg.penMsgType )
-        {
+        switch ( penMsg.penMsgType ) {
+            case PenMsgType.PEN_CUR_MEMOFFSET:
+                try {
+                    if (penMsg.getContentByJSONObject().getInt(JsonTag.INT_DOTS_MEMORY_OFFSET) != 0){
+                        isOfflineDataAvailable = true;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+
             case PenMsgType.PEN_CONNECTION_SUCCESS:
-                smartPenListener.message("Smart Pen", "Connected - "+iPenCtrl.getConnectingDevice() );
+                smartPenListener.message("Smart Pen", "Connected - " + iPenCtrl.getConnectedDevice());
                 activity.getSharedPreferences("PEN_CONFIG", Context.MODE_PRIVATE)
                         .edit()
-                        .putString("SavePenMac", selectedSmartPen.getId())
+                        .putString("SavePenMac", selectedSmartPen.getMacAddress())
                         .putBoolean("isPenSaved", true)
                         .apply();
                 selectedSmartPen.setConnected(true);
-                break;
-
-            case PenMsgType.PEN_AUTHORIZED:
-                smartPenListener.message("Smart Pen", "Authorized - "+iPenCtrl.getConnectedDevice() );
-                selectedSmartPen.setAuthorized(true);
-
-                JSONObject obj = penMsg.getContentByJSONObject();
-
-                SharedPreferences.Editor edit = mPref.edit();
-
-                try
-                {
-                    selectedSmartPen.setPassword(obj.getString( JsonTag.STRING_PEN_PASSWORD ));
-                    String macaddress = obj.getString( JsonTag.STRING_PEN_MAC_ADDRESS);
-                    edit.putString(Const.Setting.KEY_PASSWORD, selectedSmartPen.getPassword() );
-                    edit.putString(Const.Setting.KEY_MAC_ADDRESS,  macaddress );
-                    edit.commit();
-                }
-                catch ( JSONException e )
-                {
-                    e.printStackTrace();
-                }
-
-
-                iPenCtrl.reqAddUsingNoteAll(); //todo: later req for specific page sizes only
-                iPenCtrl.reqOfflineDataList(); //todo: later req for specific page sizes only
-
                 smartPenListener.onConnection(true);
+
+                iPenCtrl.requestOfflineDataInfo();
+
                 break;
 
             case PenMsgType.PEN_DISCONNECTED:
@@ -161,191 +126,77 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
                 smartPenListener.disconnected();
                 break;
 
-            case PenMsgType.PASSWORD_REQUEST:
-            {
-                JSONObject job = penMsg.getContentByJSONObject();
-                try
-                {
-                    int count = job.getInt( Const.JsonTag.INT_PASSWORD_RETRY_COUNT );
-                    smartPenListener.message("Message", "Smart pen requested password. retry count="+ String.valueOf(count));
-                }
-                catch ( JSONException e )
-                {
+            case PenMsgType.FIND_DEVICE:
+                JSONObject obj = penMsg.getContentByJSONObject();
+
+                try {
+                    String macAddress = obj.getString(JsonTag.STRING_PEN_MAC_ADDRESS);
+                    String penName;
+
+                    if(obj.has(JsonTag.STRING_DEVICE_NAME))
+                        penName = obj.getString(JsonTag.STRING_DEVICE_NAME);
+                    else
+                        penName = "NULL";
+
+                    int rssi;
+                    if(obj.has(JsonTag.STRING_DEVICE_RSSI))
+                        rssi = obj.getInt(JsonTag.STRING_DEVICE_RSSI);
+                    else
+                        rssi = -100;
+
+
+                    SmartPen smartPen = new SmartPen(rssi, penName, macAddress);
+                    addSmartPenToList(smartPen);
+
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
-            break;
-
-            case PenMsgType.PEN_STATUS:
-            {
-                JSONObject job = penMsg.getContentByJSONObject();
-                if ( job == null )
-                {
-                    return;
-                }
-                NLog.d( job.toString() );
-
-
-                SharedPreferences.Editor editor = mPref.edit();
-                try
-                {
-                    String stat_version = job.getString( Const.JsonTag.STRING_PROTOCOL_VERSION );
-
-//					int stat_timezone = job.getInt( Const.JsonTag.INT_TIMEZONE_OFFSET );
-                    long stat_timetick = job.getLong( Const.JsonTag.LONG_TIMETICK );
-                    int stat_forcemax = job.getInt( Const.JsonTag.INT_MAX_FORCE );
-                    int stat_battery = job.getInt( Const.JsonTag.INT_BATTERY_STATUS );
-                    int stat_usedmem = job.getInt( Const.JsonTag.INT_MEMORY_STATUS );
-
-//					int stat_pencolor = job.getInt( Const.JsonTag.INT_PEN_COLOR );
-
-                    boolean stat_autopower = job.getBoolean( Const.JsonTag.BOOL_AUTO_POWER_ON );
-                    boolean pencap_on =false;
-                    try
-                    {
-                        pencap_on= job.getBoolean( Const.JsonTag.BOOL_PEN_CAP_ON );
-                    }catch ( Exception e )
-                    {
-
-                    }
-//					boolean stat_accel = job.getBoolean( Const.JsonTag.BOOL_ACCELERATION_SENSOR );
-                    boolean stat_hovermode =false;
-                    try
-                    {
-                        stat_hovermode= job.getBoolean( Const.JsonTag.BOOL_HOVER );
-                    }catch ( Exception e )
-                    {
-                    }
-                    boolean stat_offlinesave = false;
-                    try
-                    {
-                        stat_offlinesave= job.getBoolean( Const.JsonTag.BOOL_OFFLINE_DATA_SAVE );
-                    }catch ( Exception e )
-                    {
-                    }
-
-
-                    boolean stat_beep = job.getBoolean( Const.JsonTag.BOOL_BEEP );
-
-                    int stat_autopower_time = job.getInt( Const.JsonTag.INT_AUTO_POWER_OFF_TIME );
-                    int stat_sensitivity = job.getInt( Const.JsonTag.INT_PEN_SENSITIVITY );
-
-//					editor.putBoolean( Const.Setting.KEY_ACCELERATION_SENSOR, stat_accel );
-                    editor.putString( Const.Setting.KEY_AUTO_POWER_OFF_TIME, "" + stat_autopower_time );
-                    editor.putBoolean( Const.Setting.KEY_AUTO_POWER_ON, stat_autopower );
-                    editor.putBoolean( Const.Setting.KEY_BEEP, stat_beep );
-//					editor.putString( Const.Setting.KEY_PEN_COLOR, ""+stat_pencolor );
-                    editor.putString( Const.Setting.KEY_SENSITIVITY, ""+stat_sensitivity );
-                    editor.putBoolean( Const.Setting.KEY_HOVER_MODE, stat_hovermode );
-                    editor.putBoolean( Const.Setting.KEY_PEN_CAP_ON, pencap_on );
-                    editor.putBoolean( Const.Setting.KEY_OFFLINE_DATA_SAVE, stat_offlinesave );
-
-                    editor.commit();
-                }
-                catch ( Exception e )
-                {
-                    e.printStackTrace();
-                }
-            }
-            break;
-
-
-            case PenMsgType.OFFLINE_DATA_NOTE_LIST:
-
-                try
-                {
-                    JSONArray list = new JSONArray( penMsg.getContent() );
-
-                    for ( int i = 0; i < list.length(); i++ )
-                    {
-                        JSONObject jobj = list.getJSONObject( i );
-
-                        int sectionId = jobj.getInt( Const.JsonTag.INT_SECTION_ID );
-                        int ownerId = jobj.getInt( Const.JsonTag.INT_OWNER_ID );
-                        int noteId = jobj.getInt( Const.JsonTag.INT_NOTE_ID );
-                        NLog.d( "offline(" + ( i + 1 ) + ") note => sectionId : " + sectionId + ", ownerId : " + ownerId + ", noteId : " + noteId );
-
-                        // Requesting Individual Pages
-                        iPenCtrl.reqOfflineDataPageList(sectionId, ownerId, noteId);
-//                        iPenCtrl.reqOfflineData(sectionId,  ownerId, noteId );
-                    }
-
-                }
-                catch ( JSONException e )
-                {
-                    e.printStackTrace();
-                } catch (ProtocolNotSupportedException e) {
-                    throw new RuntimeException(e);
-                }
-                break;
-
-            case PenMsgType.OFFLINE_DATA_PAGE_LIST:
-
-                try
-                {
-                    JSONArray list = new JSONArray( penMsg.getContent() );
-
-                    int prvSec = -1;
-                    int prvOwn = -1;
-                    int prvNote = -1;
-                    ArrayList<Integer> pageIds = new ArrayList<>( );
-
-                    for ( int i = 0; i < list.length(); i++ )
-                    {
-                        JSONObject jobj = list.getJSONObject( i );
-
-                        int sectionId = jobj.getInt( Const.JsonTag.INT_SECTION_ID );
-                        int ownerId = jobj.getInt( Const.JsonTag.INT_OWNER_ID );
-                        int noteId = jobj.getInt( Const.JsonTag.INT_NOTE_ID );
-                        int pageId = jobj.getInt( Const.JsonTag.INT_PAGE_ID );
-                        Log.i("offline-page-req", "offline(" + ( i + 1 ) + ") note => sectionId : " + sectionId + ", ownerId : " + ownerId + ", noteId : " + noteId + ", pageId : " + pageId );
-
-                        pageIds.add( pageId );
-                        // 오프라인 데이터 리스트 페이지 단위로 받기
-                        if( prvSec != sectionId || prvOwn != ownerId || prvNote != noteId )
-                        {
-//                            iPenCtrl.reqOfflineData( sectionId, ownerId, noteId, page );
-                            offlineNotes.add(new NoteModel(sectionId, ownerId, noteId, pageIds));
-                            pageIds.clear();
-                        }
-
-                    }
-
-                }
-                catch ( Exception e )
-                {
-                    e.printStackTrace();
-                    if (smartPenListener != null){
-                        smartPenListener.error("Error during offline data processing - organizing notes - " + e.getMessage());
-                    }
-                }
-
                 break;
 
         }
     }
 
+    private void addSmartPenToList(SmartPen smartPen) {
+        if (searchedPens.contains(smartPen.getMacAddress())){
+            return;
+        }
+        searchedPens.add(smartPen.getMacAddress());
+        smartPens.add(smartPen);
+        smartPensLiveData.setValue(smartPens);
+    }
+
+    int prevActionType = -1;
     @Override
-    public void onReceiveDot(String s, Dot dot) {
+    public void onReceiveDot(AFDot dot) {
         Log.i("NPROJ- dot", new Gson().toJson(dot));
         int actionType = -1;
-        if (DotType.isPenActionDown(dot.dotType))
+        if (DotType.isPenActionDown(dot.type))
             actionType = 1;
-        else if (DotType.isPenActionUp(dot.dotType)) {
+        else if (DotType.isPenActionUp(dot.type)) {
             actionType = 2;
-            Symbol sm = symbolController.getApplicableSymbol(dot.x, dot.y);
+            Symbol sm = symbolController.getApplicableSymbol(dot.X, dot.Y);
             if (sm != null){
                 if (smartPenListener != null){
                     smartPenListener.onPaperButtonPress(sm.getId(), sm.getName());
                 }
             }
         }
-        else if (DotType.isPenActionMove(dot.dotType))
-            actionType = 3;
 
+        if (prevActionType == DotType.PEN_ACTION_DOWN.getValue() && dot.type == prevActionType){
+            actionType = 3;
+        }
+
+        prevActionType = dot.type;
         DrawLiveDataBuffer.insertAction(new DrawLiveDataBuffer.DrawAction(
-                dot.x, dot.y, dot.pageId, actionType, false
+                dot.X, dot.Y, dot.page, actionType, false
         ));
+    }
+
+    @Override
+    public void onReceiveAngle(boolean b, PenGripStyle penGripStyle) {
+        if (smartPenListener != null){
+            smartPenListener.message("Angle", String.valueOf(penGripStyle) + " - " + String.valueOf(b));
+        }
     }
 
     public enum CONNECT_MESSAGE{
@@ -355,7 +206,7 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
     }
 
     //NEO Variables
-    private IPenCtrl iPenCtrl;
+    private DPenCtrl iPenCtrl;
 
 
     private SmartPenDriver(AppCompatActivity activity){
@@ -382,17 +233,14 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
             return CONNECT_MESSAGE.CONFIG_ERROR;
         }
 
-        connectionsHandler = new ConnectionsHandler();
         symbolController = new SymbolController();
 
 
-
-        //NEOCODE - Start
-        iPenCtrl = PenCtrl.getInstance();
-        iPenCtrl.setContext(activity.getApplicationContext());
-        iPenCtrl.registerBroadcastBTDuplicate();
+        iPenCtrl = DPenCtrl.getInstance();
+        iPenCtrl.setContext(activity);
         iPenCtrl.setListener(this);
         iPenCtrl.setDotListener(this);
+        iPenCtrl.setOffLineDataListener(this);
 
         mPref = activity.getSharedPreferences("SMART_PEN_PREFS", Context.MODE_PRIVATE);
 
@@ -416,14 +264,13 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
     }
 
     public void destroyConnection(){
-        iPenCtrl.unregisterBroadcastBTDuplicate();
+//        iPenCtrl.unregisterBroadcastBTDuplicate();
         iPenCtrl.disconnect();
     }
 
     boolean connectToPenAfterPermission = false;
 
     public void connectToPen(SmartPen smartPen){
-        connectionsHandler.stopScanning(activity);
         if (iPenCtrl.getConnectedDevice() != null){
             smartPenListener.message("Event", "Already Connected");
         }
@@ -440,59 +287,31 @@ public class SmartPenDriver implements IPenMsgListener, IPenDotListener {
         selectedSmartPen = smartPen;
 
         //NEO Code
-        String mac_address = smartPen.getId().toLowerCase();
-        try {
-                boolean leResult = iPenCtrl.setLeMode( smartPen.isLe() );
-                if( leResult )
-                {
-                    if( smartPen.getUuidVer() == BTLEAdt.UUID_VER.VER_5 )
-                        iPenCtrl.connect( smartPen.getSppAddress(), smartPen.getLeAddress(), smartPen.getUuidVer(), Const.APP_TYPE_FOR_PEN, Const.REQ_PROTOCOL_VER );
-                    else
-                        iPenCtrl.connect( smartPen.getSppAddress(), smartPen.getLeAddress() );
-                }
-                else
-                {
-                        iPenCtrl.connect( smartPen.getSppAddress() );
-                }
-        } catch (Exception e){
-            e.printStackTrace();
-            smartPenListener.error("Connection Error: " + e.getMessage());
-        }
+        String mac_address = smartPen.getMacAddress();
+        iPenCtrl.connect(smartPen.getMacAddress());
     }
 
 
 
 
     //--------------------OFFLINE DATA HANDLING SECTION-------------------------------
-    private ArrayList<NoteModel> offlineNotes = new ArrayList<>();
     public boolean isOfflineDataAvailable(){
-        return offlineNotes.size() > 0;
+        return iPenCtrl.getOfflineAvailableCnt() > 0 || isOfflineDataAvailable;
     }
     public void transferOfflineData(){
-        if (offlineNotes.size() <= 0|| iPenCtrl == null){
+        if (!isOfflineDataAvailable() || iPenCtrl == null){
             return;
         }
-        try {
-            for (NoteModel note : offlineNotes) {
-                iPenCtrl.setOffLineDataListener(new IOfflineDataListener() {
-                    @Override
-                    public void onReceiveOfflineStrokes(Object o, String s, Stroke[] strokes, int i, int i1, int i2, kr.neolab.sdk.metadata.structure.Symbol[] symbols) {
-                        for (Stroke stroke: strokes){
-                            for (Dot d: stroke.getDots()){
-                                //Todo: Handle Button Presses Offline
-                                onReceiveDot(s, d);
-                            }
-                        }
-                    }
-                });
-                iPenCtrl.reqOfflineData(note.sectionId, note.ownerId, note.noteId, note.getPagesArray());
-            }
-            offlineNotes.clear();
-        } catch (Exception e){
-            e.printStackTrace();
-            if (smartPenListener != null){
-                smartPenListener.error("Error during offline data processing - transferring data - " + e.getMessage());
-            }
+
+        iPenCtrl.requestAllOfflineData();
+    }
+    @Override
+    public void offlineDataDidReceivePenData(List<AFDot> list, JSONObject jsonObject) {
+        //Todo: parse atonce as path for pages, buttons different
+        for (AFDot dot: list){
+            onReceiveDot(dot);
         }
+        iPenCtrl.requestDeleteOfflineData();
+        isOfflineDataAvailable = false;
     }
 }
