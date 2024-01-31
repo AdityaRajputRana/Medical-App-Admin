@@ -88,11 +88,24 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         }
     }
 
+    boolean isOfflineDataAvailable = false;
+
     @Override
     public void onReceiveMessage(PenMsg penMsg) {
         Log.i("pen-msg-type", String.valueOf(penMsg.penMsgType));
         Log.i("pen-msg-body", new Gson().toJson(penMsg));
         switch ( penMsg.penMsgType ) {
+            case PenMsgType.PEN_CUR_MEMOFFSET:
+                try {
+                    if (penMsg.getContentByJSONObject().getInt(JsonTag.INT_DOTS_MEMORY_OFFSET) != 0){
+                        isOfflineDataAvailable = true;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+
             case PenMsgType.PEN_CONNECTION_SUCCESS:
                 smartPenListener.message("Smart Pen", "Connected - " + iPenCtrl.getConnectedDevice());
                 activity.getSharedPreferences("PEN_CONFIG", Context.MODE_PRIVATE)
@@ -103,8 +116,7 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
                 selectedSmartPen.setConnected(true);
                 smartPenListener.onConnection(true);
 
-//                iPenCtrl.requestOfflineDataInfo(); //todo: later req for specific page sizes only
-//                iPenCtrl.reqOfflineDataList(); //todo: later req for specific page sizes only
+                iPenCtrl.requestOfflineDataInfo();
 
                 break;
 
@@ -228,6 +240,7 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         iPenCtrl.setContext(activity);
         iPenCtrl.setListener(this);
         iPenCtrl.setDotListener(this);
+        iPenCtrl.setOffLineDataListener(this);
 
         mPref = activity.getSharedPreferences("SMART_PEN_PREFS", Context.MODE_PRIVATE);
 
@@ -283,7 +296,7 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
 
     //--------------------OFFLINE DATA HANDLING SECTION-------------------------------
     public boolean isOfflineDataAvailable(){
-        return iPenCtrl.getOfflineAvailableCnt() > 0;
+        return iPenCtrl.getOfflineAvailableCnt() > 0 || isOfflineDataAvailable;
     }
     public void transferOfflineData(){
         if (!isOfflineDataAvailable() || iPenCtrl == null){
@@ -294,9 +307,11 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
     }
     @Override
     public void offlineDataDidReceivePenData(List<AFDot> list, JSONObject jsonObject) {
-        //Todo: Implement in BG Thread with progress updates
+        //Todo: parse atonce as path for pages, buttons different
         for (AFDot dot: list){
             onReceiveDot(dot);
         }
+        iPenCtrl.requestDeleteOfflineData();
+        isOfflineDataAvailable = false;
     }
 }
