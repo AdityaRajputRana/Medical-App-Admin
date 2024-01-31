@@ -105,7 +105,6 @@ public class PageViewRV extends View {
         super.onDraw(canvas);
         canvas.scale(scaleFactor, scaleFactor);
 
-        Log.i("ScaleFactor", "Called On Draw, scalefactor = " + scaleFactor);
 
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.LTGRAY);
@@ -113,14 +112,12 @@ public class PageViewRV extends View {
 
         Rect dst = new Rect(getLeft(), getRight(), (int)(pageWidth), (int)(pageHeight));
         if (prescriptionBg != null) {
-            Log.i("ScaleFactor", "Drawing BG" + getLeft() + " " + getRight() + " " + pageWidth + " " + pageHeight);
             canvas.drawBitmap(prescriptionBg, null,dst, new Paint());
         } else {
             canvas.drawRect(dst, bgPaint);
         }
 
         if (previousDrawPath != null) {
-            Log.i("ScaleFactor", "Called On Draw previousDrawPath: ");
             canvas.drawPath(previousDrawPath, paint);
         }
 
