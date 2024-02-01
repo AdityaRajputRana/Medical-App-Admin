@@ -40,6 +40,8 @@ public class PatientHistoryActivity extends AppCompatActivity {
 
         loadPatientsList(currentPage,totalPages);
 
+        setListeners();
+
 
 
         binding.rcvPatients.setOnScrollChangeListener(new View.OnScrollChangeListener() {
@@ -87,6 +89,12 @@ public class PatientHistoryActivity extends AppCompatActivity {
 
     }
 
+    private void setListeners() {
+        binding.btnGoBack.setOnClickListener(view -> {
+            finish();
+        });
+    }
+
 
     int loadedPatients = -1;
 
@@ -100,6 +108,12 @@ public class PatientHistoryActivity extends AppCompatActivity {
             APIMethods.loadPatientsList(this, cPage, new APIResponseListener<PatientListRP>() {
                 @Override
                 public void success(PatientListRP response) {
+
+                    if(response.getPatients().size() == 0) {
+                        binding.llData.setVisibility(View.GONE);
+                        binding.llNoData.setVisibility(View.VISIBLE);
+
+                    }
 
                     if (patientListRP == null) {
                         patientListRP = response;
