@@ -81,9 +81,17 @@ public class ActivityCaseHistory extends AppCompatActivity {
         });
 
 
+        setListeners();
+
         //TODO: implement merge cases
 
 
+    }
+
+    private void setListeners() {
+        binding.btnGoBack.setOnClickListener(view -> {
+            finish();
+        });
     }
 
 
@@ -120,7 +128,10 @@ public class ActivityCaseHistory extends AppCompatActivity {
         APIMethods.loadCaseHistory(this, cPage, new APIResponseListener<CaseHistoryRP>() {
             @Override
             public void success(CaseHistoryRP response) {
-
+                if(response.getCases().size() == 0){
+                    binding.llData.setVisibility(View.GONE);
+                    binding.llNoData.setVisibility(View.VISIBLE);
+                }
 
                 if (caseHistoryRP == null) {
                     caseHistoryRP = response;
