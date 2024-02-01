@@ -195,7 +195,7 @@ public class HomeFragment extends Fragment {
         if (homePageRP != null) {
             shimmerContainer.stopShimmer();
             shimmerContainer.hideShimmer();
-            tvDoctorName.setText("Dr. "+homePageRP.getStaffDetails().getFullName());
+            tvDoctorName.setText(homePageRP.getStaffDetails().getFullName());
             tvTotal.setText("Total Patients : " + homePageRP.getAnalytics().getTotal().getCount());
             tvTotalMale.setText("Males : " + homePageRP.getAnalytics().getTotal().getMale());
             tvTotalFemale.setText("Females : " + homePageRP.getAnalytics().getTotal().getFemale());
