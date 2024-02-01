@@ -260,7 +260,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         //todo: remove it
         binding.actionBtn.setOnClickListener(view -> {
 //            drawEvent(0, 0, 46, 0);
-            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,49,0,false));
+            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,52,0,false));
 
         });
 
@@ -598,9 +598,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             @Override
             public void success(AddDetailsRP response) {
                 pbSaveNewPatient.setVisibility(View.GONE);
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showExistingPatientLayout(response.getFullName(),response.getGender(),String.valueOf(response.getMobileNumber()));
+                LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showExistingPatientLayout(response.getPatient().getFullName(),response.getPatient().getGender(),String.valueOf(response.getPatient().getMobileNumber()));
 
-                showExistingPatientLayout(response.getFullName(),response.getGender(),String.valueOf(response.getMobileNumber()));
+                showExistingPatientLayout(response.getPatient().getFullName(),response.getPatient().getGender(),String.valueOf(response.getPatient().getMobileNumber()));
 
                 clearAllCache();
 
@@ -718,7 +718,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void searchPens() {
         //TODO remove it
-//        dialog.dismiss();
+        dialog.dismiss();
         /////
 
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
