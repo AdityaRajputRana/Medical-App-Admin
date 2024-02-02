@@ -198,6 +198,57 @@
 
             </RelativeLayout>
 
+            <LinearLayout
+                android:id="@+id/llPageDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                android:layout_marginBottom="24dp"
+                android:visibility="gone"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/bg_main"
+
+                >
+                <TextView
+                    android:visibility="gone"
+                    android:drawableLeft="@drawable/baseline_phone_24"
+                    android:drawablePadding="4dp"
+                    android:id="@+id/tvPagePhoneNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="4dp"
+                    android:text="8580415978"
+                    android:textColor="@color/colorPrimTxt"
+                    android:textSize="14sp" />
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/llPageDetailsStrip"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:background="@color/colorSecTxt"
+                    android:orientation="horizontal" />
+
+                <TextView
+                    android:drawableLeft="@drawable/baseline_person_24"
+                    android:visibility="gone"
+                    android:drawablePadding="4dp"
+                    android:id="@+id/tvPagePatientName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="4dp"
+                    android:text="Aditya R"
+                    android:textColor="@color/colorPrimTxt"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
         </FrameLayout>
 
     </LinearLayout>
