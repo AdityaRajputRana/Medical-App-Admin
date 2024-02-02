@@ -5,6 +5,7 @@ import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 
 public class RelativePreviousCasesAdapter extends RecyclerView.Adapter<RelativePreviousCasesAdapter.ViewHolder> {
@@ -22,7 +24,9 @@ public class RelativePreviousCasesAdapter extends RecyclerView.Adapter<RelativeP
     TextView tvRelCaseDetails;
     TextView tvRelCaseName;
     TextView tvRelNoOfPages;
+    TextView tvRelCaseDate;
     LinearLayout llRelClick;
+    ImageView ivViewRelCase;
     SelectCaseListener listener;
 
 
@@ -40,11 +44,15 @@ public class RelativePreviousCasesAdapter extends RecyclerView.Adapter<RelativeP
         tvRelCaseDetails = view.findViewById(R.id.tvRelCaseDetails);
         tvRelCaseName = view.findViewById(R.id.tvRelCaseName);
         tvRelNoOfPages = view.findViewById(R.id.tvRelNoOfPages);
+        tvRelCaseDate = view.findViewById(R.id.tvRelCaseDate);
+        ivViewRelCase = view.findViewById(R.id.ivViewRelCase);
         return new ViewHolder(view);
     }
 
     public interface SelectCaseListener{
-        default void onCaseSelected(String caseId){}
+        void onCaseSelected(String caseId);
+        void onViewRelCaseClicked(String caseId);
+
     }
 
     @Override
@@ -54,8 +62,13 @@ public class RelativePreviousCasesAdapter extends RecyclerView.Adapter<RelativeP
 
         tvRelNoOfPages.setText(String.valueOf(viewPatientRP.getPatientCases().get(position).getPageCount()));
         tvRelCaseDetails.setText(viewPatientRP.getPatientCases().get(position).get_id());
+        tvRelCaseDate.setText(Methods.convertDate(viewPatientRP.getPatientCases().get(position).getUpdatedAt()));
+
         llRelClick.setOnClickListener(view -> {
             listener.onCaseSelected(viewPatientRP.getPatientCases().get(holder.getAdapterPosition()).get_id());
+        });
+        ivViewRelCase.setOnClickListener(view -> {
+            listener.onViewRelCaseClicked(viewPatientRP.getPatientCases().get(holder.getAdapterPosition()).get_id());
         });
     }
 

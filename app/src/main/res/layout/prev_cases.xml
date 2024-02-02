@@ -38,11 +38,11 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/ivSharePatient"
+        android:id="@+id/ivViewCaseDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        app:srcCompat="@drawable/baseline_share_24"
+        app:srcCompat="@drawable/baseline_remove_red_eye_24"
         android:visibility="gone" />
 
 
