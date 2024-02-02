@@ -1,7 +1,9 @@
 package com.example.medicalappadmin;
 
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaRecorder;
@@ -11,6 +13,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -28,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,6 +49,7 @@ import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
+import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
 import com.example.medicalappadmin.components.LoginSheet;
 import com.example.medicalappadmin.components.WebVideoPlayer;
@@ -51,6 +57,7 @@ import com.example.medicalappadmin.components.YTVideoPlayer;
 import com.example.medicalappadmin.databinding.ActivityPrescriptionBinding;
 import com.example.medicalappadmin.databinding.BsheetAddMobileNoBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
+import com.example.medicalappadmin.databinding.DialogViewCaseBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.api.interfaces.FileTransferResponseListener;
@@ -69,13 +76,17 @@ import com.example.medicalappadmin.rest.response.LinkGuideRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.SubmitCaseRP;
 import com.example.medicalappadmin.rest.response.UploadVoiceRP;
+import com.example.medicalappadmin.rest.response.ViewCaseRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 
@@ -260,7 +271,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         //todo: remove it
         binding.actionBtn.setOnClickListener(view -> {
 //            drawEvent(0, 0, 46, 0);
-            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,52,0,false));
+            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,59 ,0,false));
 
         });
 
@@ -382,10 +393,16 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llRelPrevCases.setVisibility(View.VISIBLE);
 
         rcvRelPrevCases.setLayoutManager(new LinearLayoutManager(PrescriptionActivity.this));
-        relativePreviousCasesAdapter = new RelativePreviousCasesAdapter(response, PrescriptionActivity.this, new RelativePreviousCasesAdapter.SelectCaseListener() {
+        relativePreviousCasesAdapter = new RelativePreviousCasesAdapter(response,
+                PrescriptionActivity.this, new RelativePreviousCasesAdapter.SelectCaseListener() {
             @Override
             public void onCaseSelected(String caseId) {
                 linkPageToCase(caseId, relativeId, selectedRelative);
+            }
+
+            @Override
+            public void onViewRelCaseClicked(String caseId) {
+                showCaseDetailsDialog(caseId);
             }
         });
 
@@ -397,6 +414,57 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
         pbSelectRelative.setVisibility(View.GONE);
 
+    }
+
+
+
+    private void showCaseDetailsDialog(String caseId) {
+
+        Dialog viewCaseDialog = new Dialog(this);
+        DialogViewCaseBinding dialogViewCaseBinding = DialogViewCaseBinding.inflate(getLayoutInflater());
+        viewCaseDialog.setContentView(dialogViewCaseBinding.getRoot());
+        Window window = viewCaseDialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            layoutParams.copyFrom(window.getAttributes());
+            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+            window.setAttributes(layoutParams);
+        }
+        viewCaseDialog.show();
+
+        dialogViewCaseBinding.ivCloseDialog.setOnClickListener(view -> viewCaseDialog.dismiss());
+        dialogViewCaseBinding.tvOpenCaseInDetail.setOnClickListener(view -> {
+            Intent intent = new Intent(PrescriptionActivity.this,PatientDetailedHistoryActivity.class);
+            intent.putExtra("CASE_ID",caseId);
+            startActivity(intent);
+        });
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(PrescriptionActivity.this,2);
+        APIMethods.viewCase(PrescriptionActivity.this, caseId, new APIResponseListener<ViewCaseRP>() {
+            @Override
+            public void success(ViewCaseRP response) {
+                dialogViewCaseBinding.pbRelViewCase.setVisibility(View.GONE);
+                dialogViewCaseBinding.llCaseData.setVisibility(View.VISIBLE);
+                dialogViewCaseBinding.tvOpenCaseInDetail.setVisibility(View.VISIBLE);
+                dialogViewCaseBinding.tvOpenCaseInDetail.setEnabled(true);
+                dialogViewCaseBinding.tvRelCaseName.setText(response.getTitle());
+                dialogViewCaseBinding.tvRelLastUpdated.setText(response.getUpdatedAt());
+                dialogViewCaseBinding.rcvRelCasePages.setLayoutManager(gridLayoutManager);
+
+                dialogViewCaseBinding.rcvRelCasePages.setAdapter(new PagesHistoryAdapter(response, PrescriptionActivity.this, new PagesHistoryAdapter.PageListener() {
+                    @Override
+                    public void onPageClicked(ArrayList<Page> pages, int currentposition) {
+                        Log.i(TAG, "onPageClicked: rel case" + currentposition);
+                    }
+                }));
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                viewCaseDialog.dismiss();
+                Toast.makeText(PrescriptionActivity.this, "Error encountered. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void hideAllLayouts(){

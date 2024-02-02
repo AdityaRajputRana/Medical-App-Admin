@@ -2,19 +2,29 @@ package com.example.medicalappadmin.components;
 
 import static com.example.medicalappadmin.Tools.Methods.hideKeyboard;
 
+import android.app.Dialog;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.medicalappadmin.Models.LinkedPatient;
+import com.example.medicalappadmin.Models.Page;
+import com.example.medicalappadmin.PatientDetailedHistoryActivity;
+import com.example.medicalappadmin.PrescriptionActivity;
 import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Tools.Methods;
+import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
 import com.example.medicalappadmin.databinding.BsheetAddMobileNoBinding;
+import com.example.medicalappadmin.databinding.DialogViewCaseBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.requests.AddDetailsReq;
@@ -23,6 +33,7 @@ import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
+import com.example.medicalappadmin.rest.response.ViewCaseRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -256,6 +267,11 @@ public class LoginSheet {
             public void onCaseSelected(String caseId) {
                 linkPageToCase(caseId, relativeId, selectedRelative);
             }
+
+            @Override
+            public void onViewRelCaseClicked(String caseId) {
+                showCaseDetailsDialog(caseId);
+            }
         });
         binding.rcvBSRelPrevCases.setAdapter(adapter);
         binding.btnBSRelNewCase.setOnClickListener(view -> {
@@ -263,6 +279,56 @@ public class LoginSheet {
         });
         binding.pbSelectRelative.setVisibility(View.GONE);
     }
+
+    private void showCaseDetailsDialog(String caseId) {
+
+        Dialog viewCaseDialog = new Dialog(context);
+        DialogViewCaseBinding dialogViewCaseBinding = DialogViewCaseBinding.inflate(context.getLayoutInflater());
+        viewCaseDialog.setContentView(dialogViewCaseBinding.getRoot());
+        Window window = viewCaseDialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            layoutParams.copyFrom(window.getAttributes());
+            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+            window.setAttributes(layoutParams);
+        }
+        viewCaseDialog.show();
+
+        dialogViewCaseBinding.ivCloseDialog.setOnClickListener(view -> viewCaseDialog.dismiss());
+        dialogViewCaseBinding.tvOpenCaseInDetail.setOnClickListener(view -> {
+            Intent intent = new Intent(context, PatientDetailedHistoryActivity.class);
+            intent.putExtra("CASE_ID",caseId);
+            context.startActivity(intent);
+        });
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context,2);
+        APIMethods.viewCase(context, caseId, new APIResponseListener<ViewCaseRP>() {
+            @Override
+            public void success(ViewCaseRP response) {
+                dialogViewCaseBinding.pbRelViewCase.setVisibility(View.GONE);
+                dialogViewCaseBinding.llCaseData.setVisibility(View.VISIBLE);
+                dialogViewCaseBinding.tvOpenCaseInDetail.setVisibility(View.VISIBLE);
+                dialogViewCaseBinding.tvOpenCaseInDetail.setEnabled(true);
+                dialogViewCaseBinding.tvRelCaseName.setText(response.getTitle());
+                dialogViewCaseBinding.tvRelLastUpdated.setText(response.getUpdatedAt());
+
+                dialogViewCaseBinding.rcvRelCasePages.setLayoutManager(gridLayoutManager);
+                dialogViewCaseBinding.rcvRelCasePages.setAdapter(new PagesHistoryAdapter(response, context, new PagesHistoryAdapter.PageListener() {
+                    @Override
+                    public void onPageClicked(ArrayList<Page> pages, int currentposition) {
+                        Log.i("Pres login sheet", "onPageClicked: rel case" + currentposition);
+                    }
+                }));
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                viewCaseDialog.dismiss();
+                Toast.makeText(context, "Error encountered. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     public void linkPageToPatient(LinkedPatient selectedRelative) {
         LinkPageReq req = new LinkPageReq();

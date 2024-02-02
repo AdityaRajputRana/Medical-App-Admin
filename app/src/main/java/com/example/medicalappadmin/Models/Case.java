@@ -2,7 +2,7 @@ package com.example.medicalappadmin.Models;
 
 public class Case {
     String _id;
-    String updatedAt;
+    Long updatedAt;
     String hospitalId;
     int pageCount;
     Long createdAt;
@@ -70,11 +70,11 @@ public class Case {
         this._id = _id;
     }
 
-    public String getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
+    public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
 

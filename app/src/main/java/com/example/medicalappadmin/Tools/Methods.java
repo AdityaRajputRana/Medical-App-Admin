@@ -23,6 +23,11 @@ import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
 import com.example.medicalappadmin.rest.api.HashUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 public class Methods {
 
     private static boolean isLogOutShown = false;
@@ -136,4 +141,29 @@ public class Methods {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+
+    public static String convertDate(long timestamp) {
+        Date date = new Date(timestamp);
+        Date today = new Date();
+        long oneDay = 24 * 60 * 60 * 1000; // Milliseconds in a day
+        long oneWeek = 7 * oneDay; // Milliseconds in a week
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.US);
+        timeFormat.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
+        String timeString = timeFormat.format(date);
+
+        long diffDays = Math.round(Math.abs((today.getTime() - date.getTime()) / oneDay));
+
+        if (diffDays == 0) {
+            return "TODAY, " + timeString;
+        } else if (diffDays == 1) {
+            return "YESTERDAY, " + timeString;
+        } else if (diffDays > 1 && diffDays < 7) {
+            SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEE", Locale.US);
+            return dayOfWeekFormat.format(date) + ", " + timeString;
+        } else {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+            return dateFormat.format(date) + ", " + timeString;
+        }
+    }
 }

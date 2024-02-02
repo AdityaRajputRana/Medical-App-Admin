@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
 
 public class ViewPatientCasesAdapter extends RecyclerView.Adapter<ViewPatientCasesAdapter.ViewHolder> {
@@ -58,7 +59,7 @@ public class ViewPatientCasesAdapter extends RecyclerView.Adapter<ViewPatientCas
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         tvVPNoOfCases.setText(String.valueOf(viewPatientRP.getPatientCases().get(position).getPageCount()));
         tvVPCaseName.setText("Untitled Case");
-        tvVPDetails.setText(viewPatientRP.getPatientCases().get(position).getUpdatedAt());
+        tvVPDetails.setText(Methods.convertDate(viewPatientRP.getPatientCases().get(position).getUpdatedAt()));
         if (viewPatientRP.getPatientCases().get(position).isOpen()) {
             tvVPStatus.setText("Open");
             tvVPStatus.setTextColor(context.getColor(R.color.colorActiveGreen));
