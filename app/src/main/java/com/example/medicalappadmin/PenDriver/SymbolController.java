@@ -44,6 +44,10 @@ public class SymbolController {
         s.add(new Symbol(100, "SUBMIT_CASE", 65f, 123.84f, 82.17f, 127.19f ));
 //        s.add(new Symbol(101, "CLOSE_CASE", 50, 9, 62, 12.5f ));
 
+        s.add(new Symbol(101, "LINK_FROM", 40, 100, 42, 102 ));
+        s.add(new Symbol(102, "LINK_PAGE", 44, 100, 46, 102 ));
+
+
 
 
 

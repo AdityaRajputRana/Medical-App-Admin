@@ -100,8 +100,24 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         }
 
         @Override
-        public void onPaperButtonPress(int id, String name) {
+        public boolean onPaperButtonPress(int id, String name) {
+            return false;
+        }
 
+        @Override
+        public void startLinkingProcedure(int page) {
+
+        }
+
+        @Override
+        public void stopLinking(int masterPage, int currentPage) {
+
+        }
+
+        @Override
+        public boolean linkPages(int masterPage, int slavePage) {
+            //return true if command is recognized
+            return false;
         }
     };
 

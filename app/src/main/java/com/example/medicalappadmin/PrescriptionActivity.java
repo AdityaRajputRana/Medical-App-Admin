@@ -1011,14 +1011,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
     @Override
-    public void onPaperButtonPress(int id, String name) {
+    public boolean onPaperButtonPress(int id, String name) {
 
 
 
 
         if (id >= 0 && id <= 10) {
             showLoginSheet(id);
-            return;
+            return true;
         } else if (id == 21 || id == 22 || id == 23) {
             switch (id) {
                 case 21: {
@@ -1100,7 +1100,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 case 39:{
                     if(selectedOtherGuide == null){
                         Toast.makeText(this, "Select a guide first.", Toast.LENGTH_SHORT).show();
-                        return;
+                        return true;
                     }
                     hideGuideVideo();
                     linkGuideToPatient(selectedOtherGuide);
@@ -1122,7 +1122,23 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             }
         }
 
-        Log.i("eta-symbol ", name);
+        return true;
+    }
+
+    @Override
+    public void startLinkingProcedure(int page) {
+
+    }
+
+    @Override
+    public void stopLinking(int masterPage, int currentPage) {
+
+    }
+
+    @Override
+    public boolean linkPages(int masterPage, int slavePage) {
+        //Todo: return true if executed command
+        return false;
     }
 
     private void showLoginSheet(int id) {
