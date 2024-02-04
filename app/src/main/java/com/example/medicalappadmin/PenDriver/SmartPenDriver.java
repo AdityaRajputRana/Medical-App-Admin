@@ -1,7 +1,11 @@
 package com.example.medicalappadmin.PenDriver;
 
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -73,7 +77,10 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         smartPensLiveData.observe(owner, observer);
     }
 
-    public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener){
+
+
+    @SuppressLint("MissingPermission")
+    public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener, int count){
 
         if (smartPens != null){
             for (SmartPen smartPen: smartPens){
@@ -82,6 +89,14 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         }
 
         Context context = activity;
+
+        //Check if bluetooth is not enabled then enable it
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            ((AppCompatActivity) context).startActivityForResult(enableBtIntent, 1);
+        }
+
         try {
             iPenCtrl.btStartForPeripheralsList(context);
         } catch (Exception e){
