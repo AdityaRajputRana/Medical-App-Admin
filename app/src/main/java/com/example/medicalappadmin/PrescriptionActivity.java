@@ -1136,19 +1136,78 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         return true;
     }
 
+    String linkMasterPageCaseId;
+    Page masterPage;
+    int linkMasterPageNumber;
     @Override
     public void startLinkingProcedure(int page) {
+        if(currentPage != null){
+            masterPage =  currentPage;
+            linkMasterPageCaseId = currentPage.getCaseId();
+            linkMasterPageNumber = page;
+            binding.connectPagesLayout.setVisibility(View.VISIBLE);
+        }
 
     }
 
     @Override
     public void stopLinking(int masterPage, int currentPage) {
-
+        linkMasterPageNumber = -1;
+        linkMasterPageCaseId = null;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                binding.connectPagesLayout.setVisibility(View.GONE);
+            }
+        },10000);
     }
 
     @Override
     public boolean linkPages(int masterPage, int slavePage) {
-        //Todo: return true if executed command
+        if(masterPage == linkMasterPageNumber) {
+            binding.connectPagesLayout.setVisibility(View.VISIBLE);
+            binding.ivConnectPages.setVisibility(View.GONE);
+            binding.linkAnimation.setVisibility(View.VISIBLE);
+
+            LinkPageReq req = new LinkPageReq();
+            req.setCaseId(linkMasterPageCaseId);
+            req.setPageNumber(slavePage);
+            req.setPatientId(currentPage.getPatientID());
+            APIMethods.linkPage(PrescriptionActivity.this, req, new APIResponseListener<LinkPageRP>() {
+                @Override
+                public void success(LinkPageRP response) {
+                    Toast.makeText(PrescriptionActivity.this, "Page linked successfully", Toast.LENGTH_SHORT).show();
+                    binding.linkAnimation.setVisibility(View.GONE);
+                    binding.ivConnectPages.setImageDrawable(AppCompatResources.getDrawable(
+                            PrescriptionActivity.this,
+                            R.drawable.ic_done_bg));
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            binding.ivConnectPages.setImageDrawable(AppCompatResources.getDrawable(PrescriptionActivity.this,R.drawable.connection));
+                            binding.connectPagesLayout.setVisibility(View.GONE);
+                        }
+                    },5000);
+
+                }
+
+                @Override
+                public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                    Methods.showError(PrescriptionActivity.this,message,false);
+//                    showError(message, new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View view) {
+//
+//                        }
+//                    });
+                    Toast.makeText(PrescriptionActivity.this, "Page linking failed", Toast.LENGTH_SHORT).show();
+                    binding.ivConnectPages.setImageDrawable(AppCompatResources.getDrawable(PrescriptionActivity.this,R.drawable.connection));
+                    binding.linkAnimation.setVisibility(View.GONE);
+                    binding.connectPagesLayout.setVisibility(View.GONE);
+                }
+            });
+            return true;
+        };
         return false;
     }
 

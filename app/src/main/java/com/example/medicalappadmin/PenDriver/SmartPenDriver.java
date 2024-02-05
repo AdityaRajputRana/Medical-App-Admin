@@ -104,6 +104,32 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
             e.printStackTrace();
         }
     }
+    @SuppressLint("MissingPermission")
+    public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener){
+        getSmartPenList(connectionsListener,0);
+
+        if (smartPens != null){
+            for (SmartPen smartPen: smartPens){
+                connectionsListener.onSmartPen(smartPen);
+            }
+        }
+
+        Context context = activity;
+
+        //Check if bluetooth is not enabled then enable it
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            ((AppCompatActivity) context).startActivityForResult(enableBtIntent, 1);
+        }
+
+        try {
+            iPenCtrl.btStartForPeripheralsList(context);
+        } catch (Exception e){
+            Toast.makeText(context, "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
 
     boolean isOfflineDataAvailable = false;
 

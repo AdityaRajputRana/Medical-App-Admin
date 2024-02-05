@@ -198,6 +198,36 @@
 
             </RelativeLayout>
 
+
+            <RelativeLayout
+                android:visibility="gone"
+                android:id="@+id/connectPagesLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:padding="24dp"
+                android:background="@drawable/circular_bg"
+                android:layout_gravity="bottom|end">
+
+                <ImageView
+                    android:id="@+id/ivConnectPages"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_centerInParent="true"
+                    app:srcCompat="@drawable/connection" />
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/linkAnimation"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    app:lottie_rawRes="@raw/linkpage"
+                    app:lottie_loop="true"
+                    android:visibility="gone"
+                    android:layout_centerInParent="true"
+                    app:lottie_autoPlay="true"/>
+
+
+            </RelativeLayout>
+
             <LinearLayout
                 android:id="@+id/llPageDetails"
                 android:layout_width="wrap_content"
@@ -209,7 +239,6 @@
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
                 android:background="@drawable/bg_main"
-
                 >
                 <TextView
                     android:visibility="gone"
