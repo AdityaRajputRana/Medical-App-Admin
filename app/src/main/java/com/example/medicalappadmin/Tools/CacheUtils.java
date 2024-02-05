@@ -88,6 +88,9 @@ public class CacheUtils {
                 }
             }
         }
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("cache", Context.MODE_PRIVATE);
+        sharedPreferences.edit().clear().apply();
     }
 
     private static File getOrCreateCacheFolder(Context context) {

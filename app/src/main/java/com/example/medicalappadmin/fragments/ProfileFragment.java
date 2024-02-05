@@ -17,6 +17,7 @@ import com.example.medicalappadmin.LoginActivity;
 import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.Tools.CacheUtils;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.Transformations.CircleTransformation;
 import com.example.medicalappadmin.VideoSettingsActivity;
@@ -120,6 +121,7 @@ public class ProfileFragment extends Fragment {
         editor.remove("JWT_TOKEN");
         editor.remove("MY_USER");
         editor.commit();
+        CacheUtils.clearCache(getActivity());
 
         startActivity(new Intent(getActivity(), LoginActivity.class));
         getActivity().finish();
