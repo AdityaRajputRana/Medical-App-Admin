@@ -24,10 +24,17 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.Tools.CacheUtils;
 
 import java.util.ArrayList;
 
 public class NotepadView extends View {
+    private int currentPageNumber = -1;
+    private Bitmap cachedBmp;
+    private static final long DEBOUNCE_DELAY = 500;
+    private Handler debounceHandler = new Handler();
+    private Runnable saveRunnable;
+
     private Paint paint;
     float scaleFactor = 1f;
     ScaleGestureDetector scaleGestureDetector;
@@ -39,7 +46,6 @@ public class NotepadView extends View {
     private int pageHeight ;
     private int pageWidth;
 
-    private Bitmap cachedBitmap;
 
     ArrayList<ArrayList<Point>> mStrokes;
 
@@ -54,11 +60,11 @@ public class NotepadView extends View {
     }
 
     private void init() {
+        this.setDrawingCacheEnabled(true);
         paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
-
     }
     public void setBackgroundImageUrl(String imageUrl,int width, int height) {
         loadImage(imageUrl);
@@ -90,6 +96,10 @@ public class NotepadView extends View {
         return bitmap;
     }
 
+    public Bitmap get(){
+        return this.getDrawingCache();
+    }
+
     Path previousDrawPath;
     Path currentLivePath;
     @Override
@@ -113,6 +123,22 @@ public class NotepadView extends View {
         }
         if (currentLivePath != null){
             canvas.drawPath(currentLivePath, paint);
+        }
+
+        if (previousDrawPath == null && cachedBmp != null){
+            canvas.drawBitmap(cachedBmp, null,dst, new Paint());
+        } else {
+            if (saveRunnable != null) {
+                debounceHandler.removeCallbacks(saveRunnable);
+            }
+            saveRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    saveBitmapToStorage(get());
+                    saveRunnable = null;
+                }
+            };
+            debounceHandler.postDelayed(saveRunnable, DEBOUNCE_DELAY);
         }
 
         Log.i("Canvas", "Scaled to " + scaleFactor);
@@ -144,11 +170,30 @@ public class NotepadView extends View {
     }
 
 
-
-    public void clearDrawing() {
+    public void clearDrawing(int pageNumber) {
+        if (saveRunnable != null){
+            debounceHandler.post(saveRunnable);
+        }
         previousDrawPath = null;
         currentLivePath = null;
+        cachedBmp = null;
+        currentPageNumber = pageNumber;
+        loadCacheImage();
         invalidate();
+    }
+
+    private void loadCacheImage() {
+        if (previousDrawPath != null || cachedBmp != null || currentPageNumber != -1) return;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                cachedBmp = CacheUtils.loadCanvasBitmapFromStorage(getContext(), currentPageNumber);
+            }
+        }).start();
+    }
+
+    private void saveBitmapToStorage(Bitmap bitmap) {
+        CacheUtils.saveCanvasBitmap(getContext(), bitmap, currentPageNumber);
     }
 
     //Todo: Shift Both Functions to BG Thread to generate a bmp and send that back to our thread
