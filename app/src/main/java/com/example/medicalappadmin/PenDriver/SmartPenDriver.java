@@ -1,7 +1,11 @@
 package com.example.medicalappadmin.PenDriver;
 
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,6 +27,7 @@ import com.afpensdk.pen.penmsg.PenMsgType;
 import com.afpensdk.structure.AFDot;
 import com.afpensdk.structure.DotType;
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
+import com.example.medicalappadmin.PenDriver.Models.Command;
 import com.example.medicalappadmin.PenDriver.Models.NoteModel;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.Models.Symbol;
@@ -35,8 +40,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Queue;
 
 
 public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAFPenOfflineDataListener {
@@ -71,7 +77,10 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         smartPensLiveData.observe(owner, observer);
     }
 
-    public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener){
+
+
+    @SuppressLint("MissingPermission")
+    public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener, int count){
 
         if (smartPens != null){
             for (SmartPen smartPen: smartPens){
@@ -80,6 +89,14 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         }
 
         Context context = activity;
+
+        //Check if bluetooth is not enabled then enable it
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            ((AppCompatActivity) context).startActivityForResult(enableBtIntent, 1);
+        }
+
         try {
             iPenCtrl.btStartForPeripheralsList(context);
         } catch (Exception e){
@@ -166,6 +183,18 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
     }
 
     int prevActionType = -1;
+
+    int linkPagePrevPageNumber = -1;
+
+    Queue<Command> commandQueue = new LinkedList<>();
+    public Queue<Command> getCommandQueue(){
+        return commandQueue;
+    }
+
+    public void clearCommandsQueue(){
+        commandQueue = new LinkedList<>();
+    }
+
     @Override
     public void onReceiveDot(AFDot dot) {
         Log.i("NPROJ- dot", new Gson().toJson(dot));
@@ -175,9 +204,24 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         else if (DotType.isPenActionUp(dot.type)) {
             actionType = 2;
             Symbol sm = symbolController.getApplicableSymbol(dot.X, dot.Y);
+
+            if (linkPagePrevPageNumber != -1 && sm != null && sm.getId() == 102){
+                boolean executed = false;
+                if (smartPenListener != null) executed = smartPenListener.linkPages(linkPagePrevPageNumber, dot.page);
+                if (!executed) commandQueue.add(new Command(103, "LINK_PAGES", dot.page, linkPagePrevPageNumber, dot.page));
+            } else if (linkPagePrevPageNumber != -1) {
+                if (smartPenListener != null) smartPenListener.stopLinking(linkPagePrevPageNumber, dot.page);
+            }
+            linkPagePrevPageNumber = -1;
+
             if (sm != null){
                 if (smartPenListener != null){
-                    smartPenListener.onPaperButtonPress(sm.getId(), sm.getName());
+                    boolean executed = smartPenListener.onPaperButtonPress(sm.getId(), sm.getName());
+                    if (!executed) commandQueue.add(new Command(sm.getId(), sm.getName(), dot.page, -1, -1));
+                    if (sm.getId() == 101){
+                        linkPagePrevPageNumber = dot.page;
+                        smartPenListener.startLinkingProcedure(linkPagePrevPageNumber);
+                    }
                 }
             }
         }
