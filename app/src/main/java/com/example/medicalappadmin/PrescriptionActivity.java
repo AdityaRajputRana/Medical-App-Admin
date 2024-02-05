@@ -933,7 +933,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 handler = null;
                 runnable = null;
             }
-            binding.canvasView.clearDrawing(currentPageNumber);
+            binding.canvasView.clearDrawing(pageId);
             currentPageNumber = pageId;
             binding.toolbar.setTitle("Page : " + currentPageNumber);
             binding.toolbar.setSubtitle("Initialising Page");
