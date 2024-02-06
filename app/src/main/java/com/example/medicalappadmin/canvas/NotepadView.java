@@ -32,7 +32,7 @@ import java.util.ArrayList;
 public class NotepadView extends View {
     private int currentPageNumber = -1;
     private Bitmap cachedBmp;
-    private static final long DEBOUNCE_DELAY = 10000;
+    private static final long DEBOUNCE_DELAY = 1000;
     private Handler debounceHandler = new Handler();
     private Runnable saveRunnable;
 
@@ -73,7 +73,7 @@ public class NotepadView extends View {
         pageWidth = width;
         scaleFactor = Math.min((float)getWidth()/width, (float)getHeight()/height);
         paint.setStrokeWidth(4f/scaleFactor);
-        invalidate();
+        redraw();
     }
 
     private void loadImage(String imageUrl) {
@@ -85,7 +85,7 @@ public class NotepadView extends View {
                     public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
                         // Set the loaded bitmap as the background image
                         prescriptionBg = resource;
-                        invalidate(); // Redraw the view
+                        redraw(); // Redraw the view
                     }
                 });
     }
@@ -97,8 +97,18 @@ public class NotepadView extends View {
         return bitmap;
     }
 
-    public Bitmap get(){
-        return this.getDrawingCache();
+    public Bitmap getCurrentBitmap(){
+        int width = getWidth();
+        int height = getHeight();
+
+        // Create a bitmap with the same dimensions as the view
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        // Create a canvas and draw the view onto the bitmap
+        Canvas canvas = new Canvas(bitmap);
+        draw(canvas);
+
+        return bitmap;
     }
 
     Path previousDrawPath;
@@ -130,20 +140,6 @@ public class NotepadView extends View {
             canvas.drawPath(currentLivePath, paint);
         }
 
-        if (previousDrawPath != null || currentLivePath != null) {
-            if (saveRunnable != null) {
-                debounceHandler.removeCallbacks(saveRunnable);
-            }
-            saveRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    saveRunnable = null;
-                    saveBitmapToStorage(get());
-                }
-            };
-            debounceHandler.postDelayed(saveRunnable, DEBOUNCE_DELAY);
-        }
-
         Log.i("Canvas", "Scaled to " + scaleFactor);
 
     }
@@ -168,7 +164,7 @@ public class NotepadView extends View {
         Handler mainHandler = new Handler(Looper.getMainLooper());
         mainHandler.post(()->{
             Log.i("Optimi", "Calling invalidate");
-            invalidate();
+            redraw();
         });
     }
 
@@ -177,7 +173,7 @@ public class NotepadView extends View {
         if (saveRunnable != null){
             debounceHandler.removeCallbacks(saveRunnable);
             saveRunnable = null;
-            saveBitmapToStorage(get());
+            saveBitmapToStorage(getCurrentBitmap());
         }
         previousDrawPath = null;
         currentLivePath = null;
@@ -212,7 +208,7 @@ public class NotepadView extends View {
 
             mainHandler.post(() -> {
                 previousDrawPath = path;
-                invalidate();
+                redraw();
             });
 
         }).start();
@@ -242,6 +238,24 @@ public class NotepadView extends View {
 
         }
         return path;
+    }
+
+
+    private void redraw(){
+        invalidate();
+        if (previousDrawPath != null || currentLivePath != null) {
+            if (saveRunnable != null) {
+                debounceHandler.removeCallbacks(saveRunnable);
+            }
+            saveRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    saveRunnable = null;
+                    saveBitmapToStorage(getCurrentBitmap());
+                }
+            };
+            debounceHandler.postDelayed(saveRunnable, DEBOUNCE_DELAY);
+        }
     }
 
 
