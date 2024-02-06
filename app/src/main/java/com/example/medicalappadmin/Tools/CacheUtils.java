@@ -38,6 +38,7 @@ public class CacheUtils {
 
     private static final String CACHE_FOLDER_NAME = "canvas_cache";
     public static void saveCanvasBitmap(Context context, Bitmap bitmap, int pageNumber) {
+
         if (bitmap == null || context == null) {
             return;
         }
