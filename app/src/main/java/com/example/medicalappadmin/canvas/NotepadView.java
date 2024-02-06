@@ -101,10 +101,8 @@ public class NotepadView extends View {
         int width = getWidth();
         int height = getHeight();
 
-        // Create a bitmap with the same dimensions as the view
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
-        // Create a canvas and draw the view onto the bitmap
         Canvas canvas = new Canvas(bitmap);
         draw(canvas);
 
@@ -132,7 +130,8 @@ public class NotepadView extends View {
         if (previousDrawPath != null){
             canvas.drawPath(previousDrawPath, paint);
         } else if (cachedBmp != null){
-            canvas.drawBitmap(cachedBmp, null,dst, new Paint());
+            Rect cacheDst = new Rect(getLeft(), getTop(), (int) (getWidth()/scaleFactor), (int) (getHeight()/scaleFactor));
+            canvas.drawBitmap(cachedBmp, null,cacheDst, new Paint());
         }
 
 
@@ -196,7 +195,6 @@ public class NotepadView extends View {
 
     private void saveBitmapToStorage(Bitmap bitmap) {
         if (currentPageNumber == -1) return;
-        BitmapUtils.inspectBitmap(getContext(), bitmap, "Saving (Canvas) : " + currentPageNumber);
         CacheUtils.saveCanvasBitmap(getContext(), bitmap, currentPageNumber);
     }
 
