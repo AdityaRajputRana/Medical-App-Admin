@@ -24,6 +24,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.Tools.BitmapUtils;
 import com.example.medicalappadmin.Tools.CacheUtils;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 public class NotepadView extends View {
     private int currentPageNumber = -1;
     private Bitmap cachedBmp;
-    private static final long DEBOUNCE_DELAY = 500;
+    private static final long DEBOUNCE_DELAY = 10000;
     private Handler debounceHandler = new Handler();
     private Runnable saveRunnable;
 
@@ -120,22 +121,24 @@ public class NotepadView extends View {
 
         if (previousDrawPath != null){
             canvas.drawPath(previousDrawPath, paint);
+        } else if (cachedBmp != null){
+            canvas.drawBitmap(cachedBmp, null,dst, new Paint());
         }
+
+
         if (currentLivePath != null){
             canvas.drawPath(currentLivePath, paint);
         }
 
-        if (previousDrawPath == null && cachedBmp != null){
-            canvas.drawBitmap(cachedBmp, null,dst, new Paint());
-        } else {
+        if (previousDrawPath != null || currentLivePath != null) {
             if (saveRunnable != null) {
                 debounceHandler.removeCallbacks(saveRunnable);
             }
             saveRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    saveBitmapToStorage(get());
                     saveRunnable = null;
+                    saveBitmapToStorage(get());
                 }
             };
             debounceHandler.postDelayed(saveRunnable, DEBOUNCE_DELAY);
@@ -172,7 +175,9 @@ public class NotepadView extends View {
 
     public void clearDrawing(int pageNumber) {
         if (saveRunnable != null){
-            debounceHandler.post(saveRunnable);
+            debounceHandler.removeCallbacks(saveRunnable);
+            saveRunnable = null;
+            saveBitmapToStorage(get());
         }
         previousDrawPath = null;
         currentLivePath = null;
@@ -183,16 +188,19 @@ public class NotepadView extends View {
     }
 
     private void loadCacheImage() {
-        if (previousDrawPath != null || cachedBmp != null || currentPageNumber != -1) return;
+        if (previousDrawPath != null || cachedBmp != null || currentPageNumber == -1) return;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                cachedBmp = CacheUtils.loadCanvasBitmapFromStorage(getContext(), currentPageNumber);
+                Bitmap mBitmap = CacheUtils.loadCanvasBitmapFromStorage(getContext(), currentPageNumber);
+                cachedBmp = mBitmap;
             }
         }).start();
     }
 
     private void saveBitmapToStorage(Bitmap bitmap) {
+        if (currentPageNumber == -1) return;
+        BitmapUtils.inspectBitmap(getContext(), bitmap, "Saving (Canvas) : " + currentPageNumber);
         CacheUtils.saveCanvasBitmap(getContext(), bitmap, currentPageNumber);
     }
 

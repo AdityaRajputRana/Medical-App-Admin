@@ -38,6 +38,8 @@ public class CacheUtils {
 
     private static final String CACHE_FOLDER_NAME = "canvas_cache";
     public static void saveCanvasBitmap(Context context, Bitmap bitmap, int pageNumber) {
+        BitmapUtils.inspectBitmap(context, bitmap, "Saving:" + pageNumber);
+
         if (bitmap == null || context == null) {
             return;
         }
@@ -51,6 +53,8 @@ public class CacheUtils {
                 FileOutputStream fos = new FileOutputStream(file);
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 fos.close();
+                Log.i("MyCache", "Saved:" + pageNumber);
+                BitmapUtils.inspectBitmap(context, bitmap, "Saved: "+ pageNumber);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -68,6 +72,7 @@ public class CacheUtils {
                     FileInputStream fis = new FileInputStream(file);
                     Bitmap bitmap = BitmapFactory.decodeStream(fis);
                     fis.close();
+                    BitmapUtils.inspectBitmap(context, bitmap, "Loaded : " + pageNumber);
                     return bitmap;
                 } catch (IOException e) {
                     e.printStackTrace();
