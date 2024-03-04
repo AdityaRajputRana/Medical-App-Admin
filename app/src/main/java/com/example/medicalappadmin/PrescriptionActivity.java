@@ -1141,17 +1141,22 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     int linkMasterPageNumber;
     @Override
     public void startLinkingProcedure(int page) {
+        Log.i("ETA - START", "" + page);
         if(currentPage != null){
             masterPage =  currentPage;
             linkMasterPageCaseId = currentPage.getCaseId();
             linkMasterPageNumber = page;
             binding.connectPagesLayout.setVisibility(View.VISIBLE);
+        } else {
+            //TODO: Add waiting here (5)
+            Log.i("ETA - Start", "Current page is null");
         }
 
     }
 
     @Override
     public void stopLinking(int masterPage, int currentPage) {
+        Log.i("ETA - stop", currentPage + " to " + masterPage);
         linkMasterPageNumber = -1;
         linkMasterPageCaseId = null;
         new Handler().postDelayed(new Runnable() {
@@ -1164,6 +1169,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     @Override
     public boolean linkPages(int masterPage, int slavePage) {
+        Log.i("ETA - LINK", slavePage + " to " + masterPage);
         if(masterPage == linkMasterPageNumber) {
             binding.connectPagesLayout.setVisibility(View.VISIBLE);
             binding.ivConnectPages.setVisibility(View.GONE);
@@ -1399,12 +1405,28 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
                 @Override
                 public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                    Methods.showError(PrescriptionActivity.this, message, true);
+                    if (active)
+                        Methods.showError(PrescriptionActivity.this, message, true);
                     Log.i(TAG, "fail: timely uploads");
 
                 }
             });
         }
+    }
+
+
+    static boolean active = false;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        active = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        active = false;
     }
 
     private void showError(String message, View.OnClickListener listener) {

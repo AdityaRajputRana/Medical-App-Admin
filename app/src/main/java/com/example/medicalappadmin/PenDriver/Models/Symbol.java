@@ -13,6 +13,12 @@ public class Symbol {
         return (xmin <= x && x <= xmax && ymin <= y && y <= ymax);
     }
 
+    public boolean isApplicable(float x, float y, float scaleFactor){
+        x *= scaleFactor;
+        y *= scaleFactor;
+        return (xmin <= x && x <= xmax && ymin <= y && y <= ymax);
+    }
+
     public Symbol(int id, String name, float xmin, float ymin, float xmax, float ymax) {
         this.id = id;
         this.name = name;
