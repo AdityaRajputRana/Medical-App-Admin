@@ -17,6 +17,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.afpensdk.pen.DPenCtrl;
+import com.afpensdk.pen.PaperSize;
 import com.afpensdk.pen.penmsg.IAFPenDotListener;
 import com.afpensdk.pen.penmsg.IAFPenMsgListener;
 import com.afpensdk.pen.penmsg.IAFPenOfflineDataListener;
@@ -307,6 +308,16 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
 
 
         iPenCtrl = DPenCtrl.getInstance();
+        List<PaperSize> paperSizes = new ArrayList<>();
+        PaperSize paperSize = new PaperSize();
+        paperSize.height = 7014;
+        paperSize.width = 4962;
+        paperSize.pageFrom = 0;
+        paperSize.pageTo = 100;
+        paperSize.bookNum = 1;
+        paperSizes.add(paperSize);
+        iPenCtrl.SetPaperSize(paperSizes);
+
         iPenCtrl.setContext(activity);
         iPenCtrl.setListener(this);
         iPenCtrl.setDotListener(this);
