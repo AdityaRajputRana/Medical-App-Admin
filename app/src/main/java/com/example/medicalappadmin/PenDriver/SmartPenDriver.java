@@ -75,6 +75,7 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
 
     private static MutableLiveData<ArrayList<SmartPen>> smartPensLiveData = new MutableLiveData<>(new ArrayList<>());
     public static void observeSmartPens(@NonNull LifecycleOwner owner, @NonNull Observer<ArrayList<SmartPen>> observer){
+        Log.i("GetSmartPens", "observer added");
         smartPensLiveData.observe(owner, observer);
     }
 
@@ -82,6 +83,8 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
 
     @SuppressLint("MissingPermission")
     public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener, int count){
+
+        Log.i("GetSmartPens", "getSmartPenList called");
 
         if (smartPens != null){
             for (SmartPen smartPen: smartPens){
@@ -99,7 +102,8 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         }
 
         try {
-            iPenCtrl.btStartForPeripheralsList(context);
+            int code = iPenCtrl.btStartForPeripheralsList(context);
+            Log.i("GetSmartPens", "started search: " + code);
         } catch (Exception e){
             Toast.makeText(context, "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();

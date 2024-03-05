@@ -831,6 +831,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         SmartPenDriver.observeSmartPens(dialog, new Observer<ArrayList<SmartPen>>() {
             @Override
             public void onChanged(ArrayList<SmartPen> mPens) {
+                Log.i("MedPA", "on Smart Pens changed: " + mPens.size());
                 for (SmartPen smartPen: mPens){
                     if (smartPens == null) {
                         smartPens = new ArrayList<>();
