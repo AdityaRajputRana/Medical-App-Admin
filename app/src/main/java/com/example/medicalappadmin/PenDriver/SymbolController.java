@@ -11,8 +11,8 @@ public class SymbolController {
     float refHeight = 128f;
     float refWidth = 90f;
 
-    float pageHeight = 4961f;
-    float pageWidth = 3496f;
+    float pageHeight = 7014f;
+    float pageWidth = 4962f;
 
     float scaleFactor = Math.min(refHeight/pageHeight, refWidth/pageWidth);
 
