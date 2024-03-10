@@ -15,9 +15,16 @@ public class ViewCaseRP {
     String diagnosis;
     Patient patient;
     ArrayList<Document> documents;
+    ArrayList<Integer> pageNumbers;
     ArrayList<Page> pages;
     boolean shareRequired;
     ArrayList<Additional> additionals;
+
+    public ArrayList<Integer> getPageNumbers() {
+        if (pageNumbers == null)
+            pageNumbers = new ArrayList<>();
+        return pageNumbers;
+    }
 
     public ViewCaseRP() {
     }

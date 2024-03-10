@@ -17,6 +17,7 @@ import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.requests.EmptyReq;
 import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -25,7 +26,6 @@ public class DetailedPageViewActivity extends AppCompatActivity {
     Page page;
     int finalCurrPageNo;
 
-    ArrayList<Page> pages;
 
     ViewCaseRP viewCaseRP;
 
@@ -37,42 +37,24 @@ public class DetailedPageViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityDetailedPageViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        String caseID = getIntent().getStringExtra("CASE_ID");
-        String pageNumber = getIntent().getStringExtra("CURRENT_PAGE_NUMBER");
-        Log.i("lol", "onCreate: received page number " + pageNumber);
-        finalCurrPageNo = Integer.parseInt(pageNumber);
-        loadPage(finalCurrPageNo, caseID);
 
         binding.backBtn.setOnClickListener(view -> finish());
 
-    }
+        String caseID = getIntent().getStringExtra("CASE_ID");
+        String pageNumber = getIntent().getStringExtra("CURRENT_PAGE_NUMBER");
+        String caseRP = getIntent().getStringExtra("CASE");
 
-    private void loadDoctorConfigurations() {
+        viewCaseRP = new Gson().fromJson(caseRP, ViewCaseRP.class);
+        finalCurrPageNo = Integer.parseInt(pageNumber);
 
-        APIMethods.configurePage(DetailedPageViewActivity.this, new EmptyReq(), new APIResponseListener<ConfigurePageRP>() {
-            @Override
-            public void success(ConfigurePageRP response) {
-                Log.i("eta act rsp", "Got");
-
-                if (response != null) {
-                    pageConfigurations = response;
-                }
-                updateUI(finalCurrPageNo);
-            }
-
-            @Override
-            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                updateUI(finalCurrPageNo);
-            }
-        });
+        loadPage(finalCurrPageNo, caseID);
+        setListeners();
     }
 
 
     private void loadPage(int finalCurrPageNo, String caseID) {
-        if (PatientDetailedHistoryActivity.viewCaseRP != null && PatientDetailedHistoryActivity.viewCaseRP.get_id().equals(caseID)) {
-            viewCaseRP = PatientDetailedHistoryActivity.viewCaseRP;
-            page = viewCaseRP.getPages().get(finalCurrPageNo);
-            loadDoctorConfigurations();
+        if (viewCaseRP != null && viewCaseRP.get_id().equals(caseID)) {
+            updateUI(finalCurrPageNo);
             return;
         }
 
@@ -80,15 +62,12 @@ public class DetailedPageViewActivity extends AppCompatActivity {
             @Override
             public void success(ViewCaseRP response) {
                 viewCaseRP = response;
-                page = response.getPages().get(finalCurrPageNo);
-                loadDoctorConfigurations();
-//                setListeners();
+                updateUI(finalCurrPageNo);
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 binding.pbPage.setVisibility(View.GONE);
-                Log.i("lol", "fail: " + message);
                 Methods.showError(DetailedPageViewActivity.this, message, true);
             }
         });
@@ -97,22 +76,17 @@ public class DetailedPageViewActivity extends AppCompatActivity {
 
     private void setListeners() {
         binding.nextPage.setOnClickListener(view -> {
-            finalCurrPageNo++;
-            if (finalCurrPageNo < viewCaseRP.getPages().size()) {
-                Log.i("lol", "setListeners: next " + finalCurrPageNo);
-                Page nextPage = viewCaseRP.getPages().get(finalCurrPageNo);
-                Log.i("lol", "setListeners:next  page " + nextPage.toString());
+            if (finalCurrPageNo < viewCaseRP.getPageNumbers().size()-1) {
+                finalCurrPageNo++;
                 binding.viewPager.setCurrentItem(finalCurrPageNo);
             } else {
                 Toast.makeText(this, "End of pages", Toast.LENGTH_SHORT).show();
             }
         });
         binding.prevPage.setOnClickListener(view -> {
-            finalCurrPageNo--;
-            if (finalCurrPageNo >= 0) {
-                Page prevPage = viewCaseRP.getPages().get(finalCurrPageNo);
+            if (finalCurrPageNo > 0) {
+                finalCurrPageNo--;
                 binding.viewPager.setCurrentItem(finalCurrPageNo);
-
             } else {
                 Toast.makeText(this, "First Page", Toast.LENGTH_SHORT).show();
             }
@@ -121,14 +95,12 @@ public class DetailedPageViewActivity extends AppCompatActivity {
     }
 
     private void updateUI(int currPageNo) {
-        Log.i("lol", "updateUI: page number " + currPageNo);
         if (currPageNo != 0) {
             binding.viewPager.setCurrentItem(currPageNo);
         }
         if (adapter == null) {
-            adapter = new PageAdapter(DetailedPageViewActivity.this,pageConfigurations, viewCaseRP, currPageNo);
+            adapter = new PageAdapter(DetailedPageViewActivity.this, viewCaseRP, currPageNo);
         }
-
         binding.viewPager.setAdapter(adapter);
         binding.viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -139,8 +111,6 @@ public class DetailedPageViewActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 finalCurrPageNo = position;
-                setListeners();
-
             }
 
             @Override

@@ -21,21 +21,19 @@ public class PageAdapter extends PagerAdapter {
 
     private final ViewCaseRP viewCaseRP;
     int currentPageNo;
-    DetailedPageView notepadView;
+    NotepadView notepadView;
     TextView tvPageNumber;
-    private final ConfigurePageRP configurePageRP;
 
 
-    public PageAdapter(Context context, ConfigurePageRP configurePageRP, ViewCaseRP response, int currentPageNo) {
+    public PageAdapter(Context context, ViewCaseRP response, int currentPageNo) {
         this.context = context;
         this.viewCaseRP = response;
         this.currentPageNo = currentPageNo;
-        this.configurePageRP = configurePageRP;
     }
 
     @Override
     public int getCount() {
-        return viewCaseRP.getPages().size();
+        return viewCaseRP.getPageNumbers().size();
     }
 
     @Override
@@ -52,14 +50,8 @@ public class PageAdapter extends PagerAdapter {
         notepadView = view.findViewById(R.id.detailedPage);
         tvPageNumber = view.findViewById(R.id.tvPageNumber);
 
-        tvPageNumber.setText("Page No: " + viewCaseRP.getPages().get(position).getPageNumber());
-        notepadView.clearDrawing();
-        if(configurePageRP != null){
-            view.post(()->{
-                notepadView.setBackgroundImageUrl(configurePageRP.getPageDetails().getPageBackground(),configurePageRP.getPageDetails().getPageWidth(),configurePageRP.getPageDetails().getPageHeight());
-            });
-        }
-        notepadView.addCoordinates(viewCaseRP.getPages().get(position).getPoints());
+        tvPageNumber.setText("Page No: " + viewCaseRP.getPageNumbers().get(position));
+        notepadView.clearDrawing(viewCaseRP.getPageNumbers().get(position), true, true);
 
         ViewPager viewPager = (ViewPager) container;
         viewPager.addView(view, 0);

@@ -5,17 +5,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.R;
-import com.example.medicalappadmin.canvas.PageViewRV;
+import com.example.medicalappadmin.canvas.NotepadView;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 
 import java.util.ArrayList;
@@ -43,13 +41,11 @@ public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapte
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.notepadView.addCoordinates(viewCaseRP.getPages().get(position).getPoints());
-        holder.pageCount.setText("Page no: " + viewCaseRP.getPages().get(position).getPageNumber());
+        holder.notepadView.clearDrawing(viewCaseRP.getPageNumbers().get(position), true, false);
+        holder.pageCount.setText("Page no: " + viewCaseRP.getPageNumbers().get(position));
         holder.llPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("lol", "onClick: " + viewCaseRP.getPages().get(holder.getAdapterPosition()).getPageNumber());
-                Log.i("lol", "onClick pos: " + holder.getAdapterPosition());
                 listener.onPageClicked(viewCaseRP.getPages(),holder.getAdapterPosition());
             }
         });
@@ -57,19 +53,17 @@ public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapte
 
     @Override
     public int getItemCount() {
-        return viewCaseRP.getPages().size();
+        return viewCaseRP.getPageNumbers().size();
     }
 
     public interface PageListener {
         default void onPageClicked(ArrayList<Page> pages, int currentposition) {
-
-
         }
     }
 
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        PageViewRV notepadView;
+        NotepadView notepadView;
         TextView pageCount;
         LinearLayout llPage;
         public MyViewHolder(@NonNull View itemView) {

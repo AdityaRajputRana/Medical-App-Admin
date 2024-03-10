@@ -222,13 +222,11 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
                 @Override
                 public void onPageClicked(ArrayList<Page> pages, int currentPosition) {
                     Intent i = new Intent(PatientDetailedHistoryActivity.this,DetailedPageViewActivity.class);
-                    String response = new Gson().toJson(pages);
-//                    i.putExtra("PAGES_LIST", response );
+                    String caseRP = new Gson().toJson(response);
                     i.putExtra("CASE_ID", caseId);
+                    i.putExtra("CASE", caseRP);
                     i.putExtra("CURRENT_PAGE_NUMBER", String.valueOf(currentPosition) );
-                    Log.i(TAG, "sent: " + currentPosition);
                     startActivity(i);
-//                    Toast.makeText(PatientDetailedHistoryActivity.this, "Clicked " + pageNumber, Toast.LENGTH_SHORT).show();
                 }
             });
         }
