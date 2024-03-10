@@ -17,15 +17,22 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
 import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Tools.BitmapUtils;
 import com.example.medicalappadmin.Tools.CacheUtils;
+import com.example.medicalappadmin.rest.api.API;
+import com.example.medicalappadmin.rest.api.APIMethods;
+import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
+import com.example.medicalappadmin.rest.response.ConfigurePageRP;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -71,9 +78,15 @@ public class NotepadView extends View {
         loadImage(imageUrl);
         pageHeight = height;
         pageWidth = width;
-        scaleFactor = Math.min((float)getWidth()/width, (float)getHeight()/height);
-        paint.setStrokeWidth(4f/scaleFactor);
-        redraw();
+        this.post(new Runnable() {
+            @Override
+            public void run() {
+                scaleFactor = Math.min((float)getWidth()/width, (float)getHeight()/height);
+                Log.i("Scale factor is set to:", String.valueOf(scaleFactor ));
+                paint.setStrokeWidth(4f/scaleFactor);
+                redraw();
+            }
+        });
     }
 
     private void loadImage(String imageUrl) {
@@ -167,8 +180,11 @@ public class NotepadView extends View {
         });
     }
 
+    public void clearDrawing(int pageNumber){
+        clearDrawing(pageNumber, false, false);
+    }
 
-    public void clearDrawing(int pageNumber) {
+    public void clearDrawing(int pageNumber, boolean loadPoints, boolean forceRefreshPoints) {
         if (saveRunnable != null){
             debounceHandler.removeCallbacks(saveRunnable);
             saveRunnable = null;
@@ -178,23 +194,65 @@ public class NotepadView extends View {
         currentLivePath = null;
         cachedBmp = null;
         currentPageNumber = pageNumber;
-        loadCacheImage();
+        configurePage();
+        loadCacheImage(loadPoints, forceRefreshPoints);
         invalidate();
     }
 
-    private void loadCacheImage() {
-        if (previousDrawPath != null || cachedBmp != null || currentPageNumber == -1) return;
+    private void configurePage() {
+        APIMethods.configurePageForceCache(getContext(), new APIResponseListener<ConfigurePageRP>() {
+            @Override
+            public void success(ConfigurePageRP response) {
+                setBackgroundImageUrl(response.getPageDetails().getPageBackground(), response.getPageDetails().getPageWidth(), response.getPageDetails().getPageHeight());
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                Toast.makeText(getContext(), "Error while configuring page", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    boolean loadCacheImage(boolean loadPoints, boolean forceRefreshPoints) {
+        if (previousDrawPath != null || cachedBmp != null || currentPageNumber == -1) return false;
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Bitmap mBitmap = CacheUtils.loadCanvasBitmapFromStorage(getContext(), currentPageNumber);
                 cachedBmp = mBitmap;
+                if (cachedBmp != null){
+                    invalidate();
+                }
+                if (loadPoints && (forceRefreshPoints || cachedBmp == null)){
+                    downloadPoints();
+                }
             }
         }).start();
+
+        return true;
+    }
+
+    private void downloadPoints() {
+        final int tempPage = currentPageNumber;
+        APIMethods.getPage(getContext(), tempPage, new APIResponseListener<Page>() {
+            @Override
+            public void success(Page response) {
+                if (currentPageNumber == tempPage){
+                    addCoordinates(response.getPoints());
+                }
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                Toast.makeText(getContext(), "Some error occurred while loading page: " + tempPage, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void saveBitmapToStorage(Bitmap bitmap) {
+        Log.i("Cache: ", "Save Called");
         if (currentPageNumber == -1) return;
+        Log.i("Cache: ", "Page is not -1");
         CacheUtils.saveCanvasBitmap(getContext(), bitmap, currentPageNumber);
     }
 
@@ -240,6 +298,7 @@ public class NotepadView extends View {
 
 
     private void redraw(){
+        //It invalidates as well as caches the image.
         invalidate();
         if (previousDrawPath != null || currentLivePath != null) {
             if (saveRunnable != null) {

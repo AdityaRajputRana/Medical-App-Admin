@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.example.medicalappadmin.Models.FileMetadata;
+import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -52,6 +53,11 @@ import java.util.ArrayList;
 
 
 public class APIMethods {
+
+    public static void getPage(Context context, int pageNumber, APIResponseListener<Page> listener){
+        InitialisePageReq req = new InitialisePageReq(pageNumber);
+        API.postData(listener, req, EndPoints.getPage, Page.class, context);
+    }
 
     public static void homePage(Context context, APIResponseListener<HomePageRP> listener){
         API.postData(listener,new EmptyReq(), EndPoints.homePage, HomePageRP.class, context);
