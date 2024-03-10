@@ -10,7 +10,7 @@ public class VolleyClient {
     public static String BASE_URL = "https://medicalappmangal.onrender.com/";
 
     public static String getBaseUrl() {
-        if (true)
+        if (false)
             return testURL;
         return BASE_URL;
     }

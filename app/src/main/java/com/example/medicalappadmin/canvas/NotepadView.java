@@ -45,8 +45,6 @@ public class NotepadView extends View {
 
     private Paint paint;
     float scaleFactor = 1f;
-    ScaleGestureDetector scaleGestureDetector;
-    GestureDetector gestureDetector;
     private float translateX = 0;
     private float translateY = 0;
     private Bitmap prescriptionBg;
@@ -73,6 +71,7 @@ public class NotepadView extends View {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
+        scaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
     }
     public void setBackgroundImageUrl(String imageUrl,int width, int height) {
         loadImage(imageUrl);
@@ -115,8 +114,8 @@ public class NotepadView extends View {
         int height = getHeight();
 
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
         Canvas canvas = new Canvas(bitmap);
+        canvas.scale(1f/zoomScaleFactor, 1f/zoomScaleFactor);
         draw(canvas);
 
         return bitmap;
@@ -129,6 +128,7 @@ public class NotepadView extends View {
         super.onDraw(canvas);
 
         canvas.scale(scaleFactor, scaleFactor);
+        canvas.scale(zoomScaleFactor, zoomScaleFactor);
 
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.LTGRAY);
@@ -152,7 +152,9 @@ public class NotepadView extends View {
             canvas.drawPath(currentLivePath, paint);
         }
 
-        Log.i("Canvas", "Scaled to " + scaleFactor);
+        Log.i("L:Canvas", "ScaleFactor = " + scaleFactor);
+        Log.i("L:Canvas", "ZoomFactor = " + zoomScaleFactor);
+
 
     }
 
@@ -194,6 +196,7 @@ public class NotepadView extends View {
         currentLivePath = null;
         cachedBmp = null;
         currentPageNumber = pageNumber;
+        zoomScaleFactor = 1f;
         configurePage();
         loadCacheImage(loadPoints, forceRefreshPoints);
         invalidate();
@@ -250,9 +253,7 @@ public class NotepadView extends View {
     }
 
     private void saveBitmapToStorage(Bitmap bitmap) {
-        Log.i("Cache: ", "Save Called");
         if (currentPageNumber == -1) return;
-        Log.i("Cache: ", "Page is not -1");
         CacheUtils.saveCanvasBitmap(getContext(), bitmap, currentPageNumber);
     }
 
@@ -312,6 +313,27 @@ public class NotepadView extends View {
                 }
             };
             debounceHandler.postDelayed(saveRunnable, DEBOUNCE_DELAY);
+        }
+    }
+
+
+    float zoomScaleFactor = 1f;
+    private ScaleGestureDetector scaleGestureDetector;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        scaleGestureDetector.onTouchEvent(event);
+        return true;
+    }
+
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            zoomScaleFactor *= detector.getScaleFactor();
+
+            scaleFactor = Math.max(0.1f, Math.min(scaleFactor, 5.0f));
+            invalidate();
+            return true;
         }
     }
 
