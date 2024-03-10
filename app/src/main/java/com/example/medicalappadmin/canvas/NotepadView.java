@@ -143,8 +143,7 @@ public class NotepadView extends View {
         if (previousDrawPath != null){
             canvas.drawPath(previousDrawPath, paint);
         } else if (cachedBmp != null){
-            Rect cacheDst = new Rect(getLeft(), getTop(), (int) (getWidth()/scaleFactor), (int) (getHeight()/scaleFactor));
-            canvas.drawBitmap(cachedBmp, null,cacheDst, new Paint());
+            canvas.drawBitmap(cachedBmp, null,dst, new Paint());
         }
 
 
@@ -224,6 +223,8 @@ public class NotepadView extends View {
                 Bitmap mBitmap = CacheUtils.loadCanvasBitmapFromStorage(getContext(), currentPageNumber);
                 cachedBmp = mBitmap;
                 if (cachedBmp != null){
+                    Log.i("L:Cache", "Width = " + cachedBmp.getWidth());
+                    Log.i("L:Cache", "Height = " + cachedBmp.getHeight());
                     invalidate();
                 }
                 if (loadPoints && (forceRefreshPoints || cachedBmp == null)){
