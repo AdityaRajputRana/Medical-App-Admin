@@ -11,9 +11,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.medicalappadmin.R;
-import com.example.medicalappadmin.canvas.DetailedPageView;
 import com.example.medicalappadmin.canvas.NotepadView;
-import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 
 public class PageAdapter extends PagerAdapter {

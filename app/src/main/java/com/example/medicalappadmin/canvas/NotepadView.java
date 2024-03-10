@@ -17,7 +17,13 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -45,8 +51,6 @@ public class NotepadView extends View {
 
     private Paint paint;
     float scaleFactor = 1f;
-    ScaleGestureDetector scaleGestureDetector;
-    GestureDetector gestureDetector;
     private float translateX = 0;
     private float translateY = 0;
     private Bitmap prescriptionBg;
@@ -73,6 +77,7 @@ public class NotepadView extends View {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
+        scaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
     }
     public void setBackgroundImageUrl(String imageUrl,int width, int height) {
         loadImage(imageUrl);
@@ -115,8 +120,9 @@ public class NotepadView extends View {
         int height = getHeight();
 
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
         Canvas canvas = new Canvas(bitmap);
+        canvas.scale(1f/zoomScaleFactor, 1f/zoomScaleFactor);
+        canvas.translate(-tDx, -tDy);
         draw(canvas);
 
         return bitmap;
@@ -128,7 +134,13 @@ public class NotepadView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.scale(scaleFactor, scaleFactor);
+        canvas.save();
+        canvas.translate(tDx, tDy);
+
+        float jointScaleFactor = scaleFactor*zoomScaleFactor;
+
+
+        canvas.scale(jointScaleFactor, jointScaleFactor);
 
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.LTGRAY);
@@ -143,28 +155,26 @@ public class NotepadView extends View {
         if (previousDrawPath != null){
             canvas.drawPath(previousDrawPath, paint);
         } else if (cachedBmp != null){
-            Rect cacheDst = new Rect(getLeft(), getTop(), (int) (getWidth()/scaleFactor), (int) (getHeight()/scaleFactor));
-            canvas.drawBitmap(cachedBmp, null,cacheDst, new Paint());
+            canvas.drawBitmap(cachedBmp, null,dst, new Paint());
         }
 
 
         if (currentLivePath != null){
             canvas.drawPath(currentLivePath, paint);
         }
+        canvas.restore();
 
-        Log.i("Canvas", "Scaled to " + scaleFactor);
-
+        Log.i("Scaling:", "Zoom Factor = " + zoomScaleFactor);
+        Log.i("Scaling:", "Scale Factor = " + scaleFactor);
     }
 
 
     float currentLiveX  =0f;
     float currentLiveY = 0f;
     public void addCoordinate(float x, float y, int actionType) {
-        Log.i("Optimiz", "Add Co-ordinate called");
         if (currentLivePath == null)
             currentLivePath = new Path();
 
-        Log.i("drawingCoordinate", "x: " + x + " y: " + y + " actionType: " + actionType);
         if(actionType == 1){
             currentLivePath.moveTo(x, y);
         } else {
@@ -175,7 +185,6 @@ public class NotepadView extends View {
         currentLiveY = y;
         Handler mainHandler = new Handler(Looper.getMainLooper());
         mainHandler.post(()->{
-            Log.i("Optimi", "Calling invalidate");
             redraw();
         });
     }
@@ -194,6 +203,11 @@ public class NotepadView extends View {
         currentLivePath = null;
         cachedBmp = null;
         currentPageNumber = pageNumber;
+        tDx = 0f;
+        tDy = 0f;
+        tOldY = -1f;
+        tOldX = -1f;
+        zoomScaleFactor = 1f;
         configurePage();
         loadCacheImage(loadPoints, forceRefreshPoints);
         invalidate();
@@ -221,6 +235,8 @@ public class NotepadView extends View {
                 Bitmap mBitmap = CacheUtils.loadCanvasBitmapFromStorage(getContext(), currentPageNumber);
                 cachedBmp = mBitmap;
                 if (cachedBmp != null){
+                    Log.i("L:Cache", "Width = " + cachedBmp.getWidth());
+                    Log.i("L:Cache", "Height = " + cachedBmp.getHeight());
                     invalidate();
                 }
                 if (loadPoints && (forceRefreshPoints || cachedBmp == null)){
@@ -250,9 +266,7 @@ public class NotepadView extends View {
     }
 
     private void saveBitmapToStorage(Bitmap bitmap) {
-        Log.i("Cache: ", "Save Called");
         if (currentPageNumber == -1) return;
-        Log.i("Cache: ", "Page is not -1");
         CacheUtils.saveCanvasBitmap(getContext(), bitmap, currentPageNumber);
     }
 
@@ -312,6 +326,83 @@ public class NotepadView extends View {
                 }
             };
             debounceHandler.postDelayed(saveRunnable, DEBOUNCE_DELAY);
+        }
+    }
+
+
+    float zoomScaleFactor = 1f;
+    private float focusX = 0f;
+    private float focusY = 0f;
+    private ScaleGestureDetector scaleGestureDetector;
+
+    float tOldX = -1f;
+    float tOldY = -1f;
+
+    float tDx = 0f;
+    float tDy = 0f;
+
+    boolean isScaling = false;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.i("Gesture: ", "onTouch");
+        scaleGestureDetector.onTouchEvent(event);
+        if (isScaling) return true;
+        ViewParent view = getParent().getParent().getParent();
+        if (zoomScaleFactor <= 1.1f){
+            view.requestDisallowInterceptTouchEvent(false);
+            return true;
+        }
+        view.requestDisallowInterceptTouchEvent(true);
+        if (event.getAction() == MotionEvent.ACTION_DOWN){
+            tOldX = event.getX();
+            tOldY = event.getY();
+            return true;
+        } else if (event.getAction() == MotionEvent.ACTION_UP){
+            tOldX = -1f;
+            tOldY = -1f;
+            return true;
+        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            if (tOldX != -1f && tOldY != -1f){
+                tDx += event.getX() - tOldX;
+                tDy += event.getY() - tOldY;
+                invalidate();
+            }
+            tOldX = event.getX();
+            tOldY = event.getY();
+            return true;
+        }
+        view.requestDisallowInterceptTouchEvent(false);
+        return true;
+    }
+
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            Log.i("Gesture: ", "onScale");
+            zoomScaleFactor *= detector.getScaleFactor();
+
+            focusX = detector.getFocusX();
+            focusY = detector.getFocusY();
+
+
+            zoomScaleFactor = Math.max(0.1f, Math.min(zoomScaleFactor, 5.0f));
+
+
+            invalidate();
+            return true;
+        }
+
+        @Override
+        public boolean onScaleBegin(@NonNull ScaleGestureDetector detector) {
+            isScaling = true;
+            return super.onScaleBegin(detector);
+        }
+
+        @Override
+        public void onScaleEnd(@NonNull ScaleGestureDetector detector) {
+            isScaling = false;
+            super.onScaleEnd(detector);
         }
     }
 
