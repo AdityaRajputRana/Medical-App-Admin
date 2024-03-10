@@ -349,7 +349,7 @@ public class NotepadView extends View {
         scaleGestureDetector.onTouchEvent(event);
         if (isScaling) return true;
         ViewParent view = getParent().getParent().getParent();
-        if (zoomScaleFactor <= 1.1f){
+        if (view instanceof ViewPager && zoomScaleFactor <= 1.1f){
             view.requestDisallowInterceptTouchEvent(false);
             return true;
         }
