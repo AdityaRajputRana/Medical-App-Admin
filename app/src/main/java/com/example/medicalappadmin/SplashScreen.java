@@ -11,6 +11,7 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         String jwt = SplashScreen.this.getSharedPreferences("MY_PREF", MODE_PRIVATE)
                 .getString("JWT_TOKEN","");
 

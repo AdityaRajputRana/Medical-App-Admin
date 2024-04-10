@@ -24,4 +24,15 @@
     <color name="colorInactiveGray">#B0B0B0</color>
     <color name="colorActiveGreen">#4CAF50</color>
 
+
+    //COLOR Panel
+
+    <color name="primary700">#18A0FB</color>
+    <color name="naturalLight">#C8D5E1</color>
+    <color name="naturalDark">#11182E</color>
+    <color name="success">#016E47</color>
+    <color name="error">#EF4444</color>
+
+
+
 </resources>
