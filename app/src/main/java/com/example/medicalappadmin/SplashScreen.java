@@ -15,6 +15,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnticipateInterpolator;
 
+import com.example.medicalappadmin.Tools.Const;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.databinding.ActivitySplashBinding;
 
@@ -101,7 +102,12 @@ public class SplashScreen extends AppCompatActivity {
         if(!jwt.equals("")){
             startActivity(new Intent(this, DashboardActivity.class));
         } else {
-            startActivity(new Intent(this, LoginActivity.class));
+            boolean isWalkThrough = SplashScreen.this.getSharedPreferences("MY_PREF", MODE_PRIVATE).getBoolean(Const.isWalkThroughComplete, false);
+            if (isWalkThrough){
+                startActivity(new Intent(this, LoginActivity.class));
+            } else {
+                startActivity(new Intent(this, WalkThroughActivity.class));
+            }
         }
         finish();
     }
