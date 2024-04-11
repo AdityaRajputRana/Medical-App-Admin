@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -30,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        Methods.setStatusBarColor(getColor(R.color.colorCta),LoginActivity.this);
+        Methods.setStatusBarColor(Color.TRANSPARENT,LoginActivity.this);
         binding.etPasswordLogin.setOnFocusChangeListener((view, hasFocus) -> {
             if (hasFocus) {
                 binding.passInputLayout.setHint("");

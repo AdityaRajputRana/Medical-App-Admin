@@ -3,9 +3,11 @@ package com.example.medicalappadmin;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import com.example.medicalappadmin.Tools.Const;
+import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.databinding.ActivityWalkThroughBinding;
 
 public class WalkThroughActivity extends AppCompatActivity {
@@ -17,7 +19,7 @@ public class WalkThroughActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityWalkThroughBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        Methods.setStatusBarColor(Color.TRANSPARENT, WalkThroughActivity.this);
         binding.getStartedBtn.setOnClickListener(view -> startLoginActivity());
     }
 

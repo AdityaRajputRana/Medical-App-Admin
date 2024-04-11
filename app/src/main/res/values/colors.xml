@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
     //colors
     <color name="offWhite">#EEF6FC</color>
     <color name="blue">#3C79A5</color>
@@ -27,6 +25,11 @@
 
     //COLOR Panel
 
+    <color name="black">#111111</color>
+    <color name="white">#FEFEFE</color>
+
+    <color name="hintColor">#94A3B8</color>
+
     <color name="primary700">#18A0FB</color>
     <color name="naturalLight">#C8D5E1</color>
     <color name="natural50">#FBFAFC</color>
@@ -35,6 +38,9 @@
     <color name="error">#EF4444</color>
     <color name="natural800">#11182E</color>
     <color name="natural500">#526780</color>
+    <color name="natural100">#F1F5F9</color>
+    <color name="natural700">#203144</color>
+    <color name="natural300">#C8D5E1</color>
 
 
 </resources>
