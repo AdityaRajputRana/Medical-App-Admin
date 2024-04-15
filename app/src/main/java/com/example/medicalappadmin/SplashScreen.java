@@ -28,7 +28,6 @@ public class SplashScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySplashBinding.inflate(getLayoutInflater());
-        Methods.setStatusBarColor(getColor(R.color.primary700),SplashScreen.this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             getSplashScreen().setOnExitAnimationListener(splashScreenView -> {
                 ObjectAnimator animator = ObjectAnimator.ofFloat(splashScreenView, "alpha", 1f, 0f);
@@ -43,15 +42,12 @@ public class SplashScreen extends AppCompatActivity {
                 animator.start();
             });
         }
-
         setContentView(binding.getRoot());
+        Methods.setStatusBarColor(Color.TRANSPARENT, SplashScreen.this);
         binding.getRoot().post(()->startAnimation());
     }
 
     private void startAnimation() {
-
-
-        Methods.setStatusBarColor(Color.TRANSPARENT, SplashScreen.this);
 
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         int screenWidth = displayMetrics.widthPixels;
@@ -63,14 +59,14 @@ public class SplashScreen extends AppCompatActivity {
         binding.circleView.animate()
                         .alpha(1f)
                         .setStartDelay(100)
-                        .setDuration(300)
+                        .setDuration(450)
                         .start();
         binding.circleView.animate()
                 .scaleX(actualScale)
                 .scaleY(actualScale)
                 .setInterpolator(new AccelerateInterpolator(2.5f))
-                .setDuration(600)
-                .setStartDelay(100)
+                .setDuration(950)
+                .setStartDelay(200)
                 .setStartDelay(0)
                 .start();
 
@@ -78,8 +74,8 @@ public class SplashScreen extends AppCompatActivity {
                 getColor(R.color.natural50),
                 getColor(R.color.primary700));
         colorAnimation
-                .setDuration(400)
-                .setStartDelay(150);
+                .setDuration(700)
+                .setStartDelay(250);
 
         colorAnimation.start();
 
@@ -92,7 +88,7 @@ public class SplashScreen extends AppCompatActivity {
                 startApp();
             }
         };
-        handler.postDelayed(runnable, 1000);
+        handler.postDelayed(runnable, 1500);
     }
 
     private void startApp() {

@@ -347,7 +347,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         super.onCreate(savedInstanceState);
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        Methods.setStatusBarColor(Color.TRANSPARENT, DashboardActivity.this);
+        Methods.setStatusBarColor(getColor(R.color.colorStatusBar), DashboardActivity.this);
 
         binding.bottomNavigationView.setItemIconTintList(null);
         changeFragment(0);

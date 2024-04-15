@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -127,8 +128,37 @@ public class Methods {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
+    public static void setStatusBarColor(int color, AppCompatActivity compatActivity){
+        setStatusBarColor(color, true, compatActivity);
+    }
 
-    public static void setStatusBarColor(int color, AppCompatActivity activity) {
+    public static void setStatusBarColor(int color, boolean isLight, AppCompatActivity activity) {
+        Window window = activity.getWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            final WindowInsetsController insetsController = window.getInsetsController();
+            if (insetsController != null) {
+                if (color == Color.TRANSPARENT) {
+                    insetsController.setSystemBarsAppearance(isLight ? WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS : 0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+                    window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                } else {
+                    insetsController.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.setStatusBarColor(color);
+                }
+            }
+        } else {
+            if (color == Color.TRANSPARENT) {
+                window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    window.setStatusBarColor(color);
+                }
+            }
+        }
+    }
+    public static void setStatusBarColorOld(int color, AppCompatActivity activity) {
         if (color == Color.TRANSPARENT){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 Window w = activity.getWindow();

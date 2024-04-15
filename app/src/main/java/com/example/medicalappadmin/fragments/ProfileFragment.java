@@ -52,7 +52,6 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         if (binding == null){
             binding = FragmentProfileBinding.inflate(inflater);
-            Methods.setStatusBarColor(requireActivity().getColor(R.color.colorStatusBar), (AppCompatActivity) requireActivity());
             loadData();
             loadUI();
             setListeners();

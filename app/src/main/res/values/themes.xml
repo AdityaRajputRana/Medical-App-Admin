@@ -7,7 +7,6 @@
     <style name="Theme.MedicalAppAdmin" parent="Base.Theme.MedicalAppAdmin" >
         <item name="android:statusBarColor">@color/colorBackground</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:progressTint">@color/primary700</item>
         <item name="android:windowSplashScreenBackground">@color/primary700</item>

@@ -10,7 +10,6 @@
     <color name="color_secondary_text">#464A4C</color>
 
 
-    <color name="colorStatusBar">#f1efee</color>
     <color name="colorPrimTxt">#383838</color>
     <color name="colorSecTxt">#5D5D5D</color>
     <color name="colorCta">#1C6BA4</color>
@@ -28,6 +27,9 @@
     <color name="black">#111111</color>
     <color name="white">#FEFEFE</color>
 
+    <color name="colorStatusBar">#FEFEFE</color>
+
+
     <color name="hintColor">#94A3B8</color>
 
     <color name="primary700">#18A0FB</color>
@@ -41,6 +43,7 @@
     <color name="natural100">#F1F5F9</color>
     <color name="natural700">#203144</color>
     <color name="natural300">#C8D5E1</color>
+    <color name="natural400">#94A3B8</color>
 
 
 </resources>
