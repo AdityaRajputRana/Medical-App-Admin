@@ -132,32 +132,50 @@ public class Methods {
         setStatusBarColor(color, true, compatActivity);
     }
 
+
     public static void setStatusBarColor(int color, boolean isLight, AppCompatActivity activity) {
         Window window = activity.getWindow();
+        View decorView = window.getDecorView();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             final WindowInsetsController insetsController = window.getInsetsController();
             if (insetsController != null) {
                 if (color == Color.TRANSPARENT) {
                     insetsController.setSystemBarsAppearance(isLight ? WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS : 0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
                     window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                    decorView.setPadding(0, 0, 0, 0);
                 } else {
                     insetsController.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
                     window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                     window.setStatusBarColor(color);
+                    int statusBarHeight = getStatusBarHeight(activity);
+                    decorView.setPadding(0, statusBarHeight, 0, 0);
                 }
             }
         } else {
             if (color == Color.TRANSPARENT) {
                 window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                decorView.setPadding(0, 0, 0, 0);
             } else {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     window.setStatusBarColor(color);
+                    int statusBarHeight = getStatusBarHeight(activity);
+                    decorView.setPadding(0, statusBarHeight, 0, 0);
                 }
             }
         }
     }
+
+    private static int getStatusBarHeight(AppCompatActivity activity) {
+        int result = 0;
+        int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = activity.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
     public static void setStatusBarColorOld(int color, AppCompatActivity activity) {
         if (color == Color.TRANSPARENT){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
