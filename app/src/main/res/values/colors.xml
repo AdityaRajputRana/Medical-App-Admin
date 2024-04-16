@@ -48,6 +48,7 @@
     <color name="error700">#AA0107</color>
     <color name="error50">#FEF2F2</color>
     <color name="success500">#02B772</color>
+    <color name="primary50">#DEF2FF</color>
 
 
 </resources>

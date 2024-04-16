@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="4dp"
-    android:background="@drawable/bg_main"
-    android:orientation="horizontal"
+    android:layout_height="100dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="8dp"
+    app:cardBackgroundColor="@color/natural50"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="0dp"
     android:padding="8dp">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-
+        <ImageView
+            android:scaleType="centerCrop"
+            android:id="@+id/thumbnailView"
+            android:background="@color/gray"
+            android:layout_width="90dp"
+            android:layout_height="match_parent"/>
 
     <LinearLayout
+        android:layout_marginStart="8dp"
         android:id="@+id/llGuide"
         android:visibility="visible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:layout_gravity="center">
+        android:layout_gravity="top">
         <TextView
             android:id="@+id/tvGuideName"
             android:layout_width="match_parent"
@@ -25,6 +38,7 @@
             android:fontFamily="@font/poppins_semibold"
             android:gravity="center_vertical"
             android:text="Name"
+            android:maxLines="2"
             android:textSize="16sp" />
 
         <TextView
@@ -34,6 +48,7 @@
             android:fontFamily="@font/poppins_medium"
             android:gravity="center_vertical"
             android:text="Extra details"
+            android:maxLines="2"
             android:textColor="@color/color_secondary_text"
             android:textSize="16sp" />
     </LinearLayout>
@@ -47,5 +62,7 @@
         app:srcCompat="@drawable/rearrange"
 />
 
+    </LinearLayout>
 
-</LinearLayout>
+
+</androidx.cardview.widget.CardView>
