@@ -44,6 +44,10 @@
     <color name="natural700">#203144</color>
     <color name="natural300">#C8D5E1</color>
     <color name="natural400">#94A3B8</color>
+    <color name="natural600">#35455B</color>
+    <color name="error700">#AA0107</color>
+    <color name="error50">#FEF2F2</color>
+    <color name="success500">#02B772</color>
 
 
 </resources>

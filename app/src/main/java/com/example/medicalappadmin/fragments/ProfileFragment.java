@@ -4,6 +4,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -88,17 +89,15 @@ public class ProfileFragment extends Fragment {
 
     private void updatePenConnectionStatus() {
         isPenConnected = PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue();
-        String message = isPenConnected?"Disconnect Pen" : "Connect To Smart Pen";
-        binding.penActionBtn.setText(message);
+        int colorId = isPenConnected ? R.color.white : R.color.error700;
+        int bgColor = isPenConnected ? R.color.success500 : R.color.error50;
+        binding.penActionBtn.setBackgroundColor(getActivity().getColor(bgColor));
+        binding.penActionBtn.setForegroundTintList(ColorStateList.valueOf(getActivity().getColor(bgColor)));
     }
 
     private void loadUI() {
         binding.nameTxt.setText(user.getName());
         binding.staffTypeTxt.setText(user.getType());
-        Picasso.get()
-                .load(user.getDisplayPicture())
-                .transform(new CircleTransformation())
-                .into(binding.profileDPImg);
 
         updatePenConnectionStatus();
     }
