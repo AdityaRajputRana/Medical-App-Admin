@@ -10,10 +10,24 @@
         android:id="@+id/mainFrameLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintBottom_toTopOf="@+id/bottomCardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bottomCardView"
+        android:layout_width="match_parent"
+        app:cardElevation="0dp"
+        android:elevation="20dp"
+        app:cardCornerRadius="0dp"
+        app:strokeWidth="0.5dp"
+        app:cardBackgroundColor="@color/white"
+        app:strokeColor="@color/natural300"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="wrap_content">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -22,12 +36,11 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:paddingTop="10dp"
-        android:paddingBottom="15dp"
+        android:paddingBottom="10dp"
         app:compatShadowEnabled="true"
         android:elevation="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_menu" />
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
