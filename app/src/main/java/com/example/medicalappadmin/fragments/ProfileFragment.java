@@ -22,6 +22,7 @@ import com.example.medicalappadmin.Tools.CacheUtils;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.Transformations.CircleTransformation;
 import com.example.medicalappadmin.VideoSettingsActivity;
+import com.example.medicalappadmin.components.ConfirmationBottomSheet;
 import com.example.medicalappadmin.databinding.FragmentProfileBinding;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -103,13 +104,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void confirmLogout(){
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Confirm Logout")
-                .setMessage("Are you sure you want to log out of the app?")
-                .setPositiveButton("Logout", (dialogInterface, i) -> logout())
-                .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss())
-                .setCancelable(true)
-                .show();
+        ConfirmationBottomSheet.confirmLogout(getActivity(), view->logout());
     }
 
     private void logout() {
