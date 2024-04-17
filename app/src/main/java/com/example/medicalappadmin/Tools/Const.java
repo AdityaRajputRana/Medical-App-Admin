@@ -6,4 +6,5 @@ public class Const {
 
     public static String patientFilter = "PT_FILTER";
     public static String patientFilterSearch = "SEARCH_ONLY";
+    public static String searchQuery = "SEARCH_QUERY";
 }

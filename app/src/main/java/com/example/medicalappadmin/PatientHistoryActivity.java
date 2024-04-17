@@ -5,8 +5,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.medicalappadmin.Tools.Const;
@@ -36,7 +39,7 @@ public class PatientHistoryActivity extends AppCompatActivity {
         binding = ActivityPatientHistoryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         
-        
+        preProcessUI();
         processFilter();
         binding.pbPatientHistory.setVisibility(View.GONE);
 
@@ -75,6 +78,13 @@ public class PatientHistoryActivity extends AppCompatActivity {
 
     }
 
+    private void preProcessUI() {
+        String query = getIntent().getStringExtra(Const.searchQuery);
+        if (query != null && !query.isEmpty()){
+            binding.searchPatientEt.setText(query);
+        }
+    }
+
     private void processFilter() {
         String filter = getIntent().getStringExtra(Const.patientFilter);
         if (filter == null) return;
@@ -89,6 +99,23 @@ public class PatientHistoryActivity extends AppCompatActivity {
         binding.btnGoBack.setOnClickListener(view -> {
             finish();
         });
+
+        binding.searchPatientEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    performSearch(v.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void performSearch(String searchQuery) {
+        Intent intent = new Intent(this, PatientHistoryActivity.class);
+        intent.putExtra(Const.searchQuery, searchQuery);
+        startActivity(intent);
     }
 
 
@@ -101,7 +128,7 @@ public class PatientHistoryActivity extends AppCompatActivity {
             }
 
             binding.pbPatientHistory.setVisibility(View.VISIBLE);
-            APIMethods.loadPatientsList(this, cPage, new APIResponseListener<PatientListRP>() {
+            APIMethods.loadPatientsList(this, cPage, getIntent().getStringExtra(Const.searchQuery), new APIResponseListener<PatientListRP>() {
                 @Override
                 public void success(PatientListRP response) {
 

@@ -58,6 +58,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cornerRadius="10dp"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
                     app:layout_constraintTop_toBottomOf="@id/backBtn"
                     android:textAlignment="viewStart"
                     app:rippleColor="@color/natural200"

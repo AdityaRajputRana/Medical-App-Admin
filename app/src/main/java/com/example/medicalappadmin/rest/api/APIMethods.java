@@ -156,6 +156,13 @@ public class APIMethods {
         API.postData(listener, req, EndPoints.patientList, PatientListRP.class, context);
     }
 
+    public static void loadPatientsList(Context context, int pageNumber, String searchQuery,  APIResponseListener<PatientListRP> listener) {
+        PatientListReq req = new PatientListReq(pageNumber, searchQuery);
+        API.postData(listener, req, EndPoints.patientList, PatientListRP.class, context);
+    }
+
+
+
     public static void viewPatient(Context context, String patientId, APIResponseListener<ViewPatientRP> listener) {
          ViewPatientReq req = new ViewPatientReq(patientId);
         API.postData(listener, req, EndPoints.viewPatient, ViewPatientRP.class, context);
