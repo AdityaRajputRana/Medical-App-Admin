@@ -25,6 +25,7 @@ import com.example.medicalappadmin.PatientHistoryActivity;
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PrescriptionActivity;
 import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.Tools.Const;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.HomePageRP;
@@ -46,21 +47,10 @@ public class HomeFragment extends Fragment {
     private ImageButton penButton;
     private TextView tvGreeting;
     private TextView tvDoctorName;
-    private TextView tvTotal;
-    private TextView tvTotalMale;
-    private TextView tvTotalFemale;
-    private TextView tvTodayTotal;
-    private TextView tvTodayMale;
-    private TextView tvTodayFemale;
-    private ImageView ivProfilePic;
-    private PieChart pieChartTotal;
-    private PieChart pieChartToday;
-    private User user;
-    private ConstraintLayout clHome;
-    private LinearLayout llAnalytics;
-    private LinearLayout llToday;
     private HomePageRP homePageRP;
     private ShimmerFrameLayout shimmerContainer;
+
+    private View searchPatientBtn;
     public HomeFragment(Context context) {
         if (context instanceof CallBacksListener) {
             listener = (CallBacksListener) context;
@@ -83,20 +73,9 @@ public class HomeFragment extends Fragment {
         penButton = view.findViewById(R.id.penStatusBtn);
         tvDoctorName = view.findViewById(R.id.tvDoctorName);
         tvGreeting = view.findViewById(R.id.tvGreeting);
-        ivProfilePic = view.findViewById(R.id.ivProfilePic);
-        pieChartTotal = view.findViewById(R.id.pieChartTotal);
-        tvTotal = view.findViewById(R.id.tvTotal);
-        tvTotalMale = view.findViewById(R.id.tvTotalMale);
-        tvTotalFemale = view.findViewById(R.id.tvTotalFemale);
-        tvTodayTotal = view.findViewById(R.id.tvTotalToday);
-        tvTodayMale = view.findViewById(R.id.tvTodayMale);
-        tvTodayFemale = view.findViewById(R.id.tvTodayFemale);
-        pieChartToday = view.findViewById(R.id.pieChartToday);
-        clHome = view.findViewById(R.id.clHome);
         shimmerContainer = view.findViewById(R.id.shimmerContainer);
-        llAnalytics = view.findViewById(R.id.llAnalytics);
-        llToday = view.findViewById(R.id.llTodayAnalytics);
 
+        searchPatientBtn = view.findViewById(R.id.searchPatientBtn);
         return view;
     }
 
@@ -114,6 +93,14 @@ public class HomeFragment extends Fragment {
     }
 
     private void setListeners() {
+        searchPatientBtn.setOnClickListener(btn->{
+            Intent i = new Intent(getActivity(), PatientHistoryActivity.class);
+            i.putExtra(Const.patientFilter, Const.patientFilterSearch);
+            getActivity().startActivity(i);
+        });
+
+
+
         btnAddNewPatient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -184,7 +171,6 @@ public class HomeFragment extends Fragment {
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 tvDoctorName.setVisibility(View.GONE);
                 setGreeting();
-                llAnalytics.setVisibility(View.GONE);
                 Log.i("Home", "fail: " + message);
             }
         });
@@ -197,45 +183,7 @@ public class HomeFragment extends Fragment {
             shimmerContainer.stopShimmer();
             shimmerContainer.hideShimmer();
             tvDoctorName.setText(homePageRP.getStaffDetails().getFullName());
-            tvTotal.setText("Total Patients : " + homePageRP.getAnalytics().getTotal().getCount());
-            tvTotalMale.setText("Males : " + homePageRP.getAnalytics().getTotal().getMale());
-            tvTotalFemale.setText("Females : " + homePageRP.getAnalytics().getTotal().getFemale());
-            pieChartTotal.addPieSlice(
-                    new PieModel(
-                            "Male", homePageRP.getAnalytics().getTotal().getMale(), Color.parseColor("#90ee90")
-                    )
-            );
-            pieChartTotal.addPieSlice(
-                    new PieModel(
-                            "Female", homePageRP.getAnalytics().getTotal().getFemale(), Color.parseColor("#FFB6C1")
-                    )
-            );
-            pieChartTotal.animate();
-            if (getActivity() != null)
-                pieChartTotal.setInnerPaddingColor(getActivity().getColor(R.color.colorBackground));
-
-            if (homePageRP.getAnalytics().getTodaySoFar().getCount() != 0) {
-                llToday.setVisibility(View.VISIBLE);
-                tvTodayTotal.setText("Total Patients : " + homePageRP.getAnalytics().getTodaySoFar().getCount());
-                tvTodayMale.setText("Males : " + homePageRP.getAnalytics().getTodaySoFar().getMale());
-                tvTodayFemale.setText("Females : " + homePageRP.getAnalytics().getTodaySoFar().getFemale());
-                pieChartToday.addPieSlice(
-                        new PieModel(
-                                "Male", homePageRP.getAnalytics().getTodaySoFar().getMale(), Color.parseColor("#90ee90")
-                        )
-                );
-                pieChartToday.addPieSlice(
-                        new PieModel(
-                                "Female", homePageRP.getAnalytics().getTodaySoFar().getFemale(), Color.parseColor("#FFB6C1")
-                        )
-                );
-                pieChartTotal.animate();
-                pieChartTotal.setInnerPaddingColor(getActivity().getColor(R.color.colorBackground));
-
             }
-        } else {
-            llAnalytics.setVisibility(View.GONE);
-        }
     }
 
     public interface CallBacksListener {

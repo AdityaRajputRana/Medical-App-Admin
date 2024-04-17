@@ -6,7 +6,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.example.medicalappadmin.Tools.Const;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.PatientListAdapter;
 import com.example.medicalappadmin.databinding.ActivityPatientHistoryBinding;
@@ -32,6 +35,9 @@ public class PatientHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityPatientHistoryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        
+        
+        processFilter();
         binding.pbPatientHistory.setVisibility(View.GONE);
 
 
@@ -47,17 +53,6 @@ public class PatientHistoryActivity extends AppCompatActivity {
         binding.rcvPatients.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
-                    if (binding.llTopStrip.getVisibility() == View.VISIBLE) {
-                        binding.llTopStrip.setVisibility(View.INVISIBLE);
-                    }
-                }
-
-                if (manager.findFirstCompletelyVisibleItemPosition() == 1) {
-                    if (binding.llTopStrip.getVisibility() != View.VISIBLE) {
-                        binding.llTopStrip.setVisibility(View.VISIBLE);
-                    }
-                }
 
                 if (manager.findLastCompletelyVisibleItemPosition() == loadedPatients - 1) {
                     if (binding.pbPatientHistory.getVisibility() != View.VISIBLE) {
@@ -70,23 +65,24 @@ public class PatientHistoryActivity extends AppCompatActivity {
 
 
 
-        binding.ibPatientBackBtn.setOnClickListener(new View.OnClickListener() {
+        binding.backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
 
-        binding.tvTemp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(PatientHistoryActivity.this, PatientDetailedHistoryActivity.class);
-                startActivity(i);
-                finish();
-            }
-        });
 
+    }
 
+    private void processFilter() {
+        String filter = getIntent().getStringExtra(Const.patientFilter);
+        if (filter == null) return;
+        
+        if (filter.contains(Const.patientFilterSearch)){
+            binding.searchPatientEt.requestFocus();
+            Methods.showKeyboardOnLaunch(this);
+        }
     }
 
     private void setListeners() {
@@ -143,8 +139,6 @@ public class PatientHistoryActivity extends AppCompatActivity {
 
                             @Override
                             public void onShareClicked() {
-                                //TODO share patient
-
                                 PatientListAdapter.PatientListener.super.onShareClicked();
                             }
                         });
