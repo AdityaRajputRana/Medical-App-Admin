@@ -34,6 +34,7 @@ import com.example.medicalappadmin.databinding.ActivityDashboardBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
 import com.example.medicalappadmin.fragments.HomeFragment;
 import com.example.medicalappadmin.fragments.NotepadFragment;
+import com.example.medicalappadmin.fragments.PatientsFragment;
 import com.example.medicalappadmin.fragments.ProfileFragment;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -361,6 +362,8 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
                 }
                 else if(item.getItemId() == R.id.profile){
                     changeFragment(1);
+                } else if (item.getItemId() == R.id.patients){
+                    changeFragment(2);
                 }
                 return true;
             }
@@ -399,6 +402,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
     private final HomeFragment homeFragment = new HomeFragment(this);
     private final  ProfileFragment profileFragment = new ProfileFragment(this);
+    private final PatientsFragment patientsFragment = new PatientsFragment();
 
 
     private void changeFragment(int i){
@@ -407,6 +411,10 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
             case 1:
                 fragment = profileFragment;
                 break;
+            case 2:
+                fragment = patientsFragment;
+                break;
+
         }
 
         FragmentManager fragmentManager = getSupportFragmentManager();

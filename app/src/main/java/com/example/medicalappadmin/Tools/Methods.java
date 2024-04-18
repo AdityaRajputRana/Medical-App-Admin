@@ -95,7 +95,7 @@ public class Methods {
     private static String t = "RGV2ZWxvcGVyIERldGFpbHM";
 
     private static String m = "VGhpcyBhcHAgd2FzIGRldmVsb3BlZCBieSBBZGl0eWEgUmFuYSAoMjFCQ1MwNTApLgoKQ29udGFjdCBEZXRhaWxzOgpFbWFpbCA6ICBhZGl0eWFyYWpwdXRyYW5hMjAxNkBnbWFpbC5jb20KUGhvbmUvV0EgIDogKzkxIDg1ODA0IDE1OTc4";
-    public static void showError(AppCompatActivity context, String message, boolean cancellable){
+    public static void showError(Activity context, String message, boolean cancellable){
         if (context != null) {
 
             AlertDialog dialog;
