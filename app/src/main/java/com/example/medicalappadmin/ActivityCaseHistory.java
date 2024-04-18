@@ -59,17 +59,6 @@ public class ActivityCaseHistory extends AppCompatActivity {
         binding.rcvCaseHistory.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
-                    if (binding.llTopStrip.getVisibility() == View.VISIBLE) {
-                        binding.llTopStrip.setVisibility(View.INVISIBLE);
-                    }
-                }
-
-                if (manager.findFirstCompletelyVisibleItemPosition() == 1) {
-                    if (binding.llTopStrip.getVisibility() != View.VISIBLE) {
-                        binding.llTopStrip.setVisibility(View.VISIBLE);
-                    }
-                }
 
                 if (manager.findLastCompletelyVisibleItemPosition() == loadedCases - 1) {
                     if (binding.pbCaseHistory.getVisibility() != View.VISIBLE) {

@@ -194,6 +194,8 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_marginStart="4dp"
                     android:background="@drawable/bg_main_btn"
                     android:orientation="vertical">
