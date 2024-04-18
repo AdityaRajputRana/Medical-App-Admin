@@ -24,15 +24,17 @@
             app:layout_constraintVertical_bias="0.5">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/headerCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                app:cardElevation="10dp"
+                app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/white">
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:paddingTop="16dp"
                     android:paddingBottom="16dp"
                     android:orientation="horizontal">
 
@@ -41,6 +43,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:cornerRadius="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         android:inputType="text"
                         android:imeOptions="actionSearch"
                         app:layout_constraintTop_toTopOf="parent"

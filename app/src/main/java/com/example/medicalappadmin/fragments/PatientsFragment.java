@@ -73,6 +73,12 @@ public class PatientsFragment extends Fragment {
                         loadPatientsList(currentPage, totalPages);
                     }
                 }
+
+                if (manager.findFirstCompletelyVisibleItemPosition() == 0){
+                    binding.headerCard.setCardElevation(0);
+                } else {
+                    binding.headerCard.setCardElevation(10);
+                }
             }
         });
         binding.searchPatientEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
