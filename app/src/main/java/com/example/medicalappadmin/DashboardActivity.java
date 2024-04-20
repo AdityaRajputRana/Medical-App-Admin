@@ -32,6 +32,7 @@ import com.example.medicalappadmin.PenDriver.SmartPenListener;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.databinding.ActivityDashboardBinding;
 import com.example.medicalappadmin.databinding.DialogPenBinding;
+import com.example.medicalappadmin.fragments.CasesHistoryFragment;
 import com.example.medicalappadmin.fragments.HomeFragment;
 import com.example.medicalappadmin.fragments.NotepadFragment;
 import com.example.medicalappadmin.fragments.PatientsFragment;
@@ -364,6 +365,8 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
                     changeFragment(1);
                 } else if (item.getItemId() == R.id.patients){
                     changeFragment(2);
+                } else if (item.getItemId() == R.id.appointments){
+                    changeFragment(3);
                 }
                 return true;
             }
@@ -403,6 +406,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
     private final HomeFragment homeFragment = new HomeFragment(this);
     private final  ProfileFragment profileFragment = new ProfileFragment(this);
     private final PatientsFragment patientsFragment = new PatientsFragment();
+    private final CasesHistoryFragment casesHistoryFragment = new CasesHistoryFragment();
 
 
     private void changeFragment(int i){
@@ -413,6 +417,9 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
                 break;
             case 2:
                 fragment = patientsFragment;
+                break;
+            case 3:
+                fragment = casesHistoryFragment;
                 break;
 
         }

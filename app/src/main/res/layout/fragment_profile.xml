@@ -139,6 +139,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/faqBtn"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
@@ -160,6 +161,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
+                android:visibility="gone"
                 android:backgroundTint="@android:color/transparent"
                 app:cornerRadius="0dp"
                 app:iconPadding="16dp"

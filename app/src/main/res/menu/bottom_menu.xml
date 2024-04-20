@@ -5,7 +5,7 @@
         android:title="Today"
         android:icon="@drawable/ic_today"/>
     <item android:id="@+id/appointments"
-        android:title="Appoint."
+        android:title="Cases"
         android:icon="@drawable/ic_appointments"/>
     <item android:id="@+id/patients"
         android:title="Patients"
