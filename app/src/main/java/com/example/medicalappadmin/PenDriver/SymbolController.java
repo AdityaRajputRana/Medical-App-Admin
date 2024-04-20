@@ -48,6 +48,11 @@ public class SymbolController {
         s.add(new Symbol(51, "GENDER_MALE", 36.1f, 28.8f, 40.7f, 31.4f ));
         s.add(new Symbol(52, "GENDER_FEMALE", 40.7f, 28.8f, 45.3f, 31.4f ));
 
+        s.add(new Symbol(61, "ATTACH_CAMERA", 65f, 108.8f, 72f, 113.7f ));
+        s.add(new Symbol(62, "ATTACH_GALLERY", 73.5f, 108.8f, 80.65f, 113.7f ));
+        s.add(new Symbol(63, "ATTACH_DOCUMENT", 83.3f, 108.8f, 90f, 113.7f ));
+
+
         s.add(new Symbol(100, "SUBMIT_CASE", 65f, 123.84f, 82.17f, 127.19f ));
 //        s.add(new Symbol(101, "CLOSE_CASE", 50, 9, 62, 12.5f ));
 

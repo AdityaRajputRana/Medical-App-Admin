@@ -77,6 +77,12 @@ public class APIMethods {
         API.postFile(context, file, req, EndPoints.uploadAdditional, UploadVoiceRP.class, listener, "test", "mp3");
     }
 
+    public static void uploadAttachment(Context context, File file, int pageNumber, FileMetadata metadata,
+                                        FileTransferResponseListener<UploadVoiceRP> listener){
+        UploadVoiceReq req = new UploadVoiceReq(metadata, pageNumber);
+        API.postFile(context, file, req, EndPoints.uploadAdditional, UploadVoiceRP.class, listener, metadata.fileName, metadata.ext);
+    }
+
 
     //login method
     public static void loginWithEmailAndPassword(Context context, String email, String password, APIResponseListener<LoginRP> listener) {

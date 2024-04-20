@@ -2,7 +2,9 @@ package com.example.medicalappadmin.adapters;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.health.connect.datatypes.Metadata;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,10 +63,12 @@ public class AdditionalsRVAdapter extends RecyclerView.Adapter<AdditionalsRVAdap
         } else if (Objects.equals(response.get(position).getMetaData().getType(), "Link")) {
             tvAdditionalDescription.setText("VIDEO");
             ivAdditionalIcon.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.baseline_videocam_24));
+        } else if (Objects.equals(response.get(position).getMetaData().getType(), "IMAGE")){
+            tvAdditionalDescription.setText(response.get(position).getMetaData().getType().toUpperCase());
+            ivAdditionalIcon.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.baseline_photo_24));
         } else {
             tvAdditionalDescription.setText("OTHER");
             ivAdditionalIcon.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.baseline_info_24));
-
         }
 
 
@@ -76,7 +80,16 @@ public class AdditionalsRVAdapter extends RecyclerView.Adapter<AdditionalsRVAdap
                 } else if (Objects.equals(response.get(position).getMetaData().getType(), "Link")) {
                     listener.onItemClicked(response.get(position).getMetaData(),"Link", response.get(position).getPublicUrl());
                 } else {
-                    Toast.makeText(context, "Additional type is other", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(response.get(position).getPublic_url()), 
+                            response.get(position).getMetaData().getMime());
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    if (intent.resolveActivity(context.getPackageManager()) != null) {
+                        context.startActivity(intent);
+                    } else {
+                        Toast.makeText(context, "No App found to handle the file", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });

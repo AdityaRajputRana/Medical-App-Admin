@@ -4,11 +4,13 @@ package com.example.medicalappadmin;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +40,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.medicalappadmin.Models.FileMetadata;
 import com.example.medicalappadmin.Models.Guide;
 import com.example.medicalappadmin.Models.LinkedPatient;
 import com.example.medicalappadmin.Models.Page;
@@ -47,6 +51,7 @@ import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
+import com.example.medicalappadmin.Tools.CameraUtils;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
@@ -81,13 +86,16 @@ import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 
 
 public class PrescriptionActivity extends AppCompatActivity implements SmartPenListener,LoginSheet.PatientDetailsListener {
@@ -157,11 +165,79 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     private Handler handler;
     private Runnable runnable;
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_REQUEST_CODE){
+            handleCameraImageResult(resultCode, data);
+        }
+    }
+
+    private static final int CAMERA_REQUEST_CODE = 345689;
+    private int attachRequestPageNumber = -1;
+
+    private void attachCameraImage() {
+        attachRequestPageNumber = currentPageNumber;
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
+    }
+
+    private void handleCameraImageResult(int resultCode, Intent data) {
+        if (resultCode != RESULT_OK){
+            Toast.makeText(this, "Error while capturing image, please try again.", Toast.LENGTH_SHORT).show();
+            attachRequestPageNumber = -1;
+            return;
+        }
+
+        if (attachRequestPageNumber == -1){
+            Toast.makeText(this, "Error while capturing image, page lost", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+        Random randomGenerator = new Random();
+        int random = randomGenerator.nextInt(9999);
+        String newimagename= "CAM_IMG_" + String.valueOf(random);
+
+        try {
+            File file = File.createTempFile(newimagename, ".png", getCacheDir());
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            fos.close();
+
+            uploadAttachment(attachRequestPageNumber, file, newimagename, ".png", "image/png");
+            attachRequestPageNumber = -1;
+        } catch (IOException e) {
+            Toast.makeText(this, "Error while Processing: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return;
+        }
 
 
+    }
 
+    private void uploadAttachment(int pageNum, File file, String fileNane, String ext, String mime) {
+        setUploadProgress(0);
+        FileMetadata metadata = new FileMetadata(ext, mime, "IMAGE", fileNane);
+        metadata.description = "Clicked Live";
+        APIMethods.uploadAttachment(this, file, pageNum, metadata, new FileTransferResponseListener<UploadVoiceRP>() {
+            @Override
+            public void success(UploadVoiceRP response) {
+                successUpload();
+            }
 
+            @Override
+            public void onProgress(int percent) {
+                setUploadProgress(percent);
+            }
 
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                Toast.makeText(PrescriptionActivity.this, "Attachment upload failed: " + message, Toast.LENGTH_SHORT).show();
+                binding.pbVoiceUpload.setVisibility(View.GONE);
+            }
+        });
+    }
 
     private void linkMobileNumber(long mobileNo) {
         if (currentPageNumber == -1) {
@@ -1133,6 +1209,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 submitCase(currentPage.getCaseId());
             }
         }
+        else if (id <= 69 && id >= 61){
+            switch (id){
+                case 61:
+                    attachCameraImage();
+                    break;
+            }
+        }
 
         return true;
     }
@@ -1649,9 +1732,20 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         public void run() {
             binding.voiceUploadLayout.setVisibility(View.GONE);
             binding.pbVoiceUpload.setProgress(0);
-
         }
     };
+
+    private void setUploadProgress(int progress){
+        binding.voiceUploadLayout.setVisibility(View.VISIBLE);
+        binding.pbVoiceUpload.setProgress(progress);
+    }
+
+    private void successUpload() {
+        binding.pbVoiceUpload.setVisibility(View.INVISIBLE);
+        binding.ivVoiceUpload.setImageDrawable(AppCompatResources.getDrawable(PrescriptionActivity.this,R.drawable.ic_done_bg));
+        Toast.makeText(PrescriptionActivity.this, "Attached to Page!", Toast.LENGTH_SHORT).show();
+        voiceHandler.postDelayed(voiceRunnable,7000);
+    }
 
     private void submitRecording() {
         if(outputFile == null){
