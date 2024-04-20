@@ -1,5 +1,6 @@
 package com.example.medicalappadmin.fragments;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -45,6 +46,7 @@ public class CasesHistoryFragment extends Fragment {
     private CaseHistoryRP caseHistoryRP;
     private ItemTouchHelper.Callback callback;
     private ItemTouchHelper itemTouchHelper;
+    private Activity activity;
 
 
     public CasesHistoryFragment() {
@@ -61,6 +63,7 @@ public class CasesHistoryFragment extends Fragment {
             binding = FragmentCaseBinding.inflate(inflater);
             manager = new LinearLayoutManager(getActivity());
             binding.rcvCaseHistory.setVisibility(View.GONE);
+            activity = getActivity();
 
             loadCases(currentPage, totalPages);
 
@@ -148,7 +151,7 @@ public class CasesHistoryFragment extends Fragment {
                 totalPages = response.getTotalPages();
 
                 if (adapter == null) {
-                    adapter = new CaseHistoryRVAdapter(response, getActivity(), new CaseHistoryRVAdapter.CaseListener() {
+                    adapter = new CaseHistoryRVAdapter(response, getActivity() == null? activity :getActivity(), new CaseHistoryRVAdapter.CaseListener() {
                         @Override
                         public void onShareClicked(String caseId) {
                             generateAndSharePDFLink(caseId);
