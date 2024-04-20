@@ -5,8 +5,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.medicalappadmin.Tools.Const;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.PatientListAdapter;
 import com.example.medicalappadmin.databinding.ActivityPatientHistoryBinding;
@@ -32,6 +38,9 @@ public class PatientHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityPatientHistoryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        
+        preProcessUI();
+        processFilter();
         binding.pbPatientHistory.setVisibility(View.GONE);
 
 
@@ -47,17 +56,6 @@ public class PatientHistoryActivity extends AppCompatActivity {
         binding.rcvPatients.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
-                    if (binding.llTopStrip.getVisibility() == View.VISIBLE) {
-                        binding.llTopStrip.setVisibility(View.INVISIBLE);
-                    }
-                }
-
-                if (manager.findFirstCompletelyVisibleItemPosition() == 1) {
-                    if (binding.llTopStrip.getVisibility() != View.VISIBLE) {
-                        binding.llTopStrip.setVisibility(View.VISIBLE);
-                    }
-                }
 
                 if (manager.findLastCompletelyVisibleItemPosition() == loadedPatients - 1) {
                     if (binding.pbPatientHistory.getVisibility() != View.VISIBLE) {
@@ -70,18 +68,9 @@ public class PatientHistoryActivity extends AppCompatActivity {
 
 
 
-        binding.ibPatientBackBtn.setOnClickListener(new View.OnClickListener() {
+        binding.backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
-            }
-        });
-
-        binding.tvTemp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(PatientHistoryActivity.this, PatientDetailedHistoryActivity.class);
-                startActivity(i);
                 finish();
             }
         });
@@ -89,10 +78,44 @@ public class PatientHistoryActivity extends AppCompatActivity {
 
     }
 
+    private void preProcessUI() {
+        String query = getIntent().getStringExtra(Const.searchQuery);
+        if (query != null && !query.isEmpty()){
+            binding.searchPatientEt.setText(query);
+        }
+    }
+
+    private void processFilter() {
+        String filter = getIntent().getStringExtra(Const.patientFilter);
+        if (filter == null) return;
+        
+        if (filter.contains(Const.patientFilterSearch)){
+            binding.searchPatientEt.requestFocus();
+            Methods.showKeyboardOnLaunch(this);
+        }
+    }
+
     private void setListeners() {
         binding.btnGoBack.setOnClickListener(view -> {
             finish();
         });
+
+        binding.searchPatientEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    performSearch(v.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void performSearch(String searchQuery) {
+        Intent intent = new Intent(this, PatientHistoryActivity.class);
+        intent.putExtra(Const.searchQuery, searchQuery);
+        startActivity(intent);
     }
 
 
@@ -105,7 +128,7 @@ public class PatientHistoryActivity extends AppCompatActivity {
             }
 
             binding.pbPatientHistory.setVisibility(View.VISIBLE);
-            APIMethods.loadPatientsList(this, cPage, new APIResponseListener<PatientListRP>() {
+            APIMethods.loadPatientsList(this, cPage, getIntent().getStringExtra(Const.searchQuery), new APIResponseListener<PatientListRP>() {
                 @Override
                 public void success(PatientListRP response) {
 
@@ -143,8 +166,6 @@ public class PatientHistoryActivity extends AppCompatActivity {
 
                             @Override
                             public void onShareClicked() {
-                                //TODO share patient
-
                                 PatientListAdapter.PatientListener.super.onShareClicked();
                             }
                         });

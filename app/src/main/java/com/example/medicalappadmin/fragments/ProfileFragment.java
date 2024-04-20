@@ -4,6 +4,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.example.medicalappadmin.Tools.CacheUtils;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.Transformations.CircleTransformation;
 import com.example.medicalappadmin.VideoSettingsActivity;
+import com.example.medicalappadmin.components.ConfirmationBottomSheet;
 import com.example.medicalappadmin.databinding.FragmentProfileBinding;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -52,7 +54,6 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         if (binding == null){
             binding = FragmentProfileBinding.inflate(inflater);
-            Methods.setStatusBarColor(requireActivity().getColor(R.color.colorStatusBar), (AppCompatActivity) requireActivity());
             loadData();
             loadUI();
             setListeners();
@@ -89,29 +90,21 @@ public class ProfileFragment extends Fragment {
 
     private void updatePenConnectionStatus() {
         isPenConnected = PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue();
-        String message = isPenConnected?"Disconnect Pen" : "Connect To Smart Pen";
-        binding.penActionBtn.setText(message);
+        int colorId = isPenConnected ? R.color.white : R.color.error700;
+        int bgColor = isPenConnected ? R.color.success500 : R.color.error50;
+        binding.penActionBtn.setBackgroundColor(getActivity().getColor(bgColor));
+        binding.penActionBtn.setForegroundTintList(ColorStateList.valueOf(getActivity().getColor(bgColor)));
     }
 
     private void loadUI() {
         binding.nameTxt.setText(user.getName());
         binding.staffTypeTxt.setText(user.getType());
-        Picasso.get()
-                .load(user.getDisplayPicture())
-                .transform(new CircleTransformation())
-                .into(binding.profileDPImg);
 
         updatePenConnectionStatus();
     }
 
     private void confirmLogout(){
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Confirm Logout")
-                .setMessage("Are you sure you want to log out of the app?")
-                .setPositiveButton("Logout", (dialogInterface, i) -> logout())
-                .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss())
-                .setCancelable(true)
-                .show();
+        ConfirmationBottomSheet.confirmLogout(getActivity(), view->logout());
     }
 
     private void logout() {

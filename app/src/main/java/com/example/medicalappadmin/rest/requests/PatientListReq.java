@@ -4,12 +4,20 @@ public class PatientListReq {
     int pageNumber;
     String doctorId;
     String creatorId;
+    String searchQuery;
+
+
 
     public PatientListReq() {
     }
 
     public PatientListReq(int pageNumber) {
         this.pageNumber = pageNumber;
+    }
+
+    public PatientListReq(int pageNumber,String query) {
+        this.pageNumber = pageNumber;
+        this.searchQuery = query;
     }
 
 

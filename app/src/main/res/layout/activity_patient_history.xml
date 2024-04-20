@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
+    android:background="@color/white"
     tools:context=".PatientHistoryActivity">
 
     <LinearLayout
@@ -13,47 +13,73 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <ImageView
-                android:id="@+id/ibPatientBackBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                app:srcCompat="@drawable/baseline_arrow_back_24" />
-
-            <TextView
-                android:id="@+id/tvTemp"
+            android:clipToPadding="false"
+            app:cardElevation="10dp"
+            app:cardBackgroundColor="@color/white">
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_semibold"
-                android:paddingTop="4dp"
-                android:paddingEnd="24dp"
-                android:textColor="@color/colorPrimTxt"
-                android:text="Previous Patients"
-                android:textAlignment="center"
-                android:textSize="18sp" />
+                android:gravity="center"
+                android:paddingBottom="16dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/backBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:srcCompat="@drawable/ic_back"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_bold"
+                    android:text="Patients"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimTxt"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="@id/backBtn"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/backBtn"/>
+
+                <EditText
+                    android:id="@+id/searchPatientEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cornerRadius="10dp"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    app:layout_constraintTop_toBottomOf="@id/backBtn"
+                    android:textAlignment="viewStart"
+                    app:rippleColor="@color/natural200"
+                    app:strokeColor="@color/natural200"
+                    android:background="@drawable/bg_main_et"
+                    android:fontFamily="@font/inter_medium"
+                    android:hint="Search Patient..."
+                    app:strokeWidth="1.5dp"
+                    android:layout_marginVertical="8dp"
+                    android:backgroundTint="@color/natural100"
+                    android:textSize="16sp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="18dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:drawableLeft="@drawable/ic_search"
+                    android:drawablePadding="16dp" />
 
 
-        </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/llTopStrip"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/color_secondary_text"
-            android:orientation="horizontal"
-            android:visibility="invisible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
 
         <LinearLayout
             android:id="@+id/llData"
@@ -62,6 +88,8 @@
             android:orientation="vertical"
             android:visibility="visible">
             <androidx.recyclerview.widget.RecyclerView
+                android:padding="16dp"
+                android:clipToPadding="false"
                 android:id="@+id/rcvPatients"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -113,7 +141,22 @@
 
 
     </LinearLayout>
-
-
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/addPatientBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Patient"
+        app:icon="@drawable/baseline_add_24"
+        android:textColor="@color/primary700"
+        android:backgroundTint="@color/primary50"
+        app:iconTint="@color/primary700"
+        android:elevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:clipToOutline="false"
+        android:layout_marginBottom="36dp"
+        app:shapeAppearance="@style/ShapeAppearance.MaterialComponents.Large.Component"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

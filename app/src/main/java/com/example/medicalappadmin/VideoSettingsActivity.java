@@ -1,5 +1,6 @@
 package com.example.medicalappadmin;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +29,7 @@ import com.example.medicalappadmin.rest.response.SetGuidePosRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 public class VideoSettingsActivity extends AppCompatActivity {
 
@@ -178,22 +180,55 @@ public class VideoSettingsActivity extends AppCompatActivity {
 
     GuidesVideosRP updatedRP;
 
+    private String getThumbnailUrl(Guide guide){
+        String link = guide.getUrl();
+        String mime = guide.getMime();
+        String type = guide.getType();
+        if (type.equals("Link") && mime.equals("link/youtube")) {
+            Uri uri = Uri.parse(link);
+            String videoId = uri.getQueryParameter("v");
+            if (videoId == null || videoId.isEmpty()){
+                videoId = link.substring(link.lastIndexOf("/") + 1);
+                videoId = videoId.substring(0, videoId.indexOf("?"));
+            }
+            String thumbnailUrl = "https://img.youtube.com/vi/" + videoId + "/0.jpg";
+            Log.i("thumbUrl", thumbnailUrl);
+            return thumbnailUrl;
+        }
+
+        return "";
+
+    }
+
+
     private void setUI() {
-        //todo ask position 1 aur 2 upar he milegi?
+
         binding.llFirstGuide.setVisibility(View.VISIBLE);
         binding.tvFirstGuideName.setText(guidesVideosRP.getAllGuides().get(0).getName());
         binding.tvFirstGuideDesc.setText(guidesVideosRP.getAllGuides().get(0).getDescription());
         binding.llFirstGuide.setOnClickListener(view -> playGuideVideo(guidesVideosRP.getAllGuides().get(0)));
+        Picasso.get()
+                .load(getThumbnailUrl(guidesVideosRP.getAllGuides().get(0)))
+                .placeholder(R.drawable.default_care_guide_thumb)
+                .into(binding.thumbnailView1);
 
         if(guidesVideosRP.getAllGuides().size() > 1){
             binding.llSecondGuide.setVisibility(View.VISIBLE);
             binding.tvSecondGuideName.setText(guidesVideosRP.getAllGuides().get(1).getName());
             binding.tvSecondGuideDesc.setText(guidesVideosRP.getAllGuides().get(1).getDescription());
-            binding.llSecondGuide.setOnClickListener(view -> playGuideVideo(guidesVideosRP.getAllGuides().get(1)));
-
+            binding.llSecondGuide.setOnClickListener(view -> {
+                Log.i("Size of List", String.valueOf(guidesVideosRP.getAllGuides().size()));
+                playGuideVideo(guidesVideosRP.getAllGuides().get(1));
+            });
+            Picasso.get()
+                    .load(getThumbnailUrl(guidesVideosRP.getAllGuides().get(1)))
+                    .placeholder(R.drawable.default_care_guide_thumb)
+                    .into(binding.thumbnailView2);
+        } else {
+            binding.llSecondGuide.setVisibility(View.GONE);
         }
-        Log.i(TAG, "setUI: removing "+ guidesVideosRP.getAllGuides().get(0).getName());
-        guidesVideosRP.getAllGuides().remove(0);
+
+
         if(guidesVideosRP.getAllGuides().size() > 1){
             Log.i(TAG, "setUI: removing "+ guidesVideosRP.getAllGuides().get(0).getName());
             guidesVideosRP.getAllGuides().remove(0);

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingVertical="64dp"
+    android:paddingBottom="48dp"
+    android:paddingHorizontal="16dp"
+    android:background="@drawable/bg_bottom_sheets"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/headerTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_bold"
+        android:textColor="@color/natural700"
+        android:text="Log out"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/secondaryTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter"
+        android:textColor="#A9A9A9"
+        android:text="Are you sure you want to log out?"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/negativeBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            app:cornerRadius="10dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/error50"
+            android:layout_marginTop="16dp"
+            app:strokeColor="@color/colorDanger"
+            android:fontFamily="@font/inter_semibold"
+            android:textSize="16sp"
+            android:textColor="@color/error700"
+            android:text="Yes" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/positiveBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            app:cornerRadius="10dp"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="@color/primary700"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/inter_semibold"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:text="Yes" />
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

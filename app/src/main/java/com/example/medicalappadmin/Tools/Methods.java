@@ -1,5 +1,6 @@
 package com.example.medicalappadmin.Tools;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -93,7 +95,7 @@ public class Methods {
     private static String t = "RGV2ZWxvcGVyIERldGFpbHM";
 
     private static String m = "VGhpcyBhcHAgd2FzIGRldmVsb3BlZCBieSBBZGl0eWEgUmFuYSAoMjFCQ1MwNTApLgoKQ29udGFjdCBEZXRhaWxzOgpFbWFpbCA6ICBhZGl0eWFyYWpwdXRyYW5hMjAxNkBnbWFpbC5jb20KUGhvbmUvV0EgIDogKzkxIDg1ODA0IDE1OTc4";
-    public static void showError(AppCompatActivity context, String message, boolean cancellable){
+    public static void showError(Activity context, String message, boolean cancellable){
         if (context != null) {
 
             AlertDialog dialog;
@@ -127,11 +129,64 @@ public class Methods {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
+    public static void setStatusBarColor(int color, AppCompatActivity compatActivity){
+        setStatusBarColor(color, true, compatActivity);
+    }
 
-    public static void setStatusBarColor(int color, AppCompatActivity activity) {
+
+    public static void setStatusBarColor(int color, boolean isLight, AppCompatActivity activity) {
+        Window window = activity.getWindow();
+        View decorView = window.getDecorView();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            final WindowInsetsController insetsController = window.getInsetsController();
+            if (insetsController != null) {
+                if (color == Color.TRANSPARENT) {
+                    insetsController.setSystemBarsAppearance(isLight ? WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS : 0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+                    window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                    decorView.setPadding(0, 0, 0, 0);
+                } else {
+                    insetsController.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.setStatusBarColor(color);
+                    int statusBarHeight = getStatusBarHeight(activity);
+                    decorView.setPadding(0, statusBarHeight, 0, 0);
+                }
+            }
+        } else {
+            if (color == Color.TRANSPARENT) {
+                window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                decorView.setPadding(0, 0, 0, 0);
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    window.setStatusBarColor(color);
+                    int statusBarHeight = getStatusBarHeight(activity);
+                    decorView.setPadding(0, statusBarHeight, 0, 0);
+                }
+            }
+        }
+    }
+
+    private static int getStatusBarHeight(AppCompatActivity activity) {
+        int result = 0;
+        int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = activity.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    public static void setStatusBarColorOld(int color, AppCompatActivity activity) {
+        if (color == Color.TRANSPARENT){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                Window w = activity.getWindow();
+                w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            }
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = activity.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(color);
         }
     }
@@ -139,6 +194,15 @@ public class Methods {
     public static void hideKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public static void showKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    public static void showKeyboardOnLaunch(Activity context){
+        context.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
 

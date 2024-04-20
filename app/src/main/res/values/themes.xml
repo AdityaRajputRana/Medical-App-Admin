@@ -4,10 +4,17 @@
 
     </style>
 
-    <style name="Theme.MedicalAppAdmin" parent="Base.Theme.MedicalAppAdmin" >
-        <item name="android:statusBarColor">@color/colorBackground</item>
-        <item name="android:windowLightStatusBar">true</item>
+    <style name="ShapeAppearance.MaterialComponents.Large.Component" parent="ShapeAppearance.MaterialComponents.Large.Component">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 
+    <style name="Theme.MedicalAppAdmin" parent="Base.Theme.MedicalAppAdmin" >
+        <item name="android:statusBarColor">@color/colorStatusBar</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:progressTint">@color/primary700</item>
+        <item name="android:windowSplashScreenBackground">@color/primary700</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
     </style>
 
     <style name="CircularDeterminateProgressBar">

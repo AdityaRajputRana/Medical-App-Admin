@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:state_checked="true" android:color="@color/primary700" >
+    <vector
+        android:width="26dp"
+        android:height="27dp"
+        android:viewportWidth="26"
+        android:viewportHeight="27">
+      <path
+          android:pathData="M2,0L10,0A2,2 0,0 1,12 2L12,8A2,2 0,0 1,10 10L2,10A2,2 0,0 1,0 8L0,2A2,2 0,0 1,2 0z"
+          android:fillColor="@color/primary700"/>
+      <path
+          android:pathData="M16,17L24,17A2,2 0,0 1,26 19L26,25A2,2 0,0 1,24 27L16,27A2,2 0,0 1,14 25L14,19A2,2 0,0 1,16 17z"
+          android:fillColor="@color/primary700"/>
+      <path
+          android:pathData="M16,0L24,0A2,2 0,0 1,26 2L26,13A2,2 0,0 1,24 15L16,15A2,2 0,0 1,14 13L14,2A2,2 0,0 1,16 0z"
+          android:fillColor="@color/primary700"/>
+      <path
+          android:pathData="M2,12L10,12A2,2 0,0 1,12 14L12,25A2,2 0,0 1,10 27L2,27A2,2 0,0 1,0 25L0,14A2,2 0,0 1,2 12z"
+          android:fillColor="@color/primary700"/>
+    </vector>
+
+  </item>
+  <item>
+    <vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="26dp"
+        android:height="27dp"
+        android:viewportWidth="26"
+        android:viewportHeight="27">
+      <path
+          android:pathData="M2,0L10,0A2,2 0,0 1,12 2L12,8A2,2 0,0 1,10 10L2,10A2,2 0,0 1,0 8L0,2A2,2 0,0 1,2 0z"
+          android:fillColor="@color/natural400"/>
+      <path
+          android:pathData="M16,17L24,17A2,2 0,0 1,26 19L26,25A2,2 0,0 1,24 27L16,27A2,2 0,0 1,14 25L14,19A2,2 0,0 1,16 17z"
+          android:fillColor="@color/natural400"/>
+      <path
+          android:pathData="M16,0L24,0A2,2 0,0 1,26 2L26,13A2,2 0,0 1,24 15L16,15A2,2 0,0 1,14 13L14,2A2,2 0,0 1,16 0z"
+          android:fillColor="@color/natural400"/>
+      <path
+          android:pathData="M2,12L10,12A2,2 0,0 1,12 14L12,25A2,2 0,0 1,10 27L2,27A2,2 0,0 1,0 25L0,14A2,2 0,0 1,2 12z"
+          android:fillColor="@color/natural400"/>
+    </vector>
+
+  </item>
+</selector>

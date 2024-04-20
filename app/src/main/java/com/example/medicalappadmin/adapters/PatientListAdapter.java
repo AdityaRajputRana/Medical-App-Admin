@@ -21,11 +21,6 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
     PatientListener listener;
     Context context;
 
-    TextView tvPatientsMobileNumber;
-    TextView tvPatientsName;
-    LinearLayout llPatientItem;
-    ImageView ivSharePatient;
-
 
     public PatientListAdapter(PatientListRP patientListRP, Context context, PatientListener listener) {
         this.patientListRP = patientListRP;
@@ -37,27 +32,17 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.patient_history_item,parent,false);
-        tvPatientsMobileNumber = view.findViewById(R.id.tvPatientsLMobileNumber);
-        tvPatientsName = view.findViewById(R.id.tvPatientsLName);
-        llPatientItem = view.findViewById(R.id.llPatientItem);
-        ivSharePatient = view.findViewById(R.id.ivSharePatient);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        tvPatientsName.setText(patientListRP.getPatients().get(position).getFullName());
-        tvPatientsMobileNumber.setText(String.valueOf(patientListRP.getPatients().get(position).getMobileNumber()));
-        llPatientItem.setOnClickListener(view -> {
-            Log.i("Adi adapter", "onBindViewHolder: name "+patientListRP.getPatients().get(holder.getAdapterPosition()).getFullName());
-            Log.i("Adi adapter", "onBindViewHolder: position "+holder.getAdapterPosition());
-            listener.onPatientClicked(patientListRP.getPatients().get(position).get_id());
-        });
-
-        ivSharePatient.setOnClickListener(view -> {
-            listener.onShareClicked();
-        });
+        holder.tvPatientsName.setText(patientListRP.getPatients().get(position).getFullName());
+        holder.tvPatientsMobileNumber.setText(String.valueOf(patientListRP.getPatients().get(position).getMobileNumber()));
+        holder.itemView.setOnClickListener(view ->
+            listener.onPatientClicked(patientListRP.getPatients().get(position).get_id())
+        );
 
     }
 
@@ -75,8 +60,12 @@ public class PatientListAdapter extends RecyclerView.Adapter<PatientListAdapter.
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvPatientsMobileNumber;
+        TextView tvPatientsName;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            tvPatientsMobileNumber = itemView.findViewById(R.id.tvPatientsLMobileNumber);
+            tvPatientsName = itemView.findViewById(R.id.tvPatientsLName);
         }
     }
 }

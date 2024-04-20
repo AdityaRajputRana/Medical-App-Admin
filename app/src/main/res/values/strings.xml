@@ -1,6 +1,11 @@
 <resources>
-    <string name="app_name">Medical App Admin</string>
+    <string name="app_name">Cliniquill</string>
     <string name="drawer_open">Open Drawer</string>
     <string name="drawer_close">Close Drawer</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="walkHeader">Welcome To</string>
+    <string name="walkText">Immerse in the Najdi hospitality with Liwanee. Share your property and culture. Join our community</string>
+    <string name="get_started">Get Started</string>
+    <string name="login">Login</string>
+    <string name="login_header">Let\'s sign you in.</string>
 </resources>

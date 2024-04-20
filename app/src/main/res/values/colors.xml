@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
     //colors
     <color name="offWhite">#EEF6FC</color>
     <color name="blue">#3C79A5</color>
     <color name="blue_bg">#1C6BA4</color>
-    <color name="gray">#383838</color>
+    <color name="gray">#F0F0F0</color>
     <color name="lightBlue">#EDEDED</color>
     <color name="lightBlue2">#DCEDF9</color>
     <color name="color_secondary_text">#464A4C</color>
 
 
-    <color name="colorStatusBar">#f1efee</color>
     <color name="colorPrimTxt">#383838</color>
     <color name="colorSecTxt">#5D5D5D</color>
     <color name="colorCta">#1C6BA4</color>
@@ -23,5 +20,36 @@
 
     <color name="colorInactiveGray">#B0B0B0</color>
     <color name="colorActiveGreen">#4CAF50</color>
+
+
+    //COLOR Panel
+
+    <color name="black">#111111</color>
+    <color name="white">#FEFEFE</color>
+
+    <color name="colorStatusBar">#FEFEFE</color>
+
+
+    <color name="hintColor">#94A3B8</color>
+
+    <color name="primary700">#18A0FB</color>
+    <color name="naturalLight">#C8D5E1</color>
+    <color name="natural50">#FBFAFC</color>
+    <color name="naturalDark">#11182E</color>
+    <color name="success">#016E47</color>
+    <color name="error">#EF4444</color>
+    <color name="natural800">#11182E</color>
+    <color name="natural500">#526780</color>
+    <color name="natural100">#F1F5F9</color>
+    <color name="natural700">#203144</color>
+    <color name="natural300">#C8D5E1</color>
+    <color name="natural400">#94A3B8</color>
+    <color name="natural600">#35455B</color>
+    <color name="error700">#AA0107</color>
+    <color name="error50">#FEF2F2</color>
+    <color name="success500">#02B772</color>
+    <color name="primary50">#DEF2FF</color>
+    <color name="natural200">#E2E8F0</color>
+
 
 </resources>

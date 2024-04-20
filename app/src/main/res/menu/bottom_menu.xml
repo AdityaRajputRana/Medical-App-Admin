@@ -2,11 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/home"
-        android:title=""
-
-        android:icon="@drawable/home"/>
+        android:title="Today"
+        android:icon="@drawable/ic_today"/>
+    <item android:id="@+id/appointments"
+        android:title="Cases"
+        android:icon="@drawable/ic_appointments"/>
+    <item android:id="@+id/patients"
+        android:title="Patients"
+        android:icon="@drawable/ic_patients"/>
     <item android:id="@+id/profile"
-        android:title=""
-        android:icon="@drawable/ic_profile"/>
+        android:title="More"
+        android:icon="@drawable/ic_more"/>
 
 </menu>
