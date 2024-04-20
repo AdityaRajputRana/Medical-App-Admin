@@ -33,7 +33,7 @@
             android:name=".VideoSettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".ActivityViewPatient"
+            android:name=".ActivityPatientDetails"
             android:exported="false" />
         <activity
             android:name=".DetailedPageViewActivity"

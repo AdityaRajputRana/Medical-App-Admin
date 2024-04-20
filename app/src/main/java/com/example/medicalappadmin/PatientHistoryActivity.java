@@ -7,21 +7,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.medicalappadmin.Tools.Const;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.PatientListAdapter;
-import com.example.medicalappadmin.databinding.ActivityPatientHistoryBinding;
+import com.example.medicalappadmin.databinding.ActivityPatientListBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.PatientListRP;
 
 public class PatientHistoryActivity extends AppCompatActivity {
-    private ActivityPatientHistoryBinding binding;
+    private ActivityPatientListBinding binding;
 
     int currentPage = 1;
     int totalPages = Integer.MAX_VALUE;
@@ -36,7 +34,7 @@ public class PatientHistoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityPatientHistoryBinding.inflate(getLayoutInflater());
+        binding = ActivityPatientListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         
         preProcessUI();
@@ -159,7 +157,7 @@ public class PatientHistoryActivity extends AppCompatActivity {
                             @Override
                             public void onPatientClicked(String id) {
                                 //TODO open patient details
-                                Intent i = new Intent(PatientHistoryActivity.this,ActivityViewPatient.class);
+                                Intent i = new Intent(PatientHistoryActivity.this, ActivityPatientDetails.class);
                                 i.putExtra("PATIENT_ID", id);
                                 startActivity(i);
                             }

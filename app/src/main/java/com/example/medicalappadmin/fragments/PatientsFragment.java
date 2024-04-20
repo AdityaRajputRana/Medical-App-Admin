@@ -3,7 +3,6 @@ package com.example.medicalappadmin.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -14,14 +13,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
-import com.example.medicalappadmin.ActivityViewPatient;
+import com.example.medicalappadmin.ActivityPatientDetails;
 import com.example.medicalappadmin.PatientHistoryActivity;
-import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Tools.Const;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.PatientListAdapter;
 import com.example.medicalappadmin.databinding.FragmentPatientsBinding;
-import com.example.medicalappadmin.databinding.FragmentProfileBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.PatientListRP;
@@ -139,7 +136,7 @@ public class PatientsFragment extends Fragment {
                         @Override
                         public void onPatientClicked(String id) {
                             //TODO open patient details
-                            Intent i = new Intent(getActivity(), ActivityViewPatient.class);
+                            Intent i = new Intent(getActivity(), ActivityPatientDetails.class);
                             i.putExtra("PATIENT_ID", id);
                             startActivity(i);
                         }

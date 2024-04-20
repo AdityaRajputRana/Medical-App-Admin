@@ -19,11 +19,7 @@ public class ViewPatientCasesAdapter extends RecyclerView.Adapter<ViewPatientCas
 
     ViewPatientRP viewPatientRP;
     Context context;
-
-    TextView tvVPNoOfCases;
-    TextView tvVPStatus;
-    TextView tvVPDetails;
-    TextView tvVPCaseName;
+    TextView tvVPCaseName, detailTxt, lastSeenTxt;
     ImageView ivVPShareCase;
     LinearLayout llVPClick;
     VPCaseListener listener;
@@ -45,9 +41,8 @@ public class ViewPatientCasesAdapter extends RecyclerView.Adapter<ViewPatientCas
         //Get the views
 
         tvVPCaseName = view.findViewById(R.id.tvVPCaseName);
-        tvVPNoOfCases = view.findViewById(R.id.tvVPNoOfCases);
-        tvVPStatus = view.findViewById(R.id.tvVPStatus);
-        tvVPDetails = view.findViewById(R.id.tvVPDetails);
+        detailTxt = view.findViewById(R.id.caseDetails);
+        lastSeenTxt = view.findViewById(R.id.lastSeenTxt);
         ivVPShareCase = view.findViewById(R.id.ivVPShareCase);
         llVPClick = view.findViewById(R.id.llVPClick);
 
@@ -57,17 +52,18 @@ public class ViewPatientCasesAdapter extends RecyclerView.Adapter<ViewPatientCas
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        tvVPNoOfCases.setText(String.valueOf(viewPatientRP.getPatientCases().get(position).getPageCount()));
-        tvVPCaseName.setText("Untitled Case");
-        tvVPDetails.setText(Methods.convertDate(viewPatientRP.getPatientCases().get(position).getUpdatedAt()));
-        if (viewPatientRP.getPatientCases().get(position).isOpen()) {
-            tvVPStatus.setText("Open");
-            tvVPStatus.setTextColor(context.getColor(R.color.colorActiveGreen));
-        } else {
-            tvVPStatus.setText("Closed");
-            tvVPStatus.setTextColor(context.getColor(R.color.colorDanger));
-        }
+        String details = "Pages - ";
+        details += String.valueOf(viewPatientRP.getPatientCases().get(position).getPageCount());
+        details += " | ";
+        details += viewPatientRP.getPatientCases().get(position).isOpen()?"Open":"Close";
+        details += " Case";
+        detailTxt.setText(details);
 
+        String lastSeen = "Last Updated -  ";
+        lastSeen +=  Methods.convertDate(viewPatientRP.getPatientCases().get(position).getUpdatedAt());
+        lastSeenTxt.setText(lastSeen);
+
+        tvVPCaseName.setText("Untitled Case");
         llVPClick.setOnClickListener(view -> {
             listener.caseClicked(viewPatientRP.getPatientCases().get(position).get_id());
         });

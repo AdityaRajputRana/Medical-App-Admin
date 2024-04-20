@@ -25,7 +25,7 @@ import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
 import com.example.medicalappadmin.components.AudioPlayer;
 import com.example.medicalappadmin.components.WebVideoPlayer;
 import com.example.medicalappadmin.components.YTVideoPlayer;
-import com.example.medicalappadmin.databinding.ActivityPatientDetailedHistoryBinding;
+import com.example.medicalappadmin.databinding.ActivityCaseDetailsBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
@@ -38,7 +38,7 @@ import java.util.Objects;
 
 public class PatientDetailedHistoryActivity extends AppCompatActivity {
 
-    private ActivityPatientDetailedHistoryBinding binding;
+    private ActivityCaseDetailsBinding binding;
     String caseId;
     PagesHistoryAdapter adapter;
     GridLayoutManager manager;
@@ -51,7 +51,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityPatientDetailedHistoryBinding.inflate(getLayoutInflater());
+        binding = ActivityCaseDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         caseId = getIntent().getStringExtra("CASE_ID");

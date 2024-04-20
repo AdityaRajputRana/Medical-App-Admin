@@ -11,16 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.ViewPatientCasesAdapter;
-import com.example.medicalappadmin.databinding.ActivityViewPatientBinding;
+import com.example.medicalappadmin.databinding.ActivityPatientDetailsBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
-import com.google.android.material.appbar.AppBarLayout;
 
-public class ActivityViewPatient extends AppCompatActivity {
+public class ActivityPatientDetails extends AppCompatActivity {
 
 
-    ActivityViewPatientBinding binding;
+    ActivityPatientDetailsBinding binding;
     ViewPatientCasesAdapter adapter;
     private boolean isFirstItemVisible = true;
     LinearLayoutManager layoutManager;
@@ -28,7 +27,7 @@ public class ActivityViewPatient extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityViewPatientBinding.inflate(getLayoutInflater());
+        binding = ActivityPatientDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         String patientId = getIntent().getStringExtra("PATIENT_ID");
@@ -84,17 +83,17 @@ public class ActivityViewPatient extends AppCompatActivity {
     private void loadPatientDetails(String patientId) {
         binding.pbVP.setVisibility(View.VISIBLE);
 
-        APIMethods.viewPatient(ActivityViewPatient.this, patientId, new APIResponseListener<ViewPatientRP>() {
+        APIMethods.viewPatient(ActivityPatientDetails.this, patientId, new APIResponseListener<ViewPatientRP>() {
             @Override
             public void success(ViewPatientRP response) {
                 setDetailsInUI(response);
 
                 //todo set up recyclerview
                 if (adapter == null) {
-                    adapter = new ViewPatientCasesAdapter(response, ActivityViewPatient.this, new ViewPatientCasesAdapter.VPCaseListener() {
+                    adapter = new ViewPatientCasesAdapter(response, ActivityPatientDetails.this, new ViewPatientCasesAdapter.VPCaseListener() {
                         @Override
                         public void caseClicked(String caseId) {
-                            Intent i = new Intent(ActivityViewPatient.this, PatientDetailedHistoryActivity.class);
+                            Intent i = new Intent(ActivityPatientDetails.this, PatientDetailedHistoryActivity.class);
                             i.putExtra("CASE_ID", caseId);
                             startActivity(i);
                         }
@@ -111,7 +110,7 @@ public class ActivityViewPatient extends AppCompatActivity {
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                Methods.showError(ActivityViewPatient.this, message, cancellable);
+                Methods.showError(ActivityPatientDetails.this, message, cancellable);
                 binding.pbVP.setVisibility(View.GONE);
 
             }
