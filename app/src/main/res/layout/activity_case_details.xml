@@ -7,7 +7,7 @@
     android:background="@color/colorBackground"
     android:orientation="vertical"
     android:paddingHorizontal="16dp"
-    tools:context=".PatientDetailedHistoryActivity">
+    tools:context=".CaseDetailsActivity">
     <ImageView
         android:id="@+id/ivPatientDetailsBackBtn"
         android:layout_width="wrap_content"

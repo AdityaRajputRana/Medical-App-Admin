@@ -39,7 +39,7 @@
             android:name=".DetailedPageViewActivity"
             android:exported="false" />
         <activity
-            android:name=".PatientDetailedHistoryActivity"
+            android:name=".CaseDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".PatientHistoryActivity"

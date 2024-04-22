@@ -51,7 +51,6 @@ import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
-import com.example.medicalappadmin.Tools.CameraUtils;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
@@ -73,7 +72,6 @@ import com.example.medicalappadmin.rest.requests.LinkGuideReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
-import com.example.medicalappadmin.rest.response.GeneratePDFLinkRP;
 import com.example.medicalappadmin.rest.response.ConfigurePageRP;
 import com.example.medicalappadmin.rest.response.EmptyRP;
 import com.example.medicalappadmin.rest.response.InitialisePageRP;
@@ -86,14 +84,10 @@ import com.example.medicalappadmin.rest.response.ViewPatientRP;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
@@ -515,7 +509,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         dialogViewCaseBinding.ivCloseDialog.setOnClickListener(view -> viewCaseDialog.dismiss());
         dialogViewCaseBinding.tvOpenCaseInDetail.setOnClickListener(view -> {
-            Intent intent = new Intent(PrescriptionActivity.this,PatientDetailedHistoryActivity.class);
+            Intent intent = new Intent(PrescriptionActivity.this, CaseDetailsActivity.class);
             intent.putExtra("CASE_ID",caseId);
             startActivity(intent);
         });

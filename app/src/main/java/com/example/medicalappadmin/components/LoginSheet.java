@@ -17,8 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.medicalappadmin.Models.LinkedPatient;
 import com.example.medicalappadmin.Models.Page;
-import com.example.medicalappadmin.PatientDetailedHistoryActivity;
-import com.example.medicalappadmin.PrescriptionActivity;
+import com.example.medicalappadmin.CaseDetailsActivity;
 import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
@@ -296,7 +295,7 @@ public class LoginSheet {
 
         dialogViewCaseBinding.ivCloseDialog.setOnClickListener(view -> viewCaseDialog.dismiss());
         dialogViewCaseBinding.tvOpenCaseInDetail.setOnClickListener(view -> {
-            Intent intent = new Intent(context, PatientDetailedHistoryActivity.class);
+            Intent intent = new Intent(context, CaseDetailsActivity.class);
             intent.putExtra("CASE_ID",caseId);
             context.startActivity(intent);
         });

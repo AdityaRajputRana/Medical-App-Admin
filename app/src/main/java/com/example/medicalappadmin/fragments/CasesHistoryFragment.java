@@ -20,13 +20,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.medicalappadmin.ActivityCaseHistory;
 import com.example.medicalappadmin.ItemTouchHelperCallback;
-import com.example.medicalappadmin.PatientDetailedHistoryActivity;
-import com.example.medicalappadmin.R;
+import com.example.medicalappadmin.CaseDetailsActivity;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.CaseHistoryRVAdapter;
-import com.example.medicalappadmin.databinding.ActivityCaseHistoryBinding;
 import com.example.medicalappadmin.databinding.FragmentCaseBinding;
 import com.example.medicalappadmin.databinding.LoadingDialogBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
@@ -159,7 +156,7 @@ public class CasesHistoryFragment extends Fragment {
 
                         @Override
                         public void onCaseClicked(String caseId) {
-                            Intent i = new Intent(getActivity(), PatientDetailedHistoryActivity.class);
+                            Intent i = new Intent(getActivity(), CaseDetailsActivity.class);
                             i.putExtra("CASE_ID", caseId);
                             startActivity(i);
                         }

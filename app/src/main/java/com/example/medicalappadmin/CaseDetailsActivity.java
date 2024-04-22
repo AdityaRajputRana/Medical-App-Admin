@@ -1,10 +1,7 @@
 package com.example.medicalappadmin;
 
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medicalappadmin.Models.Additional;
-import com.example.medicalappadmin.Models.Guide;
 import com.example.medicalappadmin.Models.MetaData;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.adapters.AdditionalsRVAdapter;
@@ -25,18 +21,16 @@ import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
 import com.example.medicalappadmin.components.AudioPlayer;
 import com.example.medicalappadmin.components.WebVideoPlayer;
 import com.example.medicalappadmin.components.YTVideoPlayer;
-import com.example.medicalappadmin.databinding.ActivityCaseDetailsBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
+import com.example.medicalappadmin.databinding.ActivityCaseDetailsBinding;
 import com.google.gson.Gson;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class PatientDetailedHistoryActivity extends AppCompatActivity {
+public class CaseDetailsActivity extends AppCompatActivity {
 
     private ActivityCaseDetailsBinding binding;
     String caseId;
@@ -59,7 +53,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
         if (caseId != null) {
             downloadCase(caseId);
         }
-        manager = new GridLayoutManager(PatientDetailedHistoryActivity.this, 2);
+        manager = new GridLayoutManager(CaseDetailsActivity.this, 2);
 
         binding.rcvPages.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -95,7 +89,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     private void downloadCase(String caseId) {
 
         Log.i("add", "downloadCase: id "+ caseId);
-        APIMethods.viewCase(PatientDetailedHistoryActivity.this, caseId, new APIResponseListener<ViewCaseRP>() {
+        APIMethods.viewCase(CaseDetailsActivity.this, caseId, new APIResponseListener<ViewCaseRP>() {
             @Override
             public void success(ViewCaseRP response) {
                 updateUI(response);
@@ -154,7 +148,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
         binding.llAdditionals.setVisibility(View.VISIBLE);
         binding.rcvAdditionals.setLayoutManager(new LinearLayoutManager(this));
 
-        binding.rcvAdditionals.setAdapter(new AdditionalsRVAdapter(additionalsList, PatientDetailedHistoryActivity.this, new AdditionalsRVAdapter.AdditionItemListener() {
+        binding.rcvAdditionals.setAdapter(new AdditionalsRVAdapter(additionalsList, CaseDetailsActivity.this, new AdditionalsRVAdapter.AdditionItemListener() {
             @Override
             public void onItemClicked(MetaData metaData,String type, String url) {
                 if(Objects.equals(type, "Voice")){
@@ -173,13 +167,13 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
     }
 
     private void playVideo(MetaData metaData, String url) {
-        Toast.makeText(PatientDetailedHistoryActivity.this, "Loading video. Please wait...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(CaseDetailsActivity.this, "Loading video. Please wait...", Toast.LENGTH_SHORT).show();
         if(metaData.getMime().equals("link/youtube")){
-            YTVideoPlayer ytVideoPlayer = new YTVideoPlayer(PatientDetailedHistoryActivity.this);
+            YTVideoPlayer ytVideoPlayer = new YTVideoPlayer(CaseDetailsActivity.this);
             Log.i(TAG, "onLinkGuideClicked: url "+url );
             ytVideoPlayer.playVideo(url);
         } else {
-            WebVideoPlayer webVideoPlayer = new WebVideoPlayer(PatientDetailedHistoryActivity.this);
+            WebVideoPlayer webVideoPlayer = new WebVideoPlayer(CaseDetailsActivity.this);
             webVideoPlayer.playVideo(url);
         }
     }
@@ -205,7 +199,7 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
 //        }
         
 //
-        AudioPlayer player = new AudioPlayer(PatientDetailedHistoryActivity.this);
+        AudioPlayer player = new AudioPlayer(CaseDetailsActivity.this);
         player.showAudioPopup(audioUrl);
 
     }
@@ -218,10 +212,10 @@ public class PatientDetailedHistoryActivity extends AppCompatActivity {
         viewCaseRP = response;
 //        binding.rcvPages.setLayoutManager(new LinearLayoutManager(PatientDetailedHistoryActivity.this));
         if (adapter == null) {
-            adapter = new PagesHistoryAdapter(response, PatientDetailedHistoryActivity.this, new PagesHistoryAdapter.PageListener() {
+            adapter = new PagesHistoryAdapter(response, CaseDetailsActivity.this, new PagesHistoryAdapter.PageListener() {
                 @Override
                 public void onPageClicked(ArrayList<Page> pages, int currentPosition) {
-                    Intent i = new Intent(PatientDetailedHistoryActivity.this,DetailedPageViewActivity.class);
+                    Intent i = new Intent(CaseDetailsActivity.this,DetailedPageViewActivity.class);
                     String caseRP = new Gson().toJson(response);
                     i.putExtra("CASE_ID", caseId);
                     i.putExtra("CASE", caseRP);

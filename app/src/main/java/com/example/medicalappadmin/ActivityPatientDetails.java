@@ -93,7 +93,7 @@ public class ActivityPatientDetails extends AppCompatActivity {
                     adapter = new ViewPatientCasesAdapter(response, ActivityPatientDetails.this, new ViewPatientCasesAdapter.VPCaseListener() {
                         @Override
                         public void caseClicked(String caseId) {
-                            Intent i = new Intent(ActivityPatientDetails.this, PatientDetailedHistoryActivity.class);
+                            Intent i = new Intent(ActivityPatientDetails.this, CaseDetailsActivity.class);
                             i.putExtra("CASE_ID", caseId);
                             startActivity(i);
                         }

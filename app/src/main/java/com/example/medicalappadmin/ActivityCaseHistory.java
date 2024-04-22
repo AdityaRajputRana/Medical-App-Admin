@@ -147,7 +147,7 @@ public class ActivityCaseHistory extends AppCompatActivity {
 
                         @Override
                         public void onCaseClicked(String caseId) {
-                            Intent i = new Intent(ActivityCaseHistory.this, PatientDetailedHistoryActivity.class);
+                            Intent i = new Intent(ActivityCaseHistory.this, CaseDetailsActivity.class);
                             i.putExtra("CASE_ID", caseId);
                             startActivity(i);
                         }
