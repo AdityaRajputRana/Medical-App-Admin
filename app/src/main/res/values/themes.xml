@@ -21,4 +21,16 @@
         <item name="android:indeterminateOnly">false</item>
         <item name="android:progressDrawable">@drawable/circle</item>
     </style>
+
+    <style name="CustomTabLayout" parent="Widget.MaterialComponents.TabLayout">
+        <item name="tabTextAppearance">@style/CustomTextAppearance</item>
+        <item name="tabSelectedTextColor">@color/primary700</item>
+        <item name="tabIndicatorColor">@color/primary700</item>
+    </style>
+
+    <style name="CustomTextAppearance" parent="Widget.MaterialComponents.TabLayout">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/natural500</item>
+        <item name="android:fontFamily">@font/inter_semibold</item>
+    </style>
 </resources>

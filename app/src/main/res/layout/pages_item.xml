@@ -13,19 +13,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
+            android:background="@drawable/bg_main_btn"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:id="@+id/tvPageCount"
-            android:layout_width="match_parent"
+            android:paddingHorizontal="8dp"
+            android:paddingTop="1dp"
+            android:paddingBottom="3dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins_semibold"
+            android:fontFamily="@font/inter_semibold"
             android:gravity="center"
             android:text="Page Number"
-            android:textColor="@color/colorPrimTxt"
-            android:textSize="12sp" />
+            android:textColor="@color/primary700"
+            android:textSize="14sp" />
     <com.example.medicalappadmin.canvas.NotepadView
-        android:background="#4D818181"
         android:id="@+id/rcvNotepadView"
         app:layout_constraintTop_toBottomOf="@id/tvPageCount"
         app:layout_constraintDimensionRatio="H, 1:1.414"

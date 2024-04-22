@@ -8,6 +8,11 @@ public class Patient {
     String email;
     String gender;
     String name;
+    String age = "Age Not Specified";
+
+    public String getAge() {
+        return age;
+    }
 
     public String getName() {
         return name;
@@ -22,6 +27,8 @@ public class Patient {
     }
 
     public String getFullName() {
+        if (fullName == null)
+            return name;
         return fullName;
     }
 
@@ -54,6 +61,13 @@ public class Patient {
     }
 
     public String getGender() {
+        return gender;
+    }
+
+    public String getGenderFull(){
+        if (gender == null) return "Not Entered";
+        if (gender.equals("M")) return "Male";
+        if (gender.equals("F")) return "Female";
         return gender;
     }
 

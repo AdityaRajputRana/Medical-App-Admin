@@ -4,370 +4,61 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
+    android:background="@color/white"
     android:orientation="vertical"
-    android:paddingHorizontal="16dp"
+    android:paddingHorizontal="0dp"
     tools:context=".CaseDetailsActivity">
-    <ImageView
-        android:id="@+id/ivPatientDetailsBackBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingVertical="8dp"
-        android:paddingEnd="16dp"
-        app:srcCompat="@drawable/baseline_arrow_back_24" />
 
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+        app:cardBackgroundColor="@color/white">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarLayout"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorBackground">
-            <com.google.android.material.appbar.CollapsingToolbarLayout
-                android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/backBtn"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_margin="16dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                app:srcCompat="@drawable/ic_back" />
 
-                <com.facebook.shimmer.ShimmerFrameLayout
-                    android:id="@+id/shimmerContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-
-                        <LinearLayout
-                            android:id="@+id/llPatient"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginVertical="8dp"
-                            android:background="@drawable/bg_main"
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:padding="5dp">
-
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="16dp"
-                                app:srcCompat="@drawable/dp_placeholder" />
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="10dp"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:id="@+id/tvPatientsName"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/poppins_semibold"
-                                    android:gravity="center_vertical"
-                                    android:text=""
-                                    android:textColor="@color/colorPrimTxt"
-                                    android:textSize="16sp" />
-
-                                <TextView
-                                    android:id="@+id/tvGender"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:gravity="center_vertical"
-                                    android:text=""
-                                    android:textColor="@color/colorSecTxt"
-                                    android:textSize="16sp" />
-
-                             <TextView
-                                    android:id="@+id/tvMobileNumber"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:gravity="center_vertical"
-                                    android:text=""
-                                    android:textColor="@color/colorSecTxt"
-                                    android:textSize="16sp" />
-
-                            </LinearLayout>
-
-                            <ImageView
-                                android:id="@+id/ivSharePatient"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="16dp"
-                                app:srcCompat="@drawable/baseline_share_24"
-                                android:visibility="gone" />
-
-
-                        </LinearLayout>
-                        <LinearLayout
-
-                            android:id="@+id/linearLayout4"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.5"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:fontFamily="@font/poppins_semibold"
-                                android:paddingTop="4dp"
-                                android:paddingEnd="24dp"
-                                android:text="Case History"
-                                android:textColor="@color/colorPrimTxt"
-                                android:textSize="16sp" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/blue_rounded_bg"
-                                android:orientation="horizontal"
-                                android:padding="16dp"
-                                android:visibility="gone">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:background="@drawable/blue_rounded_bg"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/poppins_medium"
-                                        android:text="Age"
-                                        android:textColor="@color/white"
-                                        android:textSize="18sp" />
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/poppins_medium"
-                                        android:text="Weight"
-                                        android:textColor="@color/white"
-                                        android:textSize="18sp" />
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/poppins_medium"
-                                        android:text="Blood"
-                                        android:textColor="@color/white"
-                                        android:textSize="18sp" />
-
-                                </LinearLayout>
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:background="@drawable/blue_rounded_bg"
-                                    android:gravity="end"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/poppins_medium"
-                                        android:text="Gender"
-                                        android:textColor="@color/white"
-                                        android:textSize="18sp" />
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/poppins_medium"
-                                        android:text="Height"
-                                        android:textColor="@color/white"
-                                        android:textSize="18sp" />
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/poppins_medium"
-                                        android:text="Dept"
-                                        android:textColor="@color/white"
-                                        android:textSize="18sp" />
-
-
-                                </LinearLayout>
-
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:id="@+id/infoDialog"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/bg_main"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:text="Title"
-                                    android:textColor="@color/colorSecTxt"
-                                    android:textSize="14sp" />
-
-                                <TextView
-                                    android:id="@+id/tvCaseName"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:text=""
-                                    android:textColor="@color/colorPrimTxt"
-                                    android:textSize="14sp" />
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="0.5dp"
-                                    android:layout_marginTop="8dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:background="@color/colorSecTxt" />
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/poppins_medium"
-                                        android:text="Last Update: "
-                                        android:textColor="@color/colorSecTxt"
-                                        android:textSize="14sp" />
-
-                                    <TextView
-                                        android:id="@+id/tvLastUpdated"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/poppins_medium"
-                                        android:text=""
-                                        android:textColor="@color/colorCta"
-                                        android:textSize="14sp" />
-                                </LinearLayout>
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="0.5dp"
-                                    android:layout_marginTop="8dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:background="@color/colorSecTxt" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:text="Diagnosis"
-                                    android:textColor="@color/colorSecTxt"
-                                    android:textSize="14sp" />
-
-                                <TextView
-                                    android:id="@+id/tvDiagnosis"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/poppins_medium"
-                                    android:text=""
-                                    android:textColor="@color/colorPrimTxt"
-                                    android:textSize="14sp" />
-
-                            </LinearLayout>
-
-
-
-
-                        </LinearLayout>
-                    </LinearLayout>
-
-                </com.facebook.shimmer.ShimmerFrameLayout>
-            </com.google.android.material.appbar.CollapsingToolbarLayout>
-        </com.google.android.material.appbar.AppBarLayout>
-
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-            >
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="8dp"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:paddingTop="4dp"
-                    android:paddingEnd="24dp"
-                    android:text="Pages"
-                    android:textColor="@color/colorPrimTxt"
-                    android:textSize="16sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="@color/colorPrimTxt"
-                    android:id="@+id/llStrip"
-                    android:visibility="gone"
-                    android:orientation="horizontal" />
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rcvPages"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
-
-            </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llAdditionals"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
             <TextView
+                android:text="Case Details"
+                android:fontFamily="@font/inter_bold"
+                android:textSize="24sp"
+                android:textColor="@color/natural700"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/backBtn"
+                app:layout_constraintBottom_toBottomOf="@id/backBtn" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                style="@style/CustomTabLayout"
+                app:layout_constraintTop_toBottomOf="@id/backBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="8dp"
-                android:fontFamily="@font/poppins_semibold"
-                android:paddingTop="4dp"
-                android:paddingEnd="24dp"
-                android:text="Additionals"
-                android:textColor="@color/colorPrimTxt"
-                android:textSize="16sp" />
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcvAdditionals"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-        </LinearLayout>
+                android:backgroundTint="@color/white"
+                android:id="@+id/tabLayout" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        </LinearLayout>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.cardview.widget.CardView>
 
-
-
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 </LinearLayout>

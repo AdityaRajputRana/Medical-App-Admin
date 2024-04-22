@@ -42,7 +42,7 @@ public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapte
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.notepadView.clearDrawing(viewCaseRP.getPageNumbers().get(position), true, false);
-        holder.pageCount.setText("Page no: " + viewCaseRP.getPageNumbers().get(position));
+        holder.pageCount.setText("Page " + viewCaseRP.getPageNumbers().get(position));
         holder.llPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
