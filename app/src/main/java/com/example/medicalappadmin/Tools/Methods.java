@@ -205,7 +205,22 @@ public class Methods {
         context.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
+    public static String[] splitDateTime(String dateTimeString) {
+        String[] out = dateTimeString.split(",");
+        for (int i = 0; i < out.length; i++){
+            out[i] = out[i].trim();
+        }
+        return out;
+    }
 
+    public static String[] getDateTime(long timestamp) {
+        String dateTimeString = convertDate(timestamp);
+        String[] out = dateTimeString.split(",");
+        for (int i = 0; i < out.length; i++){
+            out[i] = out[i].trim();
+        }
+        return out;
+    }
     public static String convertDate(long timestamp) {
         Date date = new Date(timestamp);
         Date today = new Date();

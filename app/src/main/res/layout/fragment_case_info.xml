@@ -5,10 +5,183 @@
     android:layout_height="match_parent"
     tools:context=".fragments.CaseDetails.CaseInfoFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+   <androidx.core.widget.NestedScrollView
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+       <LinearLayout
+           android:orientation="vertical"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content">
+
+           <LinearLayout
+               android:visibility="gone"
+               android:id="@+id/patientDetailsLayout"
+               android:layout_marginTop="20dp"
+               android:padding="16dp"
+               android:orientation="horizontal"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content">
+               <LinearLayout
+                   android:layout_weight="1"
+                   android:layout_width="0dp"
+                   android:orientation="vertical"
+                   android:layout_height="wrap_content">
+                   <TextView
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:id="@+id/patientNameTxt"
+                       android:text="Aditya Rana"
+                       android:fontFamily="@font/inter_medium"
+                       android:textColor="@color/natural600"
+                       android:textSize="16sp" />
+                   <TextView
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:id="@+id/patientDetailsTxt"
+                       android:text="Male | 20 yrs 5 months"
+                       android:fontFamily="@font/inter"
+                       android:textColor="@color/natural400"
+                       android:textSize="14sp" />
+               </LinearLayout>
+
+               <ImageButton
+                   android:layout_width="wrap_content"
+                   android:layout_height="match_parent"
+                   android:src="@drawable/ic_call"
+                   android:backgroundTint="@android:color/transparent" />
+
+           </LinearLayout>
+
+           <LinearLayout
+               android:visibility="gone"
+               android:orientation="vertical"
+               android:padding="16dp"
+               android:layout_margin="16dp"
+               android:background="@drawable/bg_sec_rounded"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:id="@+id/caseDetailsLayout">
+
+               <LinearLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:orientation="horizontal">
+
+                   <TextView
+                       android:layout_width="130dp"
+                       android:layout_height="wrap_content"
+                       android:text="Case Title"
+                       android:textSize="16sp"
+                       android:fontFamily="@font/inter"
+                       android:textColor="@color/natural500" />
+
+                   <TextView
+                       android:id="@+id/caseTitleTxt"
+                       android:layout_width="0dp"
+                       android:layout_weight="1"
+                       android:layout_height="wrap_content"
+                       android:text="Regular Visit"
+                       android:textSize="16sp"
+                       android:fontFamily="@font/inter_bold"
+                       android:textColor="@color/natural600" />
+
+
+               </LinearLayout>
+               <LinearLayout
+                   android:layout_marginTop="16dp"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:orientation="horizontal">
+
+                   <TextView
+                       android:layout_width="130dp"
+                       android:layout_height="wrap_content"
+                       android:text="Last Update"
+                       android:textSize="16sp"
+                       android:fontFamily="@font/inter"
+                       android:textColor="@color/natural500" />
+
+                   <TextView
+                       android:id="@+id/lastUpdateDateTxt"
+                       android:layout_width="0dp"
+                       android:layout_weight="1"
+                       android:layout_height="wrap_content"
+                       android:text="15 / 02 / 2024"
+                       android:textSize="16sp"
+                       android:fontFamily="@font/inter_bold"
+                       android:textColor="@color/natural600" />
+
+
+               </LinearLayout>
+               <LinearLayout
+                   android:layout_marginTop="16dp"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:orientation="horizontal">
+
+                   <TextView
+                       android:layout_width="130dp"
+                       android:layout_height="wrap_content"
+                       android:text="Time"
+                       android:textSize="16sp"
+                       android:fontFamily="@font/inter"
+                       android:textColor="@color/natural500" />
+
+                   <TextView
+                       android:id="@+id/lastUpdateTime"
+                       android:layout_width="0dp"
+                       android:layout_weight="1"
+                       android:layout_height="wrap_content"
+                       android:text="3:45 PM"
+                       android:textSize="16sp"
+                       android:fontFamily="@font/inter_bold"
+                       android:textColor="@color/natural600" />
+
+
+               </LinearLayout>
+
+
+           </LinearLayout>
+
+           <LinearLayout
+               android:id="@+id/additionalLayout"
+               android:orientation="vertical"
+               android:layout_margin="16dp"
+               android:visibility="gone"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content">
+
+               <TextView
+                   android:textSize="20sp"
+                   android:fontFamily="@font/inter_bold"
+                   android:textColor="@color/natural600"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Attachments" />
+
+
+               <androidx.recyclerview.widget.RecyclerView
+                   android:id="@+id/additionalRcv"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent"
+                   android:paddingVertical="16dp"
+                   android:clipToPadding="false"
+                   android:layout_weight="1"/>
+
+           </LinearLayout>
+
+           <ProgressBar
+               android:id="@+id/progressBar"
+               android:layout_margin="8dp"
+               android:layout_gravity="center"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+
+
+
+
+
+       </LinearLayout>
+   </androidx.core.widget.NestedScrollView>
 
 </FrameLayout>

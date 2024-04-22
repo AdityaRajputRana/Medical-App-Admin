@@ -30,6 +30,7 @@ public class ViewCaseRP {
     }
 
     public String getTitle() {
+        if (title == null || title.isEmpty()) return "Regular Visit";
         return title;
     }
 

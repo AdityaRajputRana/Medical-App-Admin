@@ -92,6 +92,7 @@ public class CaseDetailsActivity extends AppCompatActivity {
 
     private void updateUI(ViewCaseRP response) {
         prescriptionFragment.setUI(response);
+        caseInfoFragment.setUI(response);
     }
 
 
