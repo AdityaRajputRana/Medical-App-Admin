@@ -27,9 +27,9 @@ public class Patient {
     }
 
     public String getFullName() {
-        if (fullName == null)
-            return name;
-        return fullName;
+        if (fullName != null) return fullName;
+        if (name != null) return name;
+        return "Unregistered Patient";
     }
 
     public void setFullName(String fullName) {

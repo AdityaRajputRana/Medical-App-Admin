@@ -34,10 +34,7 @@ public class PrescriptionFragment extends Fragment {
     private void updateUI() {
         binding.progressBar.setVisibility(View.GONE);
 
-        //PatientDetails
         String name = viewCaseRP.getPatient().getFullName();
-        if (name == null) name = viewCaseRP.getTitle();
-        if (name == null) name = "Untitled Case";
         binding.patientNameTxt.setText(name);
 
         String details = "";
