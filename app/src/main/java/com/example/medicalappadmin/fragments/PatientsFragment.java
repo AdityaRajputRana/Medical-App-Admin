@@ -1,5 +1,6 @@
 package com.example.medicalappadmin.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -33,6 +34,8 @@ public class PatientsFragment extends Fragment {
 
     private PatientListAdapter adapter;
     LinearLayoutManager manager;
+    private Activity activity;
+
 
 
     public PatientsFragment() {
@@ -47,6 +50,7 @@ public class PatientsFragment extends Fragment {
         if (binding == null) {
             binding = FragmentPatientsBinding.inflate(inflater);
             binding.pbPatientHistory.setVisibility(View.GONE);
+            activity = getActivity();
 
 
             manager = new LinearLayoutManager(getActivity());
@@ -132,7 +136,7 @@ public class PatientsFragment extends Fragment {
                 totalPages = response.getTotalPages();
 
                 if (adapter == null) {
-                    adapter = new PatientListAdapter(response, getActivity(), new PatientListAdapter.PatientListener() {
+                    adapter = new PatientListAdapter(response, getActivity() == null? activity :getActivity(), new PatientListAdapter.PatientListener() {
                         @Override
                         public void onPatientClicked(String id) {
                             //TODO open patient details
