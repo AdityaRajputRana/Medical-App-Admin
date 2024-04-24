@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.medicalappadmin.ActivityPatientDetails;
 import com.example.medicalappadmin.DetailedPageViewActivity;
 import com.example.medicalappadmin.Models.Page;
 import com.example.medicalappadmin.R;
@@ -70,7 +71,18 @@ public class PrescriptionFragment extends Fragment {
                              Bundle savedInstanceState) {
         if (binding == null){
             binding = FragmentPrescriptionBinding.inflate(inflater);
+            setListeners();
         }
         return binding.getRoot();
+    }
+
+    private void setListeners() {
+        if (binding == null) return;
+        binding.patientDetailsLayout.setOnClickListener(view->{
+            if(viewCaseRP == null) return;
+            Intent i = new Intent(getActivity(), ActivityPatientDetails.class);
+            i.putExtra("PATIENT_ID",viewCaseRP.getPatient().get_id());
+            getActivity().startActivity(i);
+        });
     }
 }

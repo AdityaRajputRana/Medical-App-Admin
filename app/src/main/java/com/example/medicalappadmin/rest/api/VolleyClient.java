@@ -5,14 +5,19 @@ import com.example.medicalappadmin.app.MyApplication;
 
 public class VolleyClient {
 
-    public static String testURL = "http://10.0.2.2:8080/";
     public static String suffix = "";
-    public static String BASE_URL = "https://medicalappmangal.onrender.com/";
+
+    static String localUrl = "http://10.0.2.2:8080/";
+    static String devUrl = "https://medicalappmangal.onrender.com/";
+    static String prodUrl = "";
+
+    static boolean useProd = false;
+    static boolean useDev = false;
 
     public static String getBaseUrl() {
-        if (false)
-            return testURL;
-        return BASE_URL;
+        if (useProd) return prodUrl;
+        if (useDev) return devUrl;
+        return localUrl;
     }
 
     public static RequestQueue getRequestQueue() {

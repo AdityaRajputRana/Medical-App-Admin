@@ -1,5 +1,6 @@
 package com.example.medicalappadmin.fragments.CaseDetails;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.medicalappadmin.ActivityPatientDetails;
 import com.example.medicalappadmin.Models.MetaData;
 import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Tools.Methods;
@@ -82,8 +84,19 @@ public class CaseInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         if (binding == null){
             binding = FragmentCaseInfoBinding.inflate(inflater);
+            setListeners();
         }
         return binding.getRoot();
+    }
+
+    private void setListeners() {
+        if (binding == null) return;
+        binding.patientDetailsLayout.setOnClickListener(view->{
+            if(viewCaseRP == null) return;
+            Intent i = new Intent(getActivity(), ActivityPatientDetails.class);
+            i.putExtra("PATIENT_ID",viewCaseRP.getPatient().get_id());
+            getActivity().startActivity(i);
+        });
     }
 
 
