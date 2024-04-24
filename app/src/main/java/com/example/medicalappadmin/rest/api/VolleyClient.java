@@ -12,7 +12,7 @@ public class VolleyClient {
     static String prodUrl = "";
 
     static boolean useProd = false;
-    static boolean useDev = false;
+    static boolean useDev = true;
 
     public static String getBaseUrl() {
         if (useProd) return prodUrl;

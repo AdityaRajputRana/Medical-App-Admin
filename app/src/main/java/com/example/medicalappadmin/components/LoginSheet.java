@@ -31,6 +31,7 @@ import com.example.medicalappadmin.rest.requests.AddMobileNoReq;
 import com.example.medicalappadmin.rest.requests.LinkPageReq;
 import com.example.medicalappadmin.rest.response.AddDetailsRP;
 import com.example.medicalappadmin.rest.response.AddMobileNoRP;
+import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
 import com.example.medicalappadmin.rest.response.ViewPatientRP;
@@ -47,10 +48,12 @@ public class LoginSheet {
     private int pageNo;
     private String gender = "M";
     private PatientDetailsListener listener;
+    private InitialisePageRP currentPageRP;
 
-    private LoginSheet(AppCompatActivity context, int pageNo) {
+    private LoginSheet(AppCompatActivity context, int pageNo, InitialisePageRP currentPageRP) {
         this.context = context;
         this.pageNo = pageNo;
+        this.currentPageRP = currentPageRP;
         if (context instanceof PatientDetailsListener) {
             listener = (PatientDetailsListener) context;
         }
@@ -72,9 +75,9 @@ public class LoginSheet {
         handleGender();
     }
 
-    public static LoginSheet getInstance(AppCompatActivity context, int pageNo) {
+    public static LoginSheet getInstance(AppCompatActivity context, int pageNo, InitialisePageRP currentPageRP) {
         if (instance == null || instance.pageNo != pageNo || instance.context != context) {
-            instance = new LoginSheet(context, pageNo);
+            instance = new LoginSheet(context, pageNo, currentPageRP);
         }
         return instance;
     }
@@ -83,7 +86,8 @@ public class LoginSheet {
         if (!dialog.isShowing()) {
             dialog.show();
         }
-        if (binding.etBSMobile.getText().length() >= 10) return;
+        if (currentPageRP.getPatient() != null) return;
+        if (String.valueOf(currentPageRP.getPage().getMobileNumber()).length() >= 10) return;
         if (character == 10){
             if (binding.etBSMobile.getText().length() == 0) {
                 Toast.makeText(context, "All Values cleared", Toast.LENGTH_SHORT).show();

@@ -7,6 +7,7 @@ public class Page {
     String patientID;
     String hospitalId;
     String caseId;
+    Integer age;
     String creatorId;
     String doctorId;
     long createdAt;
@@ -27,12 +28,17 @@ public class Page {
         return mobileNumber;
     }
 
+    public Integer getAge(){
+        return age;
+    }
+
     public void setMobileNumber(Long mobileNumber) {
         this.mobileNumber = mobileNumber;
     }
 
     public String getFullName() {
-        return fullName;
+        if (fullName != null) return fullName;
+        return "";
     }
 
     public void setFullName(String fullName) {

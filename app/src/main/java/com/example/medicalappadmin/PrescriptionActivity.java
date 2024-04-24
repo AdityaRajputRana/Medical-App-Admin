@@ -17,6 +17,9 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AnticipateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -107,7 +110,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     int currentPageNumber = -1;
     ArrayList<Point> pendingPoints = new ArrayList<>();
     Page currentPage;
+    InitialisePageRP currentInitPageResponse;
     ActionBarDrawerToggle actionBarDrawerToggle;
+
+
     EditText etFullName;
     EditText etMobileNumber;
     EditText etEmail;
@@ -136,6 +142,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     RadioGroup relativeRadioSelector;
     RecyclerView rcvRelPrevCases;
     AppCompatButton btnRelNewCase;
+
+
+
     String gender = "M";
     ArrayList<LinkedPatient> relatives;
     SmartPenDriver driver = SmartPenDriver.getInstance(this); //driverStep1
@@ -236,7 +245,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     private void linkMobileNumber(long mobileNo) {
         if (currentPageNumber == -1) {
             Toast.makeText(PrescriptionActivity.this, "Please touch your page with pen", Toast.LENGTH_SHORT).show();
-            binding.drawerLayout.close();
+//            binding.drawerLayout.close();
             return;
         }
 
@@ -253,7 +262,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             @Override
             public void success(AddMobileNoRP response) {
 
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo).handleAddMobileResponse(response);
+                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).handleAddMobileResponse(response);
 
                 pbAddMobile.setVisibility(View.GONE);
 
@@ -295,24 +304,39 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         binding = ActivityPrescriptionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Methods.setStatusBarColor(getColor(R.color.colorCta), PrescriptionActivity.this);
-
-        setSupportActionBar(binding.toolbar);
-
         loadDoctorConfigurations();
-
-
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_close);
-        binding.drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.syncState();
-
 
         findViews();
         handleGender();
         setListeners();
-
         intialiseControls();
+    }
 
+
+    private Handler patientDetailsblinkHandler = new Handler();
+    private Runnable patientDetailsBlinkRunnable = new Runnable() {
+        @Override
+        public void run() {
+            binding.patientDetailsSection.animate()
+                    .alpha(binding.patientDetailsSection.getAlpha()==0?0.4f:0)
+                    .setDuration(750)
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .start();
+            patientDetailsblinkHandler.postDelayed(this, 900);
+        }
+    };
+
+    private void hidePatientDetailsLayout() {
+        patientDetailsblinkHandler.post(patientDetailsBlinkRunnable);
+    }
+
+    private void showPatientDetailsLayout(){
+        patientDetailsblinkHandler.removeCallbacks(patientDetailsBlinkRunnable);
+        binding.patientDetailsSection.animate()
+                .alpha(1)
+                .setDuration(300)
+                .setInterpolator(new AnticipateInterpolator())
+                .start();
     }
 
     private void setListeners() {
@@ -340,22 +364,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                     linkMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
                 }
             }
-        });
-
-
-        //todo: remove it
-        binding.actionBtn.setOnClickListener(view -> {
-//            drawEvent(0, 0, 46, 0);
-            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(0,0,62 ,0,false));
-
-        });
-
-        binding.actionBtn.setOnLongClickListener(view -> {
-//            showOtherGuidesBS();
-            showRecordVoiceSheet();
-            startRecording();
-            return true;
-
         });
     }
 
@@ -452,7 +460,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 int selectedRelativeId = relativeRadioSelector.getCheckedRadioButtonId();
                 if (selectedRelativeId != -1) {
                     showRelativeDetails(selectedRelativeId);
-                    LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showRelativeDetails(selectedRelativeId,relatives);
+                    LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showRelativeDetails(selectedRelativeId,relatives);
                 } else {
                     Toast.makeText(PrescriptionActivity.this, "Select a relative first", Toast.LENGTH_SHORT).show();
                 }
@@ -542,11 +550,17 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
     private void hideAllLayouts(){
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
+        hidePatientDetailsLayout();
+        LoginSheet.hideSheet();
+        if(recordVoiceDialog != null && recordVoiceDialog.isShowing()){
+            Toast.makeText(this, "Voice Recording Cancelled due to page change!", Toast.LENGTH_SHORT).show();
+            recordVoiceDialog.dismiss();
+        }
+//        llAddMobileNumber.setVisibility(View.GONE);
+//        llPrevPatientList.setVisibility(View.GONE);
+//        llNewPatient.setVisibility(View.GONE);
+//        llExistingPatientDetails.setVisibility(View.GONE);
+//        llRelPrevCases.setVisibility(View.GONE);
     }
     private void showAddNewPatientLayout() {
         llAddMobileNumber.setVisibility(View.GONE);
@@ -616,7 +630,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             @Override
             public void success(ViewPatientRP response) {
 
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showRelativesCasesLayout(response,relativeId,selectedRelative);
+                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showRelativesCasesLayout(response,relativeId,selectedRelative);
 
                 showRelativesCasesLayout(response,relativeId,selectedRelative);
 
@@ -651,14 +665,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 rcvRelPrevCases.setEnabled(true);
                 Toast.makeText(PrescriptionActivity.this, "Page is linked to " + selectedRelative.getFullName(), Toast.LENGTH_SHORT).show();
                 pbSelectRelative.setVisibility(View.GONE);
-                binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
+//                TODO: binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
 
                 showExistingPatientLayout(
                         selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showExistingPatientLayout(selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
+                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showExistingPatientLayout(selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
 
                 clearAllCache();
-                binding.drawerLayout.close();
+//                binding.drawerLayout.close();
                 btnRelNewCase.setEnabled(true);
                 rcvRelPrevCases.setEnabled(true);
             }
@@ -690,13 +704,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             public void success(LinkPageRP response) {
                 Toast.makeText(PrescriptionActivity.this, "Page is linked to " + selectedRelative.getFullName(), Toast.LENGTH_SHORT).show();
                 pbSelectRelative.setVisibility(View.GONE);
-                binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showExistingPatientLayout(selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
+//                binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
+                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showExistingPatientLayout(selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
                 showExistingPatientLayout(selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
                 Log.i(TAG, "success: linking" + etFullName.getText().toString());
 
 
-                binding.drawerLayout.close();
+//                binding.drawerLayout.close();
 
             }
 
@@ -740,7 +754,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             @Override
             public void success(AddDetailsRP response) {
                 pbSaveNewPatient.setVisibility(View.GONE);
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showExistingPatientLayout(response.getPatient().getFullName(),response.getPatient().getGender(),String.valueOf(response.getPatient().getMobileNumber()));
+                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showExistingPatientLayout(response.getPatient().getFullName(),response.getPatient().getGender(),String.valueOf(response.getPatient().getMobileNumber()));
 
                 showExistingPatientLayout(response.getPatient().getFullName(),response.getPatient().getGender(),String.valueOf(response.getPatient().getMobileNumber()));
 
@@ -752,10 +766,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
                 clearAllCache();
 
-                binding.toolbar.setSubtitle("Details saved successfully");
+                binding.pageStatusTxt.setText("Details saved!");
                 Toast.makeText(PrescriptionActivity.this, "Details saved successfully", Toast.LENGTH_SHORT).show();
                 btnSave.setEnabled(true);
-                binding.drawerLayout.close();
+//                binding.drawerLayout.close();
 
             }
 
@@ -764,7 +778,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 pbSaveNewPatient.setVisibility(View.GONE);
                 btnSave.setEnabled(true);
                 showError(message, null);
-                binding.drawerLayout.close();
+//                binding.drawerLayout.close();
                 Log.i("Adi", "fail: saving new patient " + message);
             }
         });
@@ -1008,88 +1022,93 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         int actionType = drawAction.actionType;
 
         if (pageId != currentPageNumber) {
-            uploadPoints();
-            LoginSheet.hideSheet();
-            if (handler != null) {
-                handler.removeCallbacks(runnable);
-                handler = null;
-                runnable = null;
-            }
-            binding.canvasView.clearDrawing(pageId);
-            currentPageNumber = pageId;
-            binding.toolbar.setTitle("Page : " + currentPageNumber);
-            binding.toolbar.setSubtitle("Initialising Page");
-            showPB();
-            final int pageNo = currentPageNumber;
-            btnSave.setEnabled(false);
-            hideAllLayouts();
-            tvDrawerInit.setText("Please wait. Initialising Page...");
-
-            APIMethods.initialisePage(this, currentPageNumber, new APIResponseListener<InitialisePageRP>() {
-                @Override
-                public void success(InitialisePageRP response) {
-                    pbSyncPage.setVisibility(View.GONE);
-                    btnSave.setEnabled(true);
-
-                    if(recordVoiceDialog != null){
-                        recordVoiceDialog.dismiss();
-                    }
-
-                    if (!response.isNewPage()) {
-                        if(response.getPage().getHospitalPatientId() == null && response.getPage().getMobileNumber() != 0){
-                            showAddNewPatientLayout();
-                            LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showAddNewPatientLayout();
-                        } else if (response.getPage().getHospitalPatientId() != null) {
-                            String name = "";
-                            String gender = "";
-                            String mobileNo = "";
-                            Log.i(TAG, "success: initialised page " + response.getPatient().getGender());
-                            if (response.getPatient().getGender() != null && !response.getPatient().getGender().isEmpty()) {
-                                gender = response.getPatient().getGender();
-                            }
-                            if (response.getPatient().getFullName() != null && !response.getPatient().getFullName().isEmpty() && !response.getPatient().getFullName().equals("")) {
-                                name = response.getPatient().getFullName();
-                            }
-                            if (response.getPatient().getMobileNumber() != null && response.getPatient().getMobileNumber() != 0) {
-                                mobileNo = String.valueOf(response.getPatient().getMobileNumber());
-                            }
-                            LoginSheet.getInstance(PrescriptionActivity.this,pageNo).showExistingPatientLayout(
-                                    name,gender,mobileNo);
-
-                            showExistingPatientLayout(name,gender,mobileNo);
-
-
-                        } else {
-                            showAddMobileNoLayout();
-                        }
-
-                        Log.i("Optimiz", "adding coords");
-                        binding.canvasView.addCoordinates(response.getPage().getPoints());
-                    } else {
-                        showAddMobileNoLayout();
-                    }
-                    hidePB();
-                    currentPage = response.getPage();
-                    setTimelyUploads();
-                    tvDrawerInit.setVisibility(View.GONE);
-                    binding.drawerLayout.close();
-                    binding.toolbar.setSubtitle("Page initialised successfully");
-
-                }
-
-                @Override
-                public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                    hidePB();
-                    Methods.showError(PrescriptionActivity.this, message, true);
-                    tvDrawerInit.setText("Error while initialising page.");
-                    pbSyncPage.setVisibility(View.GONE);
-                    btnSave.setEnabled(true);
-
-                }
-            });
+            startPageChangeProcedure(pageId);
         }
         binding.canvasView.addCoordinate(x, y, actionType);
         pendingPoints.add(new Point(x, y, actionType));
+    }
+
+    private void startPageChangeProcedure(int pageId) {
+        uploadPoints();
+        //UploadPointsHandlerRemoval
+        if (handler != null) {
+            handler.removeCallbacks(runnable);
+            handler = null;
+            runnable = null;
+        }
+        binding.canvasView.clearDrawing(pageId);
+        currentPageNumber = pageId;
+        binding.pageNumberTxt.setText("Page " + currentPageNumber);
+        binding.pageStatusTxt.setText("Initialising Page");
+        showPB();
+        final int pageNo = currentPageNumber;
+        hideAllLayouts();
+        currentInitPageResponse = null;
+        APIMethods.initialisePage(this, currentPageNumber, new APIResponseListener<InitialisePageRP>() {
+            @Override
+            public void success(InitialisePageRP response) {
+                currentInitPageResponse = response;
+                currentPage = response.getPage();
+                showLikedPatientInformation();
+
+
+                if (response.getPage() != null
+                        && response.getPage().getPoints() != null
+                        && response.getPage().getPoints().size() > 0)
+                    binding.canvasView.addCoordinates(response.getPage().getPoints());
+
+                setTimelyUploads();
+
+                binding.pageStatusTxt.setText("Page Initialized");
+                hidePB();
+            }
+
+            @Override
+            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
+                hidePB();
+                Methods.showError(PrescriptionActivity.this, message, true);
+            }
+        });
+    }
+
+    private void showLikedPatientInformation() {
+        if (currentInitPageResponse == null){
+            return;
+        }
+
+        showPatientDetailsLayout();
+        binding.linkPatientBtn.setVisibility(
+                currentInitPageResponse.getPatient() == null?View.VISIBLE: View.GONE
+        );
+
+        String nameTxt = currentInitPageResponse.getPage().getFullName();
+        if (currentInitPageResponse.getPatient() != null){
+            nameTxt = currentInitPageResponse.getPatient().getFullName();
+        }
+        binding.patientNameTxt.setText(nameTxt == null || nameTxt.isEmpty() ? "-" : nameTxt);
+
+        Long mobNum = currentInitPageResponse.getPage().getMobileNumber();
+        if (currentInitPageResponse.getPatient() != null){
+            mobNum = currentInitPageResponse.getPatient().getMobileNumber();
+        }
+        String mobNumTxt = (mobNum == null || mobNum == 0)?"-":String.valueOf(mobNum);
+        binding.patientMobileNumberTxt.setText(mobNumTxt);
+
+        String age = "";
+        if (currentInitPageResponse.getPage().getAge() != null)
+            age = String.valueOf(currentInitPageResponse.getPage().getAge());
+        if (currentInitPageResponse.getPatient() != null){
+            age = currentInitPageResponse.getPatient().getAge();
+        }
+        binding.patientAgeTxt.setText(age);
+        String gender = currentInitPageResponse.getPage().getGender();
+        if (currentInitPageResponse.getPatient() != null){
+            gender = currentInitPageResponse.getPatient().getGender();
+        }
+        if (gender != null && !gender.isEmpty()) {
+            gender = "(" + gender + ")";
+            binding.patientAgeTxt.setText(age + gender);
+        }
     }
 
     @Override
@@ -1128,13 +1147,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             AddDetailsReq req = new AddDetailsReq();
             req.setGender(gender);
             req.setPageNumber(currentPageNumber);
-            binding.toolbar.setSubtitle("Saving patient details...");
+            binding.pageStatusTxt.setText("Saving Patient Details");
             binding.pbPrescription.setVisibility(View.VISIBLE);
 
             APIMethods.addDetails(PrescriptionActivity.this, req, new APIResponseListener<AddDetailsRP>() {
                 @Override
                 public void success(AddDetailsRP response) {
-                    binding.toolbar.setSubtitle("Saved details successfully...");
+                    binding.pageStatusTxt.setText("Saved Patient Details");
                     if(gender.equals("M")){
                         Toast.makeText(PrescriptionActivity.this, "Patient gender is set as Male", Toast.LENGTH_LONG).show();
 
@@ -1296,33 +1315,38 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
     private void showLoginSheet(int id) {
-        LoginSheet.getInstance(this,currentPageNumber)
+        LoginSheet.getInstance(this,currentPageNumber, currentInitPageResponse)
                 .inputCharacter(id);
     }
+
+    private void setPageStatus(String statusTxt){
+        if (statusTxt.length() > 36)
+            statusTxt = statusTxt.substring(0, 36) + "...";
+        binding.pageStatusTxt.setText(statusTxt);
+    }
+
 
 
     public void linkGuideToPatient(Guide guide){
         if(otherGuidesBSDialog != null){
             otherGuidesBSDialog.dismiss();
         }
-        binding.toolbar.setSubtitle("Linking guide "+ guide.getName());
+
+        setPageStatus("Linking guide: "+ guide.getName());
         binding.pbPrescription.setVisibility(View.VISIBLE);
         LinkGuideReq req = new LinkGuideReq(guide.get_id(),currentPageNumber);
         APIMethods.linkAdditionalGuide(PrescriptionActivity.this, req, new APIResponseListener<LinkGuideRP>() {
             @Override
             public void success(LinkGuideRP response) {
-                binding.toolbar.setSubtitle("Added guide "+ guide.getName() + " to the patient");
-
+                setPageStatus("Added guide: "+ guide.getName() + " to the patient");
                 binding.pbPrescription.setVisibility(View.GONE);
-
                 Toast.makeText(PrescriptionActivity.this, guide.getName() + "is attached to the patient.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                binding.toolbar.setSubtitle("Some error occurred while linking guide.");
-
-                Log.i(TAG, "fail: linking guide "+message);
+                setPageStatus("Some error occurred while linking guide.");
+                Log.e(TAG, "fail: linking guide "+message);
                 binding.pbPrescription.setVisibility(View.GONE);
                 showError(message,null);
             }
@@ -1335,13 +1359,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     private ArrayList<Guide> guidesList;
     private ArrayList<Guide> otherGuidesList;
     private void loadDoctorConfigurations() {
-        binding.toolbar.setSubtitle("Loading configurations");
+        setPageStatus("Loading configurations");
         binding.pbPrescription.setVisibility(View.VISIBLE);
 
         APIMethods.configurePage(PrescriptionActivity.this, new EmptyReq(), new APIResponseListener<ConfigurePageRP>() {
             @Override
             public void success(ConfigurePageRP response) {
-                binding.toolbar.setSubtitle("Configured page");
+                setPageStatus("Configured page");
                 binding.pbPrescription.setVisibility(View.GONE);
 
 
@@ -1473,12 +1497,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             pendingPoints = new ArrayList<>();
 
             //call upload points
-            binding.toolbar.setSubtitle("Synchronising page");
+            setPageStatus("Synchronising page");
 
             APIMethods.uploadPoints(PrescriptionActivity.this, currentPageNumber, uploadPoints, new APIResponseListener<EmptyRP>() {
                 @Override
                 public void success(EmptyRP response) {
-                    binding.toolbar.setSubtitle("Page synchronised");
+                    setPageStatus("Page synchronised");
                 }
 
                 @Override

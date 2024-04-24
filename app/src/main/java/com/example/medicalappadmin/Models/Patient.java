@@ -14,6 +14,7 @@ public class Patient {
         return age;
     }
 
+
     public String getName() {
         return name;
     }
@@ -30,6 +31,12 @@ public class Patient {
         if (fullName != null) return fullName;
         if (name != null) return name;
         return "Unregistered Patient";
+    }
+
+    public String getFullNameAsItIs() {
+        if (fullName != null) return fullName;
+        if (name != null) return name;
+        return "";
     }
 
     public void setFullName(String fullName) {

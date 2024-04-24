@@ -1,299 +1,409 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/colorBackground"
+    android:orientation="vertical"
+    android:background="@color/white"
     tools:context=".PrescriptionActivity">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <!--TODO:Remove it-->
-        <LinearLayout
-            android:id="@+id/llTop"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/white">
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/blue_bg"
-            android:orientation="vertical"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:gravity="center"
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:padding="10dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    app:srcCompat="@drawable/hos_name"
-                    android:visibility="gone" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_semibold"
-                        android:text="Hospital Name"
-                        android:textColor="@color/white"
-                        android:textSize="20sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_medium"
-                        android:text="Qualifications of doctor"
-                        android:textColor="@color/white"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_medium"
-                        android:text="Reg number"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:visibility="gone" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="5dp"
-                    android:background="#175D8F"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/actionBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="3dp"
-                        android:background="@drawable/rounded_off_white_bg"
-                        android:fontFamily="@font/poppins_semibold"
-                        android:paddingHorizontal="7dp"
-                        android:paddingVertical="2dp"
-                        android:text="SUBMIT"
-                        android:textColor="#175D8F"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="3dp"
-                        android:background="@drawable/rounded_white_border_bg"
-                        android:fontFamily="@font/poppins_semibold"
-                        android:paddingHorizontal="5dp"
-                        android:paddingVertical="2dp"
-                        android:text="DND"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/rounded_white_border_bg"
-                        android:fontFamily="@font/poppins_semibold"
-                        android:paddingHorizontal="5dp"
-                        android:paddingVertical="2dp"
-                        android:text="History"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:visibility="gone" />
-
-
-                </LinearLayout>
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/backBtn"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/blue_bg"
-                android:elevation="4dp"
-                app:navigationIcon="@drawable/hamburger_icon"
-                app:subtitle="current process"
-                app:subtitleTextColor="@color/white"
-                app:title="Page Number"
-                app:titleTextColor="@color/white" />
+                android:padding="8dp"
+                app:layout_constraintBottom_toTopOf="@id/pbPrescription"
+                app:srcCompat="@drawable/ic_back"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="Prescription"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimTxt"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@id/backBtn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/backBtn"/>
 
             <ProgressBar
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:id="@+id/pbPrescription"
+                android:layout_marginBottom="0dp"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-5dp"
                 android:indeterminate="true"
                 android:indeterminateTint="@color/blue_bg"
                 android:visibility="gone" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:id="@+id/mainLayout"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/pageOptionsLayout"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:fontFamily="@font/inter_semibold"
+                android:text="Page"
+                android:textSize="14sp"
+                android:textColor="@color/natural500"
+                android:id="@+id/pageNumberTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </TextView>
+
+            <TextView
+                android:fontFamily="@font/inter_medium"
+                android:text="|"
+                android:layout_marginHorizontal="8dp"
+                android:textSize="14sp"
+                android:textColor="@color/natural500"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </TextView>
+
+            <TextView
+                android:fontFamily="@font/inter_semibold"
+                android:text="Loading Page"
+                android:textSize="14sp"
+                android:textColor="@color/natural500"
+                android:id="@+id/pageStatusTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </TextView>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:backgroundTint="@android:color/transparent"
+                android:id="@+id/addAttachmentBtn"
+                android:src="@drawable/ic_cam_prescription_opt"
+                android:layout_width="36dp"
+                android:layout_height="36dp"/>
+
+            <ImageButton
+                android:layout_marginStart="16dp"
+                android:backgroundTint="@android:color/transparent"
+                android:id="@+id/syncOfflineDataBtn"
+                android:src="@drawable/ic_grid_sync_data"
+                android:layout_width="36dp"
+                android:layout_height="36dp"/>
 
 
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+        <androidx.cardview.widget.CardView
             android:layout_weight="1"
-            >
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/prescriptionPaperLayout"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/natural100"
+            android:layout_marginHorizontal="2dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
+            <androidx.cardview.widget.CardView
+                app:cardBackgroundColor="@color/natural100"
+                android:layout_margin="4dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                android:clipToPadding="true"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent">
-
-                <com.example.medicalappadmin.canvas.NotepadView
-                    android:id="@+id/canvasView"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_width="match_parent"
-                    app:layout_constraintDimensionRatio="H, 1:1.414"
-                    android:layout_height="0dp"
-                    android:visibility="visible"
-                    />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <RelativeLayout
-                android:visibility="gone"
-                android:id="@+id/voiceUploadLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="24dp"
-                android:background="@drawable/circular_bg"
-                android:layout_gravity="bottom|end">
-
-                <ProgressBar
-                    android:id="@+id/pbVoiceUpload"
-                    android:layout_width="80dp"
-                    style="@style/CircularDeterminateProgressBar"
-                    android:layout_height="80dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:max="100"
-                    tools:progress="0" />
-
-                <ImageView
-                    android:id="@+id/ivVoiceUpload"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_centerInParent="true"
-                    app:srcCompat="@drawable/baseline_cloud_upload_24" />
-
-            </RelativeLayout>
-
-
-            <RelativeLayout
-                android:visibility="gone"
-                android:id="@+id/connectPagesLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="24dp"
-                android:padding="24dp"
-                android:background="@drawable/circular_bg"
-                android:layout_gravity="bottom|end">
-
-                <ImageView
-                    android:id="@+id/ivConnectPages"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_centerInParent="true"
-                    app:srcCompat="@drawable/connection" />
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/linkAnimation"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    app:lottie_rawRes="@raw/linkpage"
-                    app:lottie_loop="true"
-                    android:visibility="gone"
-                    android:layout_centerInParent="true"
-                    app:lottie_autoPlay="true"/>
-
-
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/llPageDetails"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center"
-                android:layout_marginBottom="24dp"
-                android:visibility="gone"
-                android:orientation="vertical"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:background="@drawable/bg_main"
-                >
-                <TextView
-                    android:visibility="gone"
-                    android:drawableLeft="@drawable/baseline_phone_24"
-                    android:drawablePadding="4dp"
-                    android:id="@+id/tvPagePhoneNumber"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:paddingHorizontal="5dp"
-                    android:paddingVertical="4dp"
-                    android:text="8580415978"
-                    android:textColor="@color/colorPrimTxt"
-                    android:textSize="14sp" />
-                <LinearLayout
-                    android:visibility="gone"
-                    android:id="@+id/llPageDetailsStrip"
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginBottom="2dp"
-                    android:background="@color/colorSecTxt"
-                    android:orientation="horizontal" />
+                    android:layout_height="match_parent">
 
-                <TextView
-                    android:drawableLeft="@drawable/baseline_person_24"
-                    android:visibility="gone"
-                    android:drawablePadding="4dp"
-                    android:id="@+id/tvPagePatientName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:paddingHorizontal="5dp"
-                    android:paddingVertical="4dp"
-                    android:text="Aditya R"
-                    android:textColor="@color/colorPrimTxt"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    <com.example.medicalappadmin.canvas.NotepadView
+                        android:id="@+id/canvasView"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_width="0dp"
+                        app:layout_constraintDimensionRatio="1:1.414"
+                        android:layout_height="match_parent"
+                        android:visibility="visible"
+                        />
 
-        </FrameLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/voiceUploadLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:background="@drawable/circular_bg"
+        android:layout_gravity="bottom|end">
+
+        <ProgressBar
+            android:id="@+id/pbVoiceUpload"
+            android:layout_width="80dp"
+            style="@style/CircularDeterminateProgressBar"
+            android:layout_height="80dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:max="100"
+            tools:progress="0" />
+
+        <ImageView
+            android:id="@+id/ivVoiceUpload"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerInParent="true"
+            app:srcCompat="@drawable/baseline_cloud_upload_24" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/connectPagesLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:padding="24dp"
+        android:background="@drawable/circular_bg"
+        android:layout_gravity="bottom|end">
+
+        <ImageView
+            android:id="@+id/ivConnectPages"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerInParent="true"
+            app:srcCompat="@drawable/connection" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/linkAnimation"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            app:lottie_rawRes="@raw/linkpage"
+            app:lottie_loop="true"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            app:lottie_autoPlay="true"/>
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/llPageDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="24dp"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:background="@drawable/bg_main"
+        >
+        <TextView
+            android:visibility="gone"
+            android:drawableLeft="@drawable/baseline_phone_24"
+            android:drawablePadding="4dp"
+            android:id="@+id/tvPagePhoneNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_semibold"
+            android:paddingHorizontal="5dp"
+            android:paddingVertical="4dp"
+            android:text="8580415978"
+            android:textColor="@color/colorPrimTxt"
+            android:textSize="14sp" />
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/llPageDetailsStrip"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:background="@color/colorSecTxt"
+            android:orientation="horizontal" />
+
+        <TextView
+            android:drawableLeft="@drawable/baseline_person_24"
+            android:visibility="gone"
+            android:drawablePadding="4dp"
+            android:id="@+id/tvPagePatientName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_semibold"
+            android:paddingHorizontal="5dp"
+            android:paddingVertical="4dp"
+            android:text="Aditya R"
+            android:textColor="@color/colorPrimTxt"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:alpha="0"
+        android:orientation="vertical"
+        android:id="@+id/patientDetailsSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:visibility="visible"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_main_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/patientDetailsLayout">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:text="Patient"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter"
+                    android:textColor="@color/natural500" />
+
+                <TextView
+                    android:id="@+id/patientNameTxt"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Loading"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:textColor="@color/natural600" />
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:text="Mobile No."
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter"
+                    android:textColor="@color/natural500" />
+
+                <TextView
+                    android:id="@+id/patientMobileNumberTxt"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Loading"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:textColor="@color/natural600" />
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:text="Age"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter"
+                    android:textColor="@color/natural500" />
+
+                <TextView
+                    android:id="@+id/patientAgeTxt"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Loading"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:textColor="@color/natural600" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:visibility="visible"
+            android:id="@+id/linkPatientBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/primary700"
+            android:fontFamily="@font/inter_semibold"
+            android:padding="20dp"
+            android:text="Link with Patient"
+            android:textSize="16sp"
+            app:cornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+
+    </LinearLayout>
+
+
+
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
@@ -301,4 +411,6 @@
         app:headerLayout="@layout/nav_drawer_body" />
 
 
-</androidx.drawerlayout.widget.DrawerLayout>
+
+
+</LinearLayout>
