@@ -1,5 +1,6 @@
 package com.example.medicalappadmin;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -83,6 +84,7 @@ public class PatientHistoryActivity extends AppCompatActivity {
         }
     }
 
+    boolean isPagePatientLinkEnabled = false;
     private void processFilter() {
         String filter = getIntent().getStringExtra(Const.patientFilter);
         if (filter == null) return;
@@ -91,11 +93,28 @@ public class PatientHistoryActivity extends AppCompatActivity {
             binding.searchPatientEt.requestFocus();
             Methods.showKeyboardOnLaunch(this);
         }
+        if (filter.contains(Const.patientFilterLinkPageAndPatient)){
+            isPagePatientLinkEnabled = true;
+        }
     }
 
     private void setListeners() {
         binding.btnGoBack.setOnClickListener(view -> {
             finish();
+        });
+
+        binding.addPatientBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(PatientHistoryActivity.this, AddNewPatientActivity.class);
+                if (isPagePatientLinkEnabled){
+                    intent.putExtra(Const.patientFilter, Const.patientFilterLinkPageAndPatient);
+                    intent.putExtra("FILTER_PHONE", getIntent().getStringExtra("FILTER_PHONE"));
+                    startActivityForResult(intent, 1);
+                    return;
+                }
+                startActivity(intent);
+            }
         });
 
         binding.searchPatientEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -113,9 +132,23 @@ public class PatientHistoryActivity extends AppCompatActivity {
     private void performSearch(String searchQuery) {
         Intent intent = new Intent(this, PatientHistoryActivity.class);
         intent.putExtra(Const.searchQuery, searchQuery);
+        if (isPagePatientLinkEnabled){
+            intent.putExtra(Const.patientFilter, Const.patientFilterLinkPageAndPatient);
+            intent.putExtra("FILTER_PHONE", getIntent().getStringExtra("FILTER_PHONE"));
+            startActivityForResult(intent, 1);
+            return;
+        }
         startActivity(intent);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && isPagePatientLinkEnabled && resultCode == RESULT_OK && data != null){
+            setResult(RESULT_OK, data);
+            finish();
+        }
+    }
 
     int loadedPatients = -1;
 
@@ -157,6 +190,13 @@ public class PatientHistoryActivity extends AppCompatActivity {
                             @Override
                             public void onPatientClicked(String id) {
                                 //TODO open patient details
+                                if (isPagePatientLinkEnabled){
+                                    Intent intent = new Intent();
+                                    intent.putExtra("SELECTED_PATIENT_ID", id);
+                                    PatientHistoryActivity.this.setResult(RESULT_OK, intent);
+                                    PatientHistoryActivity.this.finish();
+                                    return;
+                                }
                                 Intent i = new Intent(PatientHistoryActivity.this, ActivityPatientDetails.class);
                                 i.putExtra("PATIENT_ID", id);
                                 startActivity(i);

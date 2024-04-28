@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.medicalappadmin.Models.Patient;
+import com.example.medicalappadmin.Tools.Const;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.databinding.ActivityAddNewPatientBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
@@ -27,7 +28,18 @@ public class AddNewPatientActivity extends AppCompatActivity {
 
 
         //Todo: Make it perform actions and pre inflate data
+        processFilter();
         setListeners();
+    }
+
+    boolean isPagePatientLinkEnabled = false;
+    private void processFilter() {
+        String filter = getIntent().getStringExtra(Const.patientFilter);
+        if (filter == null) return;
+
+        if (filter.contains(Const.patientFilterLinkPageAndPatient)){
+            isPagePatientLinkEnabled = true;
+        }
     }
 
     private void setListeners() {
@@ -68,6 +80,13 @@ public class AddNewPatientActivity extends AppCompatActivity {
             public void success(ViewPatientRP response) {
                 stopProgress();
                 Toast.makeText(AddNewPatientActivity.this, "Patient Added Successfully", Toast.LENGTH_SHORT).show();
+                if (isPagePatientLinkEnabled){
+                    Intent intent = new Intent();
+                    intent.putExtra("SELECTED_PATIENT_ID", response.getPatientDetails().get_id());
+                    setResult(RESULT_OK, intent);
+                    finish();
+                    return;
+                }
                 Intent intent = new Intent(AddNewPatientActivity.this, ActivityPatientDetails.class);
                 intent.putExtra("PATIENT_ID", response.getPatientDetails().get_id());
                 AddNewPatientActivity.this.startActivity(intent);

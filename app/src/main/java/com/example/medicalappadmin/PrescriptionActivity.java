@@ -54,6 +54,7 @@ import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
+import com.example.medicalappadmin.Tools.Const;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
@@ -97,6 +98,7 @@ import java.util.Random;
 
 public class PrescriptionActivity extends AppCompatActivity implements SmartPenListener,LoginSheet.PatientDetailsListener {
 
+    private static final int PATIENT_ID_LINK_REQUEST = 459;
     String TAG = "pres";
     boolean isPenSearchRunning = false;
     ActivityPrescriptionBinding binding;
@@ -171,6 +173,15 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST_CODE){
             handleCameraImageResult(resultCode, data);
+        }
+        if (requestCode == PATIENT_ID_LINK_REQUEST){
+            if (resultCode == RESULT_OK && data != null && data.hasExtra("SELECTED_PATIENT_ID")){
+                String selectedPatientID = data.getStringExtra("SELECTED_PATIENT_ID");
+                if (selectedPatientID != null && !selectedPatientID.isEmpty()){
+                    linkPageToPatient(selectedPatientID);
+                }
+            }
+            return;
         }
     }
 
@@ -347,6 +358,18 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 }
             }
         });
+
+        //MyListeners
+        binding.linkPatientBtn.setOnClickListener(view->{
+            if (currentPageNumber != -1 && currentInitPageResponse != null){
+                Intent intent = new Intent(PrescriptionActivity.this, PatientHistoryActivity.class);
+                intent.putExtra(Const.patientFilter, Const.patientFilterLinkPageAndPatient);
+                if (currentInitPageResponse.getPage().getMobileNumber() != 0){
+                    intent.putExtra("FILTER_PHONE", String.valueOf(currentInitPageResponse.getPage().getMobileNumber()));
+                }
+                PrescriptionActivity.this.startActivityForResult(intent, PATIENT_ID_LINK_REQUEST);
+            }
+        });
     }
 
     private void findViews() {
@@ -473,12 +496,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
         rcvRelPrevCases.setAdapter(relativePreviousCasesAdapter);
-
-        btnRelNewCase.setOnClickListener(view -> {
-            linkPageToPatient(selectedRelative);
-        });
-        pbSelectRelative.setVisibility(View.GONE);
-
     }
 
 
@@ -538,11 +555,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             Toast.makeText(this, "Voice Recording Cancelled due to page change!", Toast.LENGTH_SHORT).show();
             recordVoiceDialog.dismiss();
         }
-//        llAddMobileNumber.setVisibility(View.GONE);
-//        llPrevPatientList.setVisibility(View.GONE);
-//        llNewPatient.setVisibility(View.GONE);
-//        llExistingPatientDetails.setVisibility(View.GONE);
-//        llRelPrevCases.setVisibility(View.GONE);
     }
     private void showAddNewPatientLayout() {
         llAddMobileNumber.setVisibility(View.GONE);
@@ -660,32 +672,27 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    //Link as new case of relative
-    private void linkPageToPatient(LinkedPatient selectedRelative) {
-
+    //Todo: First get the previous cases of patient, to view them
+    private void linkPageToPatient(String patientId) {
         LinkPageReq req = new LinkPageReq();
-        if (selectedRelative == null) {
+        if (patientId == null) {
             return;
         }
 
-        Log.i(TAG, "linkPageToPatient: selected relative id " + selectedRelative.get_id());
-        req.setPatientId(selectedRelative.get_id());
+        req.setPatientId(patientId);
         req.setPageNumber(currentPageNumber);
-        pbSelectRelative.setVisibility(View.VISIBLE);
         final int pageNo = currentPageNumber;
+
+        binding.pbPrescription.setVisibility(View.VISIBLE);
         APIMethods.linkPage(PrescriptionActivity.this, req, new APIResponseListener<LinkPageRP>() {
             @Override
             public void success(LinkPageRP response) {
-                Toast.makeText(PrescriptionActivity.this, "Page is linked to " + selectedRelative.getFullName(), Toast.LENGTH_SHORT).show();
-                pbSelectRelative.setVisibility(View.GONE);
-//                binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showExistingPatientLayout(selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
-                showExistingPatientLayout(selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
-                Log.i(TAG, "success: linking" + etFullName.getText().toString());
-
-
-//                binding.drawerLayout.close();
-
+                if (currentPageNumber == pageNo) {
+                    binding.pbPrescription.setVisibility(View.GONE);
+                    binding.pageStatusTxt.setText("Page is linked to " + response.getPatient().getFullName());
+                    currentInitPageResponse.setPatient(response.getPatient());
+                    showLinkedPatientInformation();
+                }
             }
 
             @Override
