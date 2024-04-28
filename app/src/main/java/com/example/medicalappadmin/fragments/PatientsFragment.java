@@ -15,6 +15,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
 import com.example.medicalappadmin.ActivityPatientDetails;
+import com.example.medicalappadmin.AddNewPatientActivity;
 import com.example.medicalappadmin.PatientHistoryActivity;
 import com.example.medicalappadmin.Tools.Const;
 import com.example.medicalappadmin.Tools.Methods;
@@ -91,6 +92,11 @@ public class PatientsFragment extends Fragment {
                 }
                 return false;
             }
+        });
+
+        binding.addPatientBtn.setOnClickListener(view->{
+            Intent intent = new Intent(activity, AddNewPatientActivity.class);
+            activity.startActivity(intent);
         });
     }
 

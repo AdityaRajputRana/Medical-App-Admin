@@ -1,13 +1,11 @@
 package com.example.medicalappadmin.fragments.CaseDetails;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +13,6 @@ import android.widget.Toast;
 
 import com.example.medicalappadmin.ActivityPatientDetails;
 import com.example.medicalappadmin.Models.MetaData;
-import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.AdditionalsRVAdapter;
 import com.example.medicalappadmin.components.AudioPlayer;
@@ -47,7 +44,7 @@ public class CaseInfoFragment extends Fragment {
         String details = "";
         details += viewCaseRP.getPatient().getGenderFull();
         details += " | ";
-        details += viewCaseRP.getPatient().getAge();
+        details += viewCaseRP.getPatient().getAgeText();
         binding.patientDetailsTxt.setText(details);
         binding.patientDetailsLayout.setVisibility(View.VISIBLE);
 

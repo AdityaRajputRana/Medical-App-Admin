@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import com.example.medicalappadmin.ActivityPatientDetails;
 import com.example.medicalappadmin.DetailedPageViewActivity;
 import com.example.medicalappadmin.Models.Page;
-import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
 import com.example.medicalappadmin.databinding.FragmentPrescriptionBinding;
 import com.example.medicalappadmin.rest.response.ViewCaseRP;
@@ -41,7 +40,7 @@ public class PrescriptionFragment extends Fragment {
         String details = "";
         details += viewCaseRP.getPatient().getGenderFull();
         details += " | ";
-        details += viewCaseRP.getPatient().getAge();
+        details += viewCaseRP.getPatient().getAgeText();
         binding.patientDetailsTxt.setText(details);
         binding.patientDetailsLayout.setVisibility(View.VISIBLE);
 

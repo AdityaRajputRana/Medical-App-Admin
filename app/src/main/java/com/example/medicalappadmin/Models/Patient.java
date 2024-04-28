@@ -8,10 +8,18 @@ public class Patient {
     String email;
     String gender;
     String name;
-    String age = "Age Not Specified";
+    Integer age;
 
-    public String getAge() {
-        return age;
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getAgeText() {
+        if (age == null){
+            return "Age not specified";
+        }
+        return String.valueOf(age);
     }
 
 

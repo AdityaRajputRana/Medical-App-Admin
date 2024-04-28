@@ -12,11 +12,14 @@ public class VolleyClient {
     static String prodUrl = "";
 
     static boolean useProd = false;
-    static boolean useDev = true;
+    static boolean useDev = false;
+
+    enum VERSION{PROD, DEV, LOCAL}
+    static VERSION version = VERSION.LOCAL;
 
     public static String getBaseUrl() {
-        if (useProd) return prodUrl;
-        if (useDev) return devUrl;
+        if (version == VERSION.PROD) return prodUrl;
+        if (version == VERSION.DEV) return devUrl;
         return localUrl;
     }
 

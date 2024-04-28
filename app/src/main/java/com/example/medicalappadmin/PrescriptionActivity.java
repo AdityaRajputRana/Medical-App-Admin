@@ -18,7 +18,6 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -1098,7 +1097,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         if (currentInitPageResponse.getPage().getAge() != null)
             age = String.valueOf(currentInitPageResponse.getPage().getAge());
         if (currentInitPageResponse.getPatient() != null){
-            age = currentInitPageResponse.getPatient().getAge();
+            age = currentInitPageResponse.getPatient().getAgeText();
         }
         binding.patientAgeTxt.setText(age);
         String gender = currentInitPageResponse.getPage().getGender();

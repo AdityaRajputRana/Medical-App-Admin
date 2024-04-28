@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.example.medicalappadmin.Models.FileMetadata;
 import com.example.medicalappadmin.Models.Page;
+import com.example.medicalappadmin.Models.Patient;
 import com.example.medicalappadmin.Models.Point;
 import com.example.medicalappadmin.Models.User;
 import com.example.medicalappadmin.rest.api.interfaces.APIResponseListener;
@@ -184,6 +185,10 @@ public class APIMethods {
     }
     public static void setGuideVideoPosition(Context context, SetGuidePosReq req, APIResponseListener<SetGuidePosRP> listener) {
         API.postData(listener, req, EndPoints.setGuidePosition, SetGuidePosRP.class, context);
+    }
+
+    public static void addNewPatient(Context context, Patient patient, APIResponseListener<ViewPatientRP> listener){
+        API.postData(listener, patient, EndPoints.addNewPatient, ViewPatientRP.class, context);
     }
 
 
