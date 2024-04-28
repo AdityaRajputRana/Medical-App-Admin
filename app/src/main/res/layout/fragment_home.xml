@@ -159,7 +159,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Register Visit"
+                        android:text="View Patients"
                         android:layout_marginTop="8dp"
                         android:fontFamily="@font/inter_semibold"
                         android:textSize="13sp" />
@@ -193,6 +193,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
+                    android:visibility="invisible"
                     android:padding="16dp"
                     android:clickable="true"
                     android:focusable="true"

@@ -152,6 +152,7 @@ tools:context=".fragments.CasesHistoryFragment">
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="New Case"
+    android:visibility="gone"
     app:icon="@drawable/baseline_add_24"
     android:textColor="@color/primary700"
     android:backgroundTint="@color/primary50"

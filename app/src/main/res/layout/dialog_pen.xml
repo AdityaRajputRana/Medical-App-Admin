@@ -7,7 +7,7 @@
     android:gravity="center"
     android:padding="16dp"
     android:layout_margin="28dp"
-    android:background="@drawable/bg_et_main">
+    android:background="@drawable/bg_main_btn">
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -27,9 +27,9 @@
         android:id="@+id/titleTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_semibold"
+        android:fontFamily="@font/inter_semibold"
         android:text="Order Placed!"
-        android:textColor="@android:color/black"
+        android:textColor="@color/natural700"
         android:textSize="24sp"
         android:layout_marginTop="16dp" />
 
@@ -38,13 +38,14 @@
         android:id="@+id/bodyTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_medium"
+        android:fontFamily="@font/inter_medium"
         android:text="Your order will be delivered within 25 minutes"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
+        android:textColor="@color/natural500"
         android:textSize="18sp"
         android:layout_marginTop="0dp" />
     <RadioGroup
+        android:paddingTop="16dp"
         android:id="@+id/radioSelector"
         android:visibility="gone"
         android:layout_width="match_parent"
@@ -56,24 +57,31 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:orientation="horizontal">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/actionBtn"
         android:visibility="gone"
-        android:layout_width="wrap_content"
+        app:cornerRadius="10dp"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:padding="16dp"
+        android:fontFamily="@font/inter_semibold"
+        android:textSize="18sp"
+        android:backgroundTint="@color/primary700"
+        android:textColor="@color/white"
         android:layout_height="wrap_content"
         android:text="Connect"/>
 
     <Button
         android:id="@+id/hideBtn"
         android:visibility="gone"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:background="@android:color/transparent"
-        android:textColor="@color/gray"
+        android:textColor="@color/natural400"
+        android:textAlignment="center"
         android:text="Hide Dialog"/>
 
     </LinearLayout>
