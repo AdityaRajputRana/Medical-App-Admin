@@ -15,7 +15,7 @@ public class VolleyClient {
     static boolean useDev = false;
 
     enum VERSION{PROD, DEV, LOCAL}
-    static VERSION version = VERSION.LOCAL;
+    static VERSION version = VERSION.DEV;
 
     public static String getBaseUrl() {
         if (version == VERSION.PROD) return prodUrl;

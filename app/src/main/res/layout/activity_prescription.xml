@@ -128,7 +128,6 @@
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
-            android:layout_weight="1"
             android:layout_gravity="center_horizontal"
             android:id="@+id/prescriptionPaperLayout"
             android:layout_marginTop="16dp"
@@ -137,7 +136,7 @@
             app:cardCornerRadius="10dp"
             app:cardElevation="0dp"
             android:layout_width="wrap_content"
-            android:layout_height="0dp">
+            android:layout_height="wrap_content">
 
             <androidx.cardview.widget.CardView
                 app:cardBackgroundColor="@color/natural100"
@@ -146,10 +145,10 @@
                 app:cardElevation="0dp"
                 android:clipToPadding="true"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content">
 
                     <com.example.medicalappadmin.canvas.NotepadView
                         android:id="@+id/canvasView"
@@ -159,7 +158,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         android:layout_width="0dp"
                         app:layout_constraintDimensionRatio="1:1.414"
-                        android:layout_height="match_parent"
+                        android:layout_height="350dp"
                         android:visibility="visible"
                         />
 
@@ -377,6 +376,72 @@
 
 
         </LinearLayout>
+        <LinearLayout
+            android:visibility="visible"
+            android:id="@+id/tempMobileLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_main_btn"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:layout_margin="16dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Typing mobile number:"
+                    android:fontFamily="@font/inter"
+                    android:textColor="@color/natural500" />
+                <TextView
+                    android:id="@+id/tempMobileNumberTxt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="36892238907"
+                    android:textSize="24sp"
+                    android:textColor="@color/natural700"
+                    android:fontFamily="@font/inter_bold" />
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="60dp"
+                android:layout_height="60dp">
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/tempMobileDetProgress"
+                    android:progress="25"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminateTint="@color/primary700" />
+
+                <ProgressBar
+                    android:visibility="gone"
+                    android:id="@+id/tempMobileIndetProgressBar"
+                    android:progress="25"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminateTint="@color/primary700" />
+
+
+                <ImageButton
+                    android:id="@+id/tempMobileCancelBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:backgroundTint="@android:color/transparent"
+                    android:src="@drawable/baseline_cancel_24" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+
 
         <com.google.android.material.button.MaterialButton
             android:visibility="visible"

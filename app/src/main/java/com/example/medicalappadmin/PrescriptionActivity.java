@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -101,7 +102,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     ActivityPrescriptionBinding binding;
     DialogPenBinding dialogPenBinding;
     AlertDialog dialog;
-    int state = 0;
     SmartPen selectedPen;
     ArrayList<SmartPen> smartPens;
     ArrayList<Point> pointsArrayList;
@@ -149,7 +149,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     SmartPenDriver driver = SmartPenDriver.getInstance(this); //driverStep1
     long tempMobile = 0;
     RelativePreviousCasesAdapter relativePreviousCasesAdapter;
-    boolean isMobileSheetVisible = false;
 
 
     //Bottom Sheet attach audio views
@@ -241,10 +240,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    private void linkMobileNumber(long mobileNo) {
+    private void linkMobileNumber(final long mobileNo) {
         if (currentPageNumber == -1) {
             Toast.makeText(PrescriptionActivity.this, "Please touch your page with pen", Toast.LENGTH_SHORT).show();
-//            binding.drawerLayout.close();
             return;
         }
 
@@ -261,29 +259,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             @Override
             public void success(AddMobileNoRP response) {
 
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).handleAddMobileResponse(response);
-
+                tempMobileNumber = "";
+                binding.tempMobileIndetProgressBar.setVisibility(View.GONE);
+                binding.tempMobileNumberTxt.setText("");
                 pbAddMobile.setVisibility(View.GONE);
 
-                //TODO: Check
-                binding.llPageDetails.setVisibility(View.VISIBLE);
-                binding.tvPagePhoneNumber.setVisibility(View.VISIBLE);
-                binding.tvPagePhoneNumber.setText(String.valueOf(mobileNo));
-
-                if (response.getPatients().size() != 0) {
-                    //relatives exist
-                    Log.i(TAG, "success: relative exists");
-
-                    showPreviousPatientsLayout(response);
-
-                }
-                else {
-                    //new patient
-                    Log.i(TAG, "success: relative does not exist, new patient");
-
-                    showAddNewPatientLayout();
-                    setBtnSaveListener();
-
+                if (currentInitPageResponse.getPage().getPageNumber() == pageNo){
+                    currentInitPageResponse.getPage().setMobileNumber(mobileNo);
+                    showLinkedPatientInformation();
                 }
             }
 
@@ -291,7 +274,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 pbAddMobile.setVisibility(View.GONE);
                 showError(message, null);
-                Log.i("Adi", "fail: add mobile " + message);
             }
         });
     }
@@ -331,6 +313,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void showPatientDetailsLayout(){
         patientDetailsblinkHandler.removeCallbacks(patientDetailsBlinkRunnable);
+        binding.patientDetailsLayout.setVisibility(View.VISIBLE);
         binding.patientDetailsSection.animate()
                 .alpha(1)
                 .setDuration(300)
@@ -566,14 +549,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         llPrevPatientList.setVisibility(View.GONE);
         llNewPatient.setVisibility(View.VISIBLE);
         llExistingPatientDetails.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-    }
-
-    private void showAddMobileNoLayout() {
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llAddMobileNumber.setVisibility(View.VISIBLE);
-        llNewPatient.setVisibility(View.GONE);
         llRelPrevCases.setVisibility(View.GONE);
     }
 
@@ -1029,6 +1004,14 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void startPageChangeProcedure(int pageId) {
         uploadPoints();
+        binding.tempMobileLayout.setVisibility(View.GONE);
+        binding.tempMobileDetProgress.setVisibility(View.GONE);
+        binding.tempMobileIndetProgressBar.setVisibility(View.GONE);
+        binding.tempMobileNumberTxt.setText("");
+        binding.patientDetailsLayout.setVisibility(View.VISIBLE);
+        tempMobileNumber = "";
+        tempMobileCountDownHandler.removeCallbacks(tempMobileCountDownRunnable);
+
         //UploadPointsHandlerRemoval
         if (handler != null) {
             handler.removeCallbacks(runnable);
@@ -1048,7 +1031,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             public void success(InitialisePageRP response) {
                 currentInitPageResponse = response;
                 currentPage = response.getPage();
-                showLikedPatientInformation();
+                showLinkedPatientInformation();
 
 
                 if (response.getPage() != null
@@ -1070,12 +1053,13 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    private void showLikedPatientInformation() {
+    private void showLinkedPatientInformation() {
         if (currentInitPageResponse == null){
             return;
         }
 
         showPatientDetailsLayout();
+        binding.tempMobileLayout.setVisibility(View.GONE);
         binding.linkPatientBtn.setVisibility(
                 currentInitPageResponse.getPatient() == null?View.VISIBLE: View.GONE
         );
@@ -1313,9 +1297,93 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         return false;
     }
 
+    boolean isAddingPhoneNumberToPagePossible(){
+        if (currentPageNumber == -1){
+            Toast.makeText(this, "Touch the paper with pen to initialize page", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (currentInitPageResponse == null){
+            Toast.makeText(this, "Please Wait till page is initialized", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (currentInitPageResponse.getPatient() != null){
+            Toast.makeText(this, "Page is already linked with a patient. Adding Phone number is not possible right now!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (currentInitPageResponse.getPage().getMobileNumber() != 0){
+            Toast.makeText(this, "This page already has phone number attached. Adding Phone number is not possible right now!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+    String tempMobileNumber = "";
+    Handler tempMobileCountDownHandler = new Handler();
+    int i = 0;
+    int inc = 50*100/5000;
+    Runnable tempMobileCountDownRunnable = new Runnable() {
+        @Override
+        public void run() {
+            i += inc;
+            binding.tempMobileDetProgress.setProgress(i);
+            if (i >= 100){
+                binding.tempMobileIndetProgressBar.setVisibility(View.VISIBLE);
+                binding.tempMobileDetProgress.setVisibility(View.GONE);
+                binding.tempMobileCancelBtn.setVisibility(View.GONE);
+                linkMobileNumber(Long.parseLong(tempMobileNumber));
+                tempMobileNumber = "";
+            } else {
+                tempMobileCountDownHandler.postDelayed(this, 50);
+            }
+        }
+    };
     private void showLoginSheet(int id) {
-        LoginSheet.getInstance(this,currentPageNumber, currentInitPageResponse)
-                .inputCharacter(id);
+       if (!isAddingPhoneNumberToPagePossible()){
+           return;
+       }
+
+       binding.tempMobileLayout.setVisibility(View.VISIBLE);
+       binding.patientDetailsLayout.setVisibility(View.GONE);
+
+
+       if (id == 10){
+           if (tempMobileNumber.length() == 0) {
+               return;
+           };
+           if (tempMobileNumber.length() == 10){
+               tempMobileCountDownHandler.removeCallbacks(tempMobileCountDownRunnable);
+               binding.tempMobileCancelBtn.setVisibility(View.GONE);
+               binding.tempMobileDetProgress.setVisibility(View.GONE);
+               binding.tempMobileIndetProgressBar.setVisibility(View.GONE);
+           }
+           tempMobileNumber = tempMobileNumber.substring(0, tempMobileNumber.length()-1);
+           binding.tempMobileNumberTxt.setText(tempMobileNumber);
+           return;
+       }
+
+
+        if (tempMobileNumber.length() >= 10){
+            Toast.makeText(this, "Saving Mobile Number please wait!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+       tempMobileNumber += String.valueOf(id);
+       binding.tempMobileNumberTxt.setText(tempMobileNumber);
+        binding.tempMobileDetProgress.setVisibility(View.GONE);
+        binding.tempMobileIndetProgressBar.setVisibility(View.GONE);
+        binding.tempMobileCancelBtn.setVisibility(View.GONE);
+       if (tempMobileNumber.length() == 10){
+           binding.tempMobileCancelBtn.setVisibility(View.VISIBLE);
+           binding.tempMobileIndetProgressBar.setVisibility(View.GONE);
+           binding.tempMobileDetProgress.setVisibility(View.VISIBLE);
+           i = 0;
+           tempMobileCountDownHandler.postDelayed(tempMobileCountDownRunnable, 50);
+           binding.tempMobileCancelBtn.setOnClickListener(view->{
+               tempMobileCountDownHandler.removeCallbacks(tempMobileCountDownRunnable);
+               binding.tempMobileCancelBtn.setVisibility(View.GONE);
+               binding.tempMobileIndetProgressBar.setVisibility(View.GONE);
+               binding.tempMobileDetProgress.setVisibility(View.GONE);
+           });
+       }
     }
 
     private void setPageStatus(String statusTxt){
