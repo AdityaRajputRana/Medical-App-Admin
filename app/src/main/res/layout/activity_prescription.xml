@@ -59,115 +59,303 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <LinearLayout
-        android:layout_weight="1"
-        android:id="@+id/mainLayout"
-        android:padding="16dp"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical">
-
+        android:layout_weight="1">
         <LinearLayout
-            android:id="@+id/pageOptionsLayout"
-            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:id="@+id/mainLayout"
+            android:padding="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:fontFamily="@font/inter_semibold"
-                android:text="Page"
-                android:textSize="14sp"
-                android:textColor="@color/natural500"
-                android:id="@+id/pageNumberTxt"
-                android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/pageOptionsLayout"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Page"
+                    android:textSize="14sp"
+                    android:textColor="@color/natural500"
+                    android:id="@+id/pageNumberTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                </TextView>
+
+                <TextView
+                    android:fontFamily="@font/inter_medium"
+                    android:text="|"
+                    android:layout_marginHorizontal="8dp"
+                    android:textSize="14sp"
+                    android:textColor="@color/natural500"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                </TextView>
+
+                <TextView
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Loading Page"
+                    android:textSize="14sp"
+                    android:textColor="@color/natural500"
+                    android:id="@+id/pageStatusTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                </TextView>
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <ImageButton
+                    android:backgroundTint="@android:color/transparent"
+                    android:id="@+id/addAttachmentBtn"
+                    android:src="@drawable/ic_cam_prescription_opt"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"/>
+
+                <ImageButton
+                    android:layout_marginStart="16dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:id="@+id/syncOfflineDataBtn"
+                    android:src="@drawable/ic_grid_sync_data"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"/>
+
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/prescriptionPaperLayout"
+                app:cardBackgroundColor="@color/natural100"
+                android:layout_marginVertical="16dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-            </TextView>
+                <androidx.cardview.widget.CardView
+                    app:cardBackgroundColor="@color/natural100"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="0dp"
+                    android:clipToPadding="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-            <TextView
-                android:fontFamily="@font/inter_medium"
-                android:text="|"
-                android:layout_marginHorizontal="8dp"
-                android:textSize="14sp"
-                android:textColor="@color/natural500"
-                android:layout_width="wrap_content"
+                        <com.example.medicalappadmin.canvas.NotepadView
+                            android:id="@+id/canvasView"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_width="match_parent"
+                            app:layout_constraintDimensionRatio="1:1.414"
+                            android:layout_height="0dp"
+                            android:visibility="visible"
+                            />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+            </androidx.cardview.widget.CardView>
+            <LinearLayout
+                android:alpha="0"
+                android:orientation="vertical"
+                android:id="@+id/patientDetailsSection"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-            </TextView>
+                <LinearLayout
+                    android:visibility="visible"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/bg_main_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/patientDetailsLayout">
 
-            <TextView
-                android:fontFamily="@font/inter_semibold"
-                android:text="Loading Page"
-                android:textSize="14sp"
-                android:textColor="@color/natural500"
-                android:id="@+id/pageStatusTxt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
 
-            </TextView>
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                        <TextView
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:text="Patient"
+                            android:textSize="16sp"
+                            android:fontFamily="@font/inter"
+                            android:textColor="@color/natural500" />
 
-            <ImageButton
-                android:backgroundTint="@android:color/transparent"
-                android:id="@+id/addAttachmentBtn"
-                android:src="@drawable/ic_cam_prescription_opt"
-                android:layout_width="36dp"
-                android:layout_height="36dp"/>
+                        <TextView
+                            android:id="@+id/patientNameTxt"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Loading"
+                            android:textSize="16sp"
+                            android:fontFamily="@font/inter_semibold"
+                            android:textColor="@color/natural600" />
 
-            <ImageButton
-                android:layout_marginStart="16dp"
-                android:backgroundTint="@android:color/transparent"
-                android:id="@+id/syncOfflineDataBtn"
-                android:src="@drawable/ic_grid_sync_data"
-                android:layout_width="36dp"
-                android:layout_height="36dp"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_marginTop="16dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:text="Mobile No."
+                            android:textSize="16sp"
+                            android:fontFamily="@font/inter"
+                            android:textColor="@color/natural500" />
+
+                        <TextView
+                            android:id="@+id/patientMobileNumberTxt"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Loading"
+                            android:textSize="16sp"
+                            android:fontFamily="@font/inter_semibold"
+                            android:textColor="@color/natural600" />
+
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_marginTop="16dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:text="Age"
+                            android:textSize="16sp"
+                            android:fontFamily="@font/inter"
+                            android:textColor="@color/natural500" />
+
+                        <TextView
+                            android:id="@+id/patientAgeTxt"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Loading"
+                            android:textSize="16sp"
+                            android:fontFamily="@font/inter_semibold"
+                            android:textColor="@color/natural600" />
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:visibility="visible"
+                    android:id="@+id/tempMobileLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_main_btn"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:layout_margin="16dp">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Typing mobile number:"
+                            android:fontFamily="@font/inter"
+                            android:textColor="@color/natural500" />
+                        <TextView
+                            android:id="@+id/tempMobileNumberTxt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="36892238907"
+                            android:textSize="24sp"
+                            android:textColor="@color/natural700"
+                            android:fontFamily="@font/inter_bold" />
+
+                    </LinearLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="60dp"
+                        android:layout_height="60dp">
+
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/tempMobileDetProgress"
+                            android:progress="25"
+                            android:visibility="gone"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:indeterminateTint="@color/primary700" />
+
+                        <ProgressBar
+                            android:visibility="gone"
+                            android:id="@+id/tempMobileIndetProgressBar"
+                            android:progress="25"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:indeterminateTint="@color/primary700" />
+
+
+                        <ImageButton
+                            android:id="@+id/tempMobileCancelBtn"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone"
+                            android:backgroundTint="@android:color/transparent"
+                            android:src="@drawable/baseline_cancel_24" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:visibility="visible"
+                    android:id="@+id/linkPatientBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="16dp"
+                    android:backgroundTint="@color/primary700"
+                    android:fontFamily="@font/inter_semibold"
+                    android:padding="20dp"
+                    android:text="Link with Patient"
+                    android:textSize="16sp"
+                    app:cornerRadius="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+
+
+            </LinearLayout>
 
 
         </LinearLayout>
 
-        <androidx.cardview.widget.CardView
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/prescriptionPaperLayout"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="@color/natural100"
-            android:layout_marginHorizontal="2dp"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="0dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <androidx.cardview.widget.CardView
-                app:cardBackgroundColor="@color/natural100"
-                android:layout_margin="4dp"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="0dp"
-                android:clipToPadding="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <com.example.medicalappadmin.canvas.NotepadView
-                        android:id="@+id/canvasView"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_width="0dp"
-                        app:layout_constraintDimensionRatio="1:1.414"
-                        android:layout_height="350dp"
-                        android:visibility="visible"
-                        />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
-
-        </androidx.cardview.widget.CardView>
-
-    </LinearLayout>
+    </ScrollView>
 
     <RelativeLayout
         android:visibility="gone"
@@ -279,190 +467,6 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <LinearLayout
-        android:alpha="0"
-        android:orientation="vertical"
-        android:id="@+id/patientDetailsSection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
-            android:visibility="visible"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_margin="16dp"
-            android:background="@drawable/bg_main_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/patientDetailsLayout">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="130dp"
-                    android:layout_height="wrap_content"
-                    android:text="Patient"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/inter"
-                    android:textColor="@color/natural500" />
-
-                <TextView
-                    android:id="@+id/patientNameTxt"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Loading"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/natural600" />
-
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_marginTop="16dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="130dp"
-                    android:layout_height="wrap_content"
-                    android:text="Mobile No."
-                    android:textSize="16sp"
-                    android:fontFamily="@font/inter"
-                    android:textColor="@color/natural500" />
-
-                <TextView
-                    android:id="@+id/patientMobileNumberTxt"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Loading"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/natural600" />
-
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_marginTop="16dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="130dp"
-                    android:layout_height="wrap_content"
-                    android:text="Age"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/inter"
-                    android:textColor="@color/natural500" />
-
-                <TextView
-                    android:id="@+id/patientAgeTxt"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Loading"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/inter_semibold"
-                    android:textColor="@color/natural600" />
-
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-        <LinearLayout
-            android:visibility="visible"
-            android:id="@+id/tempMobileLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_main_btn"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="16dp"
-            android:layout_margin="16dp">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Typing mobile number:"
-                    android:fontFamily="@font/inter"
-                    android:textColor="@color/natural500" />
-                <TextView
-                    android:id="@+id/tempMobileNumberTxt"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="36892238907"
-                    android:textSize="24sp"
-                    android:textColor="@color/natural700"
-                    android:fontFamily="@font/inter_bold" />
-
-            </LinearLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="60dp"
-                android:layout_height="60dp">
-
-                <com.google.android.material.progressindicator.CircularProgressIndicator
-                    android:id="@+id/tempMobileDetProgress"
-                    android:progress="25"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:indeterminateTint="@color/primary700" />
-
-                <ProgressBar
-                    android:visibility="gone"
-                    android:id="@+id/tempMobileIndetProgressBar"
-                    android:progress="25"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:indeterminateTint="@color/primary700" />
-
-
-                <ImageButton
-                    android:id="@+id/tempMobileCancelBtn"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="gone"
-                    android:backgroundTint="@android:color/transparent"
-                    android:src="@drawable/baseline_cancel_24" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </LinearLayout>
-
-
-
-        <com.google.android.material.button.MaterialButton
-            android:visibility="visible"
-            android:id="@+id/linkPatientBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/primary700"
-            android:fontFamily="@font/inter_semibold"
-            android:padding="20dp"
-            android:text="Link with Patient"
-            android:textSize="16sp"
-            app:cornerRadius="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-
-
-    </LinearLayout>
 
 
 

@@ -300,6 +300,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
         //MyListeners
+        binding.backBtn.setOnClickListener(view -> onBackPressed());
         binding.linkPatientBtn.setOnClickListener(view->{
             if (currentPageNumber != -1 && currentInitPageResponse != null){
                 Intent intent = new Intent(PrescriptionActivity.this, PatientHistoryActivity.class);
