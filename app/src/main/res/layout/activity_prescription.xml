@@ -466,16 +466,4 @@
 
 
 
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navView"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@color/colorBackground"
-        app:headerLayout="@layout/nav_drawer_body" />
-
-
-
-
 </LinearLayout>

@@ -96,7 +96,7 @@ import java.util.Objects;
 import java.util.Random;
 
 
-public class PrescriptionActivity extends AppCompatActivity implements SmartPenListener,LoginSheet.PatientDetailsListener {
+public class PrescriptionActivity extends AppCompatActivity implements SmartPenListener {
 
     private static final int PATIENT_ID_LINK_REQUEST = 459;
     String TAG = "pres";
@@ -115,42 +115,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     ActionBarDrawerToggle actionBarDrawerToggle;
 
 
-    EditText etFullName;
-    EditText etMobileNumber;
-    EditText etEmail;
-    EditText etPageNumber;
-    TextView tvMale;
-    TextView tvFemale;
-    TextView tvDrawerInit;
-    LinearLayout llPrevPatientList;
-    LinearLayout llNewPatient;
-    LinearLayout llAddMobileNumber;
-    LinearLayout llExistingPatientDetails;
-    LinearLayout llRelPrevCases;
-    AppCompatButton btnCheckRelatives;
-    AppCompatButton btnNext;
-    AppCompatButton btnSave;
-    AppCompatButton btnSyncPage;
-    TextView tvEPatientsNo;
-    TextView tvEPGender;
-    TextView tvEPatientName;
-    ImageView ivEPatientsDp;
-    ProgressBar pbAddMobile;
-    ProgressBar pbSyncPage;
-    ProgressBar pbSelectRelative;
-    ProgressBar pbSaveNewPatient;
-    ProgressBar pbLinkToCase;
-    RadioGroup relativeRadioSelector;
-    RecyclerView rcvRelPrevCases;
-    AppCompatButton btnRelNewCase;
-
-
 
     String gender = "M";
-    ArrayList<LinkedPatient> relatives;
     SmartPenDriver driver = SmartPenDriver.getInstance(this); //driverStep1
-    long tempMobile = 0;
-    RelativePreviousCasesAdapter relativePreviousCasesAdapter;
 
 
     //Bottom Sheet attach audio views
@@ -263,7 +230,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         req.setMobileNumber(mobileNo);
 
         Log.i(TAG, "req set mobile" + req.toString());
-        pbAddMobile.setVisibility(View.VISIBLE);
         final int pageNo =  currentPageNumber;
 
         APIMethods.addMobileNumber(PrescriptionActivity.this, req, new APIResponseListener<AddMobileNoRP>() {
@@ -273,7 +239,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 tempMobileNumber = "";
                 binding.tempMobileIndetProgressBar.setVisibility(View.GONE);
                 binding.tempMobileNumberTxt.setText("");
-                pbAddMobile.setVisibility(View.GONE);
 
                 if (currentInitPageResponse.getPage().getPageNumber() == pageNo){
                     currentInitPageResponse.getPage().setMobileNumber(mobileNo);
@@ -283,7 +248,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                pbAddMobile.setVisibility(View.GONE);
                 showError(message, null);
             }
         });
@@ -298,7 +262,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
         loadDoctorConfigurations();
 
-        findViews();
         handleGender();
         setListeners();
         intialiseControls();
@@ -334,30 +297,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     private void setListeners() {
         //initialise page
-        btnSyncPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pbSyncPage.setVisibility(View.VISIBLE);
-                hideKeyboard(view);
-                Log.i(TAG, "onClick: current page no " + currentPageNumber);
-//                drawEvent(0, 0, Integer.parseInt(etPageNumber.getText().toString()), 0);
-            }
-        });
 
-        btnCheckRelatives.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hideKeyboard(view);
-                tempMobile = Long.parseLong(etMobileNumber.getText().toString());
-                if (etMobileNumber.getText() == null ||
-                        etMobileNumber.getText().toString().isEmpty() ||
-                        etMobileNumber.getText().toString().equals("")) {
-                    etMobileNumber.setError("Required");
-                } else {
-                    linkMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
-                }
-            }
-        });
 
         //MyListeners
         binding.linkPatientBtn.setOnClickListener(view->{
@@ -372,52 +312,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    private void findViews() {
-        //Initial drawer layout
-        tvDrawerInit = binding.navView.getHeaderView(0).findViewById(R.id.tvDrawerInit);
-
-
-        //LL Sync page
-        btnSyncPage = binding.navView.getHeaderView(0).findViewById(R.id.btnLinkPage);
-        pbSyncPage = binding.navView.getHeaderView(0).findViewById(R.id.pbLinkPage);
-
-        //LL Existing patient  details
-        llExistingPatientDetails = binding.navView.getHeaderView(0).findViewById(R.id.llExistingPatientDetails);
-        tvEPatientName = binding.navView.getHeaderView(0).findViewById(R.id.tvEPatientName);
-        tvEPatientsNo = binding.navView.getHeaderView(0).findViewById(R.id.tvEPatientsNo);
-        tvEPGender = binding.navView.getHeaderView(0).findViewById(R.id.tvEPGender);
-        ivEPatientsDp = binding.navView.getHeaderView(0).findViewById(R.id.ivEPatientsDp);
-
-        //LL add mobile number
-        llAddMobileNumber = binding.navView.getHeaderView(0).findViewById(R.id.llAddMobileNumber);
-        etMobileNumber = binding.navView.getHeaderView(0).findViewById(R.id.etMobile);
-        etPageNumber = binding.navView.getHeaderView(0).findViewById(R.id.etPageNumber);
-        btnCheckRelatives = binding.navView.getHeaderView(0).findViewById(R.id.btnCheckRelatives);
-        pbAddMobile = binding.navView.getHeaderView(0).findViewById(R.id.pbAddMobile);
-
-
-        //LL check relatives
-        llPrevPatientList = binding.navView.getHeaderView(0).findViewById(R.id.llPrevPatientList);
-        relativeRadioSelector = binding.navView.getHeaderView(0).findViewById(R.id.relativeRadioSelector);
-        btnNext = binding.navView.getHeaderView(0).findViewById(R.id.btnNext);
-        pbSelectRelative = binding.navView.getHeaderView(0).findViewById(R.id.pbSelectRelative);
-
-        //LL previous cases of relative
-        llRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.llRelPrevCases);
-        btnRelNewCase = binding.navView.getHeaderView(0).findViewById(R.id.btnRelNewCase);
-        rcvRelPrevCases = binding.navView.getHeaderView(0).findViewById(R.id.rcvRelPrevCases);
-        pbLinkToCase = binding.navView.getHeaderView(0).findViewById(R.id.pbLinkToCase);
-
-
-        //LL new patient
-        llNewPatient = binding.navView.getHeaderView(0).findViewById(R.id.llNewPatient);
-        etFullName = binding.navView.getHeaderView(0).findViewById(R.id.etFullName);
-        etEmail = binding.navView.getHeaderView(0).findViewById(R.id.etEmail);
-        tvMale = binding.navView.getHeaderView(0).findViewById(R.id.tvMale);
-        tvFemale = binding.navView.getHeaderView(0).findViewById(R.id.tvFemale);
-        btnSave = binding.navView.getHeaderView(0).findViewById(R.id.btnSave);
-        pbSaveNewPatient = binding.navView.getHeaderView(0).findViewById(R.id.pbSaveNewPatient);
-    }
 
 
     @Override
@@ -426,80 +320,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         offlineData();
     }
 
-    private void showPreviousPatientsLayout(AddMobileNoRP response) {
-        llPrevPatientList.setVisibility(View.VISIBLE);
-        llAddMobileNumber.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-
-        relatives = new ArrayList<>();
-        relatives = response.getPatients();
-        relativeRadioSelector.clearCheck();
-        relativeRadioSelector.removeAllViews();
-
-        for (int i = 0; i < response.getPatients().size(); i++) {
-            RadioButton button = new RadioButton(PrescriptionActivity.this);
-            button.setText(relatives.get(i).getFullName());
-            button.setTextSize(16);
-            button.setTextColor(getColor(R.color.colorPrimTxt));
-            button.setId(i);
-            relativeRadioSelector.addView(button);
-            Log.i(TAG, "success: iteration " + i + 1);
-        }
-
-        //RadioButton for new patient
-        RadioButton button = new RadioButton(PrescriptionActivity.this);
-        button.setText("Other");
-        button.setTextSize(16);
-        button.setTextColor(getColor(R.color.colorPrimTxt));
-        button.setId(relatives.size());
-        relativeRadioSelector.addView(button);
-
-        final int pageNo = currentPageNumber;
-
-        btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hideKeyboard(view);
-                int selectedRelativeId = relativeRadioSelector.getCheckedRadioButtonId();
-                if (selectedRelativeId != -1) {
-                    showRelativeDetails(selectedRelativeId);
-                    LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showRelativeDetails(selectedRelativeId,relatives);
-                } else {
-                    Toast.makeText(PrescriptionActivity.this, "Select a relative first", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    private void showRelativesCasesLayout(ViewPatientRP response, String relativeId, LinkedPatient selectedRelative) {
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.VISIBLE);
-
-        rcvRelPrevCases.setLayoutManager(new LinearLayoutManager(PrescriptionActivity.this));
-        relativePreviousCasesAdapter = new RelativePreviousCasesAdapter(response,
-                PrescriptionActivity.this, new RelativePreviousCasesAdapter.SelectCaseListener() {
-            @Override
-            public void onCaseSelected(String caseId) {
-                linkPageToCase(caseId, relativeId, selectedRelative);
-            }
-
-            @Override
-            public void onViewRelCaseClicked(String caseId) {
-                showCaseDetailsDialog(caseId);
-            }
-        });
-
-
-        rcvRelPrevCases.setAdapter(relativePreviousCasesAdapter);
-    }
 
 
 
+
+    //Todo: Preview Case before addition: Move to Patient Selector Activity
     private void showCaseDetailsDialog(String caseId) {
 
         Dialog viewCaseDialog = new Dialog(this);
@@ -556,83 +381,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
             recordVoiceDialog.dismiss();
         }
     }
-    private void showAddNewPatientLayout() {
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.VISIBLE);
-        llExistingPatientDetails.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-    }
-
-    private void showExistingPatientLayout(String name, String gender,String mobileNo) {
-        llExistingPatientDetails.setVisibility(View.VISIBLE);
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-        tvEPatientName.setText(name);
-        if (Objects.equals(gender, "M")) {
-            tvEPGender.setText("Male");
-        } else {
-            tvEPGender.setText("Female");
-        }
-        tvEPatientsNo.setText(mobileNo);
-
-        clearAllCache();
-    }
-
-    private void setBtnSaveListener() {
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hideKeyboard(view);
-                saveNewPatient();
-            }
-        });
-
-    }
-
-    private void showRelativeDetails(int selectedRelativeId) {
-        if (selectedRelativeId == relatives.size()) {
-            showAddNewPatientLayout();
-            setBtnSaveListener();
-        } else if (selectedRelativeId < relatives.size()) {
-            LinkedPatient selectedRelative = relatives.get(selectedRelativeId);
-            showRelativePrevCases(selectedRelative);
-        } else {
-            Log.i(TAG, "showRelativeDetails: relatives null");
-        }
 
 
-    }
-
-    private void showRelativePrevCases(LinkedPatient selectedRelative) {
-
-        pbSelectRelative.setVisibility(View.VISIBLE);
-
-        String relativeId = selectedRelative.get_id();
-        final int pageNo = currentPageNumber;
-        APIMethods.viewPatient(PrescriptionActivity.this, relativeId, new APIResponseListener<ViewPatientRP>() {
-            @Override
-            public void success(ViewPatientRP response) {
-
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showRelativesCasesLayout(response,relativeId,selectedRelative);
-
-                showRelativesCasesLayout(response,relativeId,selectedRelative);
-
-            }
-
-            @Override
-            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                pbSelectRelative.setVisibility(View.GONE);
-
-                Log.i(TAG, "fail: rel prev case");
-                showError(message, null);
-            }
-        });
-
-
-    }
 
     private void linkPageToCase(String caseId, String relativeId, LinkedPatient selectedRelative) {
         LinkPageReq req = new LinkPageReq();
@@ -640,39 +390,21 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         req.setPatientId(relativeId);
         req.setCaseId(caseId);
         final int pageNo =currentPageNumber;
-        pbLinkToCase.setVisibility(View.VISIBLE);
-        btnRelNewCase.setEnabled(false);
-        rcvRelPrevCases.setEnabled(false);
         APIMethods.linkPage(PrescriptionActivity.this, req, new APIResponseListener<LinkPageRP>() {
             @Override
             public void success(LinkPageRP response) {
 
-                btnRelNewCase.setEnabled(true);
-                rcvRelPrevCases.setEnabled(true);
                 Toast.makeText(PrescriptionActivity.this, "Page is linked to " + selectedRelative.getFullName(), Toast.LENGTH_SHORT).show();
-                pbSelectRelative.setVisibility(View.GONE);
 //                TODO: binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
-
-                showExistingPatientLayout(
-                        selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showExistingPatientLayout(selectedRelative.getFullName(),selectedRelative.getGender(),etMobileNumber.getText().toString());
-
-                clearAllCache();
-//                binding.drawerLayout.close();
-                btnRelNewCase.setEnabled(true);
-                rcvRelPrevCases.setEnabled(true);
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
                 showError(message, null);
-                btnRelNewCase.setEnabled(true);
-                rcvRelPrevCases.setEnabled(true);
             }
         });
     }
 
-    //Todo: First get the previous cases of patient, to view them
     private void linkPageToPatient(String patientId) {
         LinkPageReq req = new LinkPageReq();
         if (patientId == null) {
@@ -697,7 +429,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                pbSelectRelative.setVisibility(View.GONE);
 
                 showError(message, null);
                 Log.i(TAG, "fail: link to page " + message);
@@ -705,87 +436,10 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         });
     }
 
-    private void clearAllCache() {
-        etFullName.setText("");
-        etEmail.setText("");
-        etMobileNumber.setText("");
-    }
 
-    private void saveNewPatient() {
-        AddDetailsReq req = new AddDetailsReq();
-        if (etFullName.getText().toString().isEmpty()) {
-            etFullName.setError("Required");
-            return;
-        }
-        if (etFullName.getText() != null && !etFullName.getText().toString().isEmpty()) {
-            req.setFullName(etFullName.getText().toString());
-        }
-        if (etEmail.getText() != null && !etEmail.getText().toString().isEmpty()) {
-            req.setEmail(etEmail.getText().toString());
-        }
-
-        req.setGender(gender);
-        req.setPageNumber(currentPageNumber);
-        req.setMobileNumber(Long.parseLong(etMobileNumber.getText().toString()));
-
-        pbSaveNewPatient.setVisibility(View.VISIBLE);
-        btnSave.setEnabled(false);
-        final int pageNo = currentPageNumber;
-        APIMethods.addDetails(PrescriptionActivity.this, req, new APIResponseListener<AddDetailsRP>() {
-            @Override
-            public void success(AddDetailsRP response) {
-                pbSaveNewPatient.setVisibility(View.GONE);
-                LoginSheet.getInstance(PrescriptionActivity.this,pageNo, currentInitPageResponse).showExistingPatientLayout(response.getPatient().getFullName(),response.getPatient().getGender(),String.valueOf(response.getPatient().getMobileNumber()));
-
-                showExistingPatientLayout(response.getPatient().getFullName(),response.getPatient().getGender(),String.valueOf(response.getPatient().getMobileNumber()));
-
-                //TODO: Check
-                binding.llPageDetailsStrip.setVisibility(View.VISIBLE);
-                binding.tvPagePatientName.setVisibility(View.VISIBLE);
-                binding.tvPagePatientName.setText(response.getFullName());
-
-
-                clearAllCache();
-
-                binding.pageStatusTxt.setText("Details saved!");
-                Toast.makeText(PrescriptionActivity.this, "Details saved successfully", Toast.LENGTH_SHORT).show();
-                btnSave.setEnabled(true);
-//                binding.drawerLayout.close();
-
-            }
-
-            @Override
-            public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-                pbSaveNewPatient.setVisibility(View.GONE);
-                btnSave.setEnabled(true);
-                showError(message, null);
-//                binding.drawerLayout.close();
-                Log.i("Adi", "fail: saving new patient " + message);
-            }
-        });
-    }
 
     private void handleGender() {
-        tvMale.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                gender = "M";
-                tvMale.setBackgroundColor(getColor(R.color.blue_bg));
-                tvFemale.setBackgroundColor(getColor(R.color.colorBackground));
-                tvMale.setTextColor(getColor(R.color.white));
-                tvFemale.setTextColor(getColor(R.color.colorPrimTxt));
-            }
-        });
-        tvFemale.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                gender = "F";
-                tvFemale.setBackgroundColor(getColor(R.color.blue_bg));
-                tvMale.setBackgroundColor(getColor(R.color.colorBackground));
-                tvFemale.setTextColor(getColor(R.color.white));
-                tvMale.setTextColor(getColor(R.color.colorPrimTxt));
-            }
-        });
+        //Todo: Implement Handling Gender
     }
 
     @Override
@@ -1103,9 +757,6 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     @Override
     public boolean onPaperButtonPress(int id, String name) {
-
-
-
 
         if (id >= 0 && id <= 10) {
             showLoginSheet(id);
@@ -1879,60 +1530,11 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         }
     }
 
-
-    @Override
-    public void phoneNoAdded(AddMobileNoRP response, int pageNo) {
-        if (response.getPatients().size() != 0) {
-            //relatives exist
-            Log.i(TAG, "bs success: relative exists");
-
-            showPreviousPatientsLayout(response);
-
-        }
-        else {
-            //new patient
-            Log.i(TAG, "bs success: relative does not exist, new patient");
-
-            showAddNewPatientLayout();
-            setBtnSaveListener();
-
-        }
-    }
-
-    @Override
-    public void relativePreviousCases(ViewPatientRP response, LinkedPatient selectedRelative, String relativeId, int pageNo) {
-        showRelativesCasesLayout(response,relativeId,selectedRelative);
-    }
-
-    @Override
-    public void detailsAdded(AddDetailsRP response, int pageNo) {
-        showPatientDetails(response);
-    }
-
-    private void showPatientDetails(AddDetailsRP response) {
-        llExistingPatientDetails.setVisibility(View.VISIBLE);
-        llAddMobileNumber.setVisibility(View.GONE);
-        llPrevPatientList.setVisibility(View.GONE);
-        llNewPatient.setVisibility(View.GONE);
-        llRelPrevCases.setVisibility(View.GONE);
-
-
-        if (response.getFullName() != null)
-            tvEPatientName.setText(response.getFullName());
-        tvEPatientsNo.setText(String.valueOf(response.getMobileNumber()));
-        if (response.getGender().equals("M"))
-            tvEPGender.setText("Male");
-        else if (response.getGender().equals("F")) {
-            tvEPGender.setText("Female");
-        }
-
-    }
-
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         if(pendingPoints.size() != 0){
             uploadPoints();
         }
+        super.onBackPressed();
     }
 }
