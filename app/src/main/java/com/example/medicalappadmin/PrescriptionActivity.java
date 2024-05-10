@@ -59,6 +59,7 @@ import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.adapters.OtherGuidesAdapterBS;
 import com.example.medicalappadmin.adapters.PagesHistoryAdapter;
 import com.example.medicalappadmin.adapters.RelativePreviousCasesAdapter;
+import com.example.medicalappadmin.components.AttachmentSheetModule;
 import com.example.medicalappadmin.components.LoginSheet;
 import com.example.medicalappadmin.components.WebVideoPlayer;
 import com.example.medicalappadmin.components.YTVideoPlayer;
@@ -296,11 +297,16 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     }
 
     private void setListeners() {
-        //initialise page
-
 
         //MyListeners
         binding.backBtn.setOnClickListener(view -> onBackPressed());
+        binding.addAttachmentBtn.setOnClickListener(view-> {
+            if (currentInitPageResponse == null){
+                Toast.makeText(this, "Please wait for the page to load from server first", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            AttachmentSheetModule.getInstance().showAttachmentOptions(currentInitPageResponse.getPage().getCaseId(), PrescriptionActivity.this);
+        });
         binding.linkPatientBtn.setOnClickListener(view->{
             if (currentPageNumber != -1 && currentInitPageResponse != null){
                 Intent intent = new Intent(PrescriptionActivity.this, PatientHistoryActivity.class);
