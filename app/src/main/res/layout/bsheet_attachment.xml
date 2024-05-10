@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheets"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingBottom="48dp"
+    android:paddingTop="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_bold"
+        android:textSize="20sp"
+        android:textColor="@color/natural600"
+        android:text="Attach Documents"
+        android:layout_marginVertical="24dp" />
+
+
+    <LinearLayout
+        android:padding="16dp"
+        android:background="@drawable/bg_options_rounded100"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/oldPrescriptionBtn">
+        
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            app:tint="@color/natural600"
+            android:src="@drawable/ic_case" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Normal Prescription"
+                android:textColor="@color/natural700"
+                android:fontFamily="@font/inter_semibold"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/natural400"
+                android:text="You can add image of old non Cliniquill prescription from Camera/Gallery"
+                android:fontFamily="@font/inter"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        android:background="@drawable/bg_options_rounded100"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/reportsBtn">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            app:tint="@color/natural600"
+            android:src="@drawable/ic_report" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Report"
+                android:textColor="@color/natural700"
+                android:fontFamily="@font/inter_semibold"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/natural400"
+                android:text="You can add clinical notes, vital signs, lab records files etc from Camera/Device"
+                android:fontFamily="@font/inter"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        android:background="@drawable/bg_options_rounded100"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/guidesBtn">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            app:tint="@color/natural600"
+            android:src="@drawable/ic_care_guide" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add Care Guide"
+                android:textColor="@color/natural700"
+                android:fontFamily="@font/inter_semibold"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/natural400"
+                android:text="Pick from the list of already configured video guides to be shared."
+                android:fontFamily="@font/inter"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        android:background="@drawable/bg_options_rounded100"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/voiceButton">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            app:tint="@color/natural600"
+            android:src="@drawable/ic_mic" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Voice Note"
+                android:textColor="@color/natural700"
+                android:fontFamily="@font/inter_semibold"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/natural400"
+                android:text="Record your voice to share personalized instructions for the patient."
+                android:fontFamily="@font/inter"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+
+
+
+</LinearLayout>
