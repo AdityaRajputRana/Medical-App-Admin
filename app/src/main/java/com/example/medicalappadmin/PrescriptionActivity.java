@@ -1,6 +1,7 @@
 package com.example.medicalappadmin;
 
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +31,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -97,7 +102,7 @@ import java.util.Objects;
 import java.util.Random;
 
 
-public class PrescriptionActivity extends AppCompatActivity implements SmartPenListener {
+public class PrescriptionActivity extends AppCompatActivity implements SmartPenListener, AttachmentSheetModule.AttachmentInterface {
 
     private static final int PATIENT_ID_LINK_REQUEST = 459;
     String TAG = "pres";
@@ -114,6 +119,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     Page currentPage;
     InitialisePageRP currentInitPageResponse;
     ActionBarDrawerToggle actionBarDrawerToggle;
+
+
 
 
 
@@ -139,6 +146,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AttachmentSheetModule.ATTACHMENT_PICKER_REQ_CODE){
+            AttachmentSheetModule.getInstance().gotFilePickResult(requestCode, resultCode, data);
+        }
         if (requestCode == CAMERA_REQUEST_CODE){
             handleCameraImageResult(resultCode, data);
         }
@@ -161,6 +171,8 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
     }
+
+
 
     private void handleCameraImageResult(int resultCode, Intent data) {
         if (resultCode != RESULT_OK){
@@ -196,7 +208,9 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
     }
 
-    private void uploadAttachment(int pageNum, File file, String fileNane, String ext, String mime) {
+
+
+    public void uploadAttachment(int pageNum, File file, String fileNane, String ext, String mime) {
         setUploadProgress(0);
         FileMetadata metadata = new FileMetadata(ext, mime, "IMAGE", fileNane);
         metadata.description = "Clicked Live";
@@ -305,7 +319,7 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 Toast.makeText(this, "Please wait for the page to load from server first", Toast.LENGTH_SHORT).show();
                 return;
             }
-            AttachmentSheetModule.getInstance().showAttachmentOptions(currentInitPageResponse.getPage().getCaseId(), PrescriptionActivity.this);
+            AttachmentSheetModule.getInstance().showAttachmentOptions(currentInitPageResponse.getPage().getCaseId(), PrescriptionActivity.this, currentPageNumber);
         });
         binding.linkPatientBtn.setOnClickListener(view->{
             if (currentPageNumber != -1 && currentInitPageResponse != null){
@@ -317,6 +331,12 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
                 PrescriptionActivity.this.startActivityForResult(intent, PATIENT_ID_LINK_REQUEST);
             }
         });
+
+        binding.appBar.setOnLongClickListener(view->{
+            handleSingleDraw(new DrawLiveDataBuffer.DrawAction(10, 10, 1, 1, false));
+            return true;
+        });
+
     }
 
 
@@ -1485,16 +1505,24 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         }
     };
 
-    private void setUploadProgress(int progress){
+    @Override
+    public void setUploadProgress(int progress){
         binding.voiceUploadLayout.setVisibility(View.VISIBLE);
         binding.pbVoiceUpload.setProgress(progress);
     }
 
-    private void successUpload() {
+    @Override
+    public void successUpload() {
         binding.pbVoiceUpload.setVisibility(View.INVISIBLE);
         binding.ivVoiceUpload.setImageDrawable(AppCompatResources.getDrawable(PrescriptionActivity.this,R.drawable.ic_done_bg));
         Toast.makeText(PrescriptionActivity.this, "Attached to Page!", Toast.LENGTH_SHORT).show();
         voiceHandler.postDelayed(voiceRunnable,7000);
+    }
+
+    @Override
+    public void onAttachmentFail(String err) {
+        binding.pbVoiceUpload.setVisibility(View.GONE);
+        Methods.showError(this, "Error while uploading Attachment: " + err, true);
     }
 
     private void submitRecording() {
