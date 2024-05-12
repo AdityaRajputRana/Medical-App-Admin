@@ -63,13 +63,18 @@ public class AdditionalsRVAdapter extends RecyclerView.Adapter<AdditionalsRVAdap
         } else if (Objects.equals(response.get(position).getMetaData().getType(), "Link")) {
             tvAdditionalDescription.setText("VIDEO");
             ivAdditionalIcon.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.baseline_videocam_24));
-        } else if (Objects.equals(response.get(position).getMetaData().getType(), "IMAGE")){
-            tvAdditionalDescription.setText(response.get(position).getMetaData().getType().toUpperCase());
+        } else if (response.get(position).getMetaData().getMime().startsWith("image")){
+            tvAdditionalDescription.setText("IMAGE");
             ivAdditionalIcon.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.baseline_photo_24));
+        } else if (response.get(position).getMetaData().getMime().equals("application/pdf")){
+            tvAdditionalDescription.setText("PDF");
+            ivAdditionalIcon.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.baseline_picture_as_pdf_24));
         } else {
-            tvAdditionalDescription.setText("OTHER");
             ivAdditionalIcon.setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.baseline_info_24));
         }
+
+        tvAdditionalDescription.setText(response.get(position).getMetaData().getType().toUpperCase());
+
 
 
         llAdditional.setOnClickListener(new View.OnClickListener() {
@@ -81,15 +86,10 @@ public class AdditionalsRVAdapter extends RecyclerView.Adapter<AdditionalsRVAdap
                     listener.onItemClicked(response.get(position).getMetaData(),"Link", response.get(position).getPublicUrl());
                 } else {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(response.get(position).getPublic_url()), 
-                            response.get(position).getMetaData().getMime());
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setDataAndType(Uri.parse(response.get(position).getPublic_url()), response.get(position).getMetaData().getMime());
 
-                    if (intent.resolveActivity(context.getPackageManager()) != null) {
-                        context.startActivity(intent);
-                    } else {
-                        Toast.makeText(context, "No App found to handle the file", Toast.LENGTH_SHORT).show();
-                    }
+                    context.startActivity(intent);
+
                 }
             }
         });
