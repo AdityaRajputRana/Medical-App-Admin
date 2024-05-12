@@ -59,6 +59,7 @@
 
     </LinearLayout>
     <LinearLayout
+        android:visibility="gone"
         android:layout_marginTop="16dp"
         android:padding="16dp"
         android:background="@drawable/bg_options_rounded100"
@@ -99,6 +100,7 @@
 
     </LinearLayout>
     <LinearLayout
+        android:visibility="gone"
         android:layout_marginTop="16dp"
         android:padding="16dp"
         android:background="@drawable/bg_options_rounded100"
@@ -139,6 +141,7 @@
 
     </LinearLayout>
     <LinearLayout
+        android:visibility="gone"
         android:layout_marginTop="16dp"
         android:padding="16dp"
         android:background="@drawable/bg_options_rounded100"

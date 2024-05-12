@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.medicalappadmin.Models.FileMetadata;
 import com.example.medicalappadmin.PrescriptionActivity;
+import com.example.medicalappadmin.Tools.FileUtils;
+import com.example.medicalappadmin.Tools.Methods;
 import com.example.medicalappadmin.databinding.BsheetAttachmentBinding;
 import com.example.medicalappadmin.databinding.BsheetSourceSelectorBinding;
 import com.example.medicalappadmin.rest.api.APIMethods;
@@ -46,10 +49,30 @@ public class AttachmentSheetModule {
     private int currentUploadProcesses = 1;
 
     public void gotFilePickResult(int reqCode, int resCode, Intent data) {
-        if (reqCode != ATTACHMENT_PICKER_REQ_CODE || resCode != RESULT_OK) return;
+        if (reqCode != ATTACHMENT_PICKER_REQ_CODE || resCode != RESULT_OK || data == null) return;
         if (bottomSheetDialog.isShowing()) bottomSheetDialog.dismiss();
         if (sourceDialog.isShowing()) sourceDialog.dismiss();
-        handleCameraImageResult(resCode, data);
+        if (currentAttachmentSource == AttachmentSource.CAM) handleCameraImageResult(resCode, data);
+        if (currentAttachmentSource == AttachmentSource.GALL || currentAttachmentSource == AttachmentSource.DEV) handleFileResult(resCode, data);
+    }
+
+
+    private void handleFileResult(int resCode, Intent data) {
+        //This function shall handle the gallery intent to get the File, it's name, and mime from the data
+        if (context == null) {
+            if (attachmentInterface != null) attachmentInterface.onAttachmentFail("Null context error: L62");
+            return;
+        }
+        Uri imageUri = data.getData();
+        String imageName = FileUtils.getImageName(imageUri, context);
+        String mimeType = FileUtils.getImageMimeType(imageUri, context);
+        File file = FileUtils.getFile(context, imageUri);
+        String ext = FileUtils.getFileExtension(imageUri, context);
+        if (file == null) {
+            Log.i("eta - FileUtils", "Final file is null");
+            return;
+        };
+        uploadAttachment(pageNumber, file, imageName, ext, mimeType);
     }
 
 
@@ -66,8 +89,8 @@ public class AttachmentSheetModule {
 
         Bitmap bitmap = (Bitmap) data.getExtras().get("data");
         Random randomGenerator = new Random();
-        int random = randomGenerator.nextInt(9999);
-        String newimagename= "CAM_IMG_" + String.valueOf(random);
+        int random = randomGenerator.nextInt(99999);
+        String newimagename= "CAMERA_IMG_" + String.valueOf(random);
 
         try {
             File file = File.createTempFile(newimagename, ".png", context.getCacheDir());
@@ -86,8 +109,13 @@ public class AttachmentSheetModule {
 
     private void uploadAttachment(final int pageNum, File file, String fileNane, String ext, String mime) {
         if (attachmentInterface != null) attachmentInterface.setUploadProgress(0);
-        FileMetadata metadata = new FileMetadata(ext, mime, "IMAGE", fileNane);
+        String type = "ATTACHMENT";
+        if (currentAttachmentType == AttachmentType.PRES) type = "PRES";
+        if (currentAttachmentType == AttachmentType.REPORT) type = "REPORT";
+        FileMetadata metadata = new FileMetadata(ext, mime, type, fileNane);
         metadata.description = "Clicked Live";
+        if (currentAttachmentSource == AttachmentSource.GALL) metadata.description = "Selected from gallery";
+        if (currentAttachmentSource == AttachmentSource.DEV) metadata.description = "Uploaded from device";
         APIMethods.uploadAttachment(context, file, pageNum, metadata, new FileTransferResponseListener<UploadVoiceRP>() {
             @Override
             public void success(UploadVoiceRP response) {
@@ -109,6 +137,7 @@ public class AttachmentSheetModule {
 
 
     private enum AttachmentType{PRES, REPORT, VIDEO, VOICE};
+    private enum AttachmentSource{CAM, GALL, DEV};
 
 
     public interface AttachmentInterface{
@@ -133,6 +162,9 @@ public class AttachmentSheetModule {
         this.caseId = caseId;
         this.context = activity;
         this.pageNumber = pageNumber;
+        this.currentAttachmentSource = null;
+        this.currentAttachmentType = null;
+
         if (activity instanceof AttachmentInterface) this.attachmentInterface = (AttachmentInterface) activity;
 
         Log.i("Toda", "New Attachement Views Inflated!");
@@ -156,6 +188,7 @@ public class AttachmentSheetModule {
 
         sourceSelectorBinding.cameraBtn.setOnClickListener(view->{
             Intent attachmentIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            currentAttachmentSource = AttachmentSource.CAM;
             context.startActivityForResult(attachmentIntent, ATTACHMENT_PICKER_REQ_CODE);
         });
 
@@ -167,6 +200,7 @@ public class AttachmentSheetModule {
                 attachmentIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 attachmentIntent.setType("image/*");
             }
+            currentAttachmentSource = AttachmentSource.GALL;
             context.startActivityForResult(attachmentIntent, ATTACHMENT_PICKER_REQ_CODE);
         });
 
@@ -174,12 +208,15 @@ public class AttachmentSheetModule {
             Intent attachmentIntent = new Intent(Intent.ACTION_GET_CONTENT);
             attachmentIntent.setType("application/pdf");
 
+            currentAttachmentSource = AttachmentSource.DEV;
             context.startActivityForResult(attachmentIntent, ATTACHMENT_PICKER_REQ_CODE);
         });
     }
 
     private AttachmentType currentAttachmentType;
+    private AttachmentSource currentAttachmentSource;
     private void confirmSource(AttachmentType attachmentType) {
+        currentAttachmentType = attachmentType;
 
         sourceSelectorBinding.cameraBtn.setVisibility(View.VISIBLE);
         sourceSelectorBinding.galleryBtn.setVisibility(View.VISIBLE);

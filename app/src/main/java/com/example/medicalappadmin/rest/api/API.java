@@ -241,7 +241,6 @@ public class API {
         try {
             String encodedData = "";
             AppRequest request = HashUtils.getHashedDataObject(rawData, context, endpoint);
-            Log.i("encodedData", request.getData());
             if (request != null){
                 encodedData = request.getData();
             }
