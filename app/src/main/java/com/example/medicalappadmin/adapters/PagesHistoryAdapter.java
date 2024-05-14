@@ -22,6 +22,7 @@ public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapte
     ViewCaseRP viewCaseRP;
     Context context;
     PageListener listener;
+    boolean keepHeightFixed = false;
 
 
 
@@ -32,10 +33,19 @@ public class PagesHistoryAdapter extends RecyclerView.Adapter<PagesHistoryAdapte
         this.listener = listener;
     }
 
+    public PagesHistoryAdapter(ViewCaseRP viewCaseRP, Context context, PageListener listener, boolean keepHeightFixed) {
+        this.viewCaseRP = viewCaseRP;
+        this.context = context;
+        this.listener = listener;
+        this.keepHeightFixed = keepHeightFixed;
+    }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.pages_item, parent, false);
+        int layoutId = R.layout.pages_item;
+        if (keepHeightFixed) layoutId = R.layout.pages_item_for_fixed_height;
+        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         return new MyViewHolder(view);
     }
 

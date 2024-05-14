@@ -129,6 +129,13 @@ public class PatientHistoryActivity extends AppCompatActivity {
         });
     }
 
+    private void selectCaseOfThePatient(String patientID){
+        Intent intent = new Intent(this, ActivityCaseHistory.class);
+        intent.putExtra("CASE_SELECTOR_FILTER_EN", true);
+        intent.putExtra("PATIENT_ID", patientID);
+        startActivityForResult(intent, 1);
+    }
+
     private void performSearch(String searchQuery) {
         Intent intent = new Intent(this, PatientHistoryActivity.class);
         intent.putExtra(Const.searchQuery, searchQuery);
@@ -191,10 +198,7 @@ public class PatientHistoryActivity extends AppCompatActivity {
                             public void onPatientClicked(String id) {
                                 //TODO open patient details
                                 if (isPagePatientLinkEnabled){
-                                    Intent intent = new Intent();
-                                    intent.putExtra("SELECTED_PATIENT_ID", id);
-                                    PatientHistoryActivity.this.setResult(RESULT_OK, intent);
-                                    PatientHistoryActivity.this.finish();
+                                    selectCaseOfThePatient(id);
                                     return;
                                 }
                                 Intent i = new Intent(PatientHistoryActivity.this, ActivityPatientDetails.class);

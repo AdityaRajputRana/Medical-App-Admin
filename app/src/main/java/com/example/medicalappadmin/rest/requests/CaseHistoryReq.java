@@ -4,12 +4,19 @@ public class CaseHistoryReq {
     int pageNumber;
     String doctorId;
     String creatorId;
+    String patientId;
 
     public CaseHistoryReq() {
     }
 
+
     public CaseHistoryReq(int pageNumber) {
         this.pageNumber = pageNumber;
+    }
+
+    public CaseHistoryReq(int pageNumber, String patientId) {
+        this.pageNumber = pageNumber;
+        this.patientId = patientId;
     }
 
 

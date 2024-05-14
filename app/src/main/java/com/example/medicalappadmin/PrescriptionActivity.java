@@ -154,9 +154,15 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
         }
         if (requestCode == PATIENT_ID_LINK_REQUEST){
             if (resultCode == RESULT_OK && data != null && data.hasExtra("SELECTED_PATIENT_ID")){
+                String selectedCaseId = data.getStringExtra("SELECTED_CASE_ID");
                 String selectedPatientID = data.getStringExtra("SELECTED_PATIENT_ID");
+                if (selectedCaseId != null && !selectedCaseId.isEmpty()){
+                    linkPageToCase(selectedCaseId, selectedPatientID);
+                    return;
+                }
                 if (selectedPatientID != null && !selectedPatientID.isEmpty()){
                     linkPageToPatient(selectedPatientID);
+                    return;
                 }
             }
             return;
@@ -411,18 +417,22 @@ public class PrescriptionActivity extends AppCompatActivity implements SmartPenL
 
 
 
-    private void linkPageToCase(String caseId, String relativeId, LinkedPatient selectedRelative) {
+    private void linkPageToCase(String caseId, String relativeId) {
         LinkPageReq req = new LinkPageReq();
         req.setPageNumber(currentPageNumber);
         req.setPatientId(relativeId);
         req.setCaseId(caseId);
         final int pageNo =currentPageNumber;
+        binding.pbPrescription.setVisibility(View.VISIBLE);
         APIMethods.linkPage(PrescriptionActivity.this, req, new APIResponseListener<LinkPageRP>() {
             @Override
             public void success(LinkPageRP response) {
-
-                Toast.makeText(PrescriptionActivity.this, "Page is linked to " + selectedRelative.getFullName(), Toast.LENGTH_SHORT).show();
-//                TODO: binding.toolbar.setSubtitle("Page is linked to " + selectedRelative.getFullName());
+                if (currentPageNumber == pageNo) {
+                    binding.pbPrescription.setVisibility(View.GONE);
+                    binding.pageStatusTxt.setText("Page is linked to " + response.getPatient().getFullName());
+                    currentInitPageResponse.setPatient(response.getPatient());
+                    showLinkedPatientInformation();
+                }
             }
 
             @Override

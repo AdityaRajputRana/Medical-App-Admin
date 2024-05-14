@@ -123,6 +123,15 @@ public class APIMethods {
         API.postData(listener, req, EndPoints.caseHistory, CaseHistoryRP.class, context);
     }
 
+    public static void loadPatientCases(Context context, int pageNumber, String patientId, APIResponseListener<CaseHistoryRP> listener) {
+        if (patientId == null){
+            loadCaseHistory(context, pageNumber, listener);
+            return;
+        }
+        CaseHistoryReq req = new CaseHistoryReq(pageNumber, patientId);
+        API.postData(listener, req, EndPoints.caseHistory, CaseHistoryRP.class, context);
+    }
+
 
     //merge cases
     public static void mergeCasesHistory(Context context, String fromCaseId, String toCaseId, APIResponseListener<EmptyRP> listener) {

@@ -155,7 +155,7 @@ public class CasesHistoryFragment extends Fragment {
                         }
 
                         @Override
-                        public void onCaseClicked(String caseId) {
+                        public void openCase(String caseId) {
                             Intent i = new Intent(getActivity(), CaseDetailsActivity.class);
                             i.putExtra("CASE_ID", caseId);
                             startActivity(i);

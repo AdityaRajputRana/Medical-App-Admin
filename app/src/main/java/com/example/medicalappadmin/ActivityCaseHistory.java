@@ -38,12 +38,17 @@ public class ActivityCaseHistory extends AppCompatActivity {
     private ItemTouchHelper.Callback callback;
     private ItemTouchHelper itemTouchHelper;
 
+    private boolean isCaseSelectionFilter = false;
+    private String patientId = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityCaseHistoryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        getFiltersFromIntent();
 
         manager = new LinearLayoutManager(ActivityCaseHistory.this);
         binding.rcvCaseHistory.setVisibility(View.GONE);
@@ -77,6 +82,16 @@ public class ActivityCaseHistory extends AppCompatActivity {
 
     }
 
+    private void getFiltersFromIntent() {
+        isCaseSelectionFilter = getIntent().getBooleanExtra("CASE_SELECTOR_FILTER_EN", false);
+        if (isCaseSelectionFilter){
+            binding.newBtn.setVisibility(View.VISIBLE);
+            binding.newBtn.setOnClickListener(view ->passCaseSelectionResult(null));
+            binding.activityTitle.setText("Select Case");
+        }
+        patientId = getIntent().getStringExtra("PATIENT_ID");
+    }
+
     private void setListeners() {
         binding.btnGoBack.setOnClickListener(view -> {
             finish();
@@ -107,77 +122,96 @@ public class ActivityCaseHistory extends AppCompatActivity {
     private void loadCases(int cPage, int tPages) {
         if (cPage > tPages) {
             binding.pbCaseHistory.setVisibility(View.GONE);
-//            Toast.makeText(this, "That's all", Toast.LENGTH_SHORT).show();
             return;
         }
 
         binding.pbCaseHistory.setVisibility(View.VISIBLE);
         if (caseHistoryRP != null)
             binding.rcvCaseHistory.smoothScrollToPosition(caseHistoryRP.getCases().size() - 1);
-        APIMethods.loadCaseHistory(this, cPage, new APIResponseListener<CaseHistoryRP>() {
+
+        //This method will load patient's cases or will load all cases if patientId is null
+        APIMethods.loadPatientCases(this, cPage,patientId, new APIResponseListener<CaseHistoryRP>() {
             @Override
             public void success(CaseHistoryRP response) {
-                if(response.getCases().size() == 0){
-                    binding.llData.setVisibility(View.GONE);
-                    binding.llNoData.setVisibility(View.VISIBLE);
-                }
-
-                if (caseHistoryRP == null) {
-                    caseHistoryRP = response;
-                } else {
-                    caseHistoryRP.getCases().addAll(response.getCases());
-                    caseHistoryRP.setTotalPages(response.getTotalPages());
-                    caseHistoryRP.setCurrentPage(response.getCurrentPage());
-                }
-
-                if (loadedCases == -1) {
-                    loadedCases = 0;
-                }
-                loadedCases += response.getCases().size();
-
-                binding.rcvCaseHistory.setVisibility(View.VISIBLE);
-                totalPages = response.getTotalPages();
-
-                if (adapter == null) {
-                    adapter = new CaseHistoryRVAdapter(response, ActivityCaseHistory.this, new CaseHistoryRVAdapter.CaseListener() {
-                        @Override
-                        public void onShareClicked(String caseId) {
-                            generateAndSharePDFLink(caseId);
-                        }
-
-                        @Override
-                        public void onCaseClicked(String caseId) {
-                            Intent i = new Intent(ActivityCaseHistory.this, CaseDetailsActivity.class);
-                            i.putExtra("CASE_ID", caseId);
-                            startActivity(i);
-                        }
-
-                        @Override
-                        public void submitCaseToPatient(String caseId) {
-                            shareCaseToPatient(caseId);
-                        }
-                    });
-                    binding.rcvCaseHistory.setLayoutManager(manager);
-                    binding.rcvCaseHistory.setAdapter(adapter);
-                    callback = new ItemTouchHelperCallback(binding.rcvCaseHistory, response, ActivityCaseHistory.this);
-                    itemTouchHelper = new ItemTouchHelper(callback);
-                    itemTouchHelper.attachToRecyclerView(binding.rcvCaseHistory);
-                } else {
-                    adapter.notifyItemRangeInserted(caseHistoryRP.getCases().size() - response.getCases().size() + 1, response.getCases().size());
-                    itemTouchHelper.attachToRecyclerView(binding.rcvCaseHistory);
-                }
-                binding.pbCaseHistory.setVisibility(View.GONE);
+                handleCaseHistoryResponse(response);
             }
 
             @Override
             public void fail(String code, String message, String redirectLink, boolean retry, boolean cancellable) {
-
-
-
+                Methods.showError(ActivityCaseHistory.this, message, false);
             }
         });
 
 
+    }
+
+    private void handleCaseHistoryResponse(CaseHistoryRP response){
+        if(response.getCases().size() == 0){
+            binding.llData.setVisibility(View.GONE);
+            binding.llNoData.setVisibility(View.VISIBLE);
+        }
+
+        if (caseHistoryRP == null) {
+            caseHistoryRP = response;
+        } else {
+            caseHistoryRP.getCases().addAll(response.getCases());
+            caseHistoryRP.setTotalPages(response.getTotalPages());
+            caseHistoryRP.setCurrentPage(response.getCurrentPage());
+        }
+
+        if (loadedCases == -1) {
+            loadedCases = 0;
+        }
+        loadedCases += response.getCases().size();
+
+        binding.rcvCaseHistory.setVisibility(View.VISIBLE);
+        totalPages = response.getTotalPages();
+
+        if (adapter == null) {
+            adapter = new CaseHistoryRVAdapter(response, ActivityCaseHistory.this, new CaseHistoryRVAdapter.CaseListener() {
+                @Override
+                public void onShareClicked(String caseId) {
+                    generateAndSharePDFLink(caseId);
+                }
+
+                @Override
+                public void openCase(String caseId) {
+                    Intent i = new Intent(ActivityCaseHistory.this, CaseDetailsActivity.class);
+                    i.putExtra("CASE_ID", caseId);
+                    startActivity(i);
+                }
+
+                @Override
+                public void submitCaseToPatient(String caseId) {
+                    shareCaseToPatient(caseId);
+                }
+
+                @Override
+                public void onCaseSelected(String caseId) {
+                    passCaseSelectionResult(caseId);
+                }
+            }, isCaseSelectionFilter);
+            binding.rcvCaseHistory.setLayoutManager(manager);
+            binding.rcvCaseHistory.setAdapter(adapter);
+            callback = new ItemTouchHelperCallback(binding.rcvCaseHistory, response, ActivityCaseHistory.this);
+            itemTouchHelper = new ItemTouchHelper(callback);
+            itemTouchHelper.attachToRecyclerView(binding.rcvCaseHistory);
+        } else {
+            adapter.notifyItemRangeInserted(caseHistoryRP.getCases().size() - response.getCases().size() + 1, response.getCases().size());
+            itemTouchHelper.attachToRecyclerView(binding.rcvCaseHistory);
+        }
+        binding.pbCaseHistory.setVisibility(View.GONE);
+    }
+
+    private void passCaseSelectionResult(String caseId) {
+        if (isCaseSelectionFilter){
+            Intent intent = new Intent();
+            intent.putExtra("SELECTED_PATIENT_ID", patientId);
+            if (caseId != null)
+                intent.putExtra("SELECTED_CASE_ID", caseId);
+            ActivityCaseHistory.this.setResult(RESULT_OK, intent);
+            ActivityCaseHistory.this.finish();
+        }
     }
 
 
