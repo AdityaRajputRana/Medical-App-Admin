@@ -65,14 +65,28 @@
 
 
                 </LinearLayout>
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/penActionBgCard"
+                    app:cardCornerRadius="50dp"
+                    app:cardElevation="5dp"
+                    app:cardUseCompatPadding="false"
+                    android:clipToPadding="true"
+                    android:clipChildren="false"
+                    app:cardBackgroundColor="@color/error50"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                <ImageButton
                     android:id="@+id/penActionBtn"
                     android:src="@drawable/ic_pen"
-                    android:tint="@color/error700"
-                    android:backgroundTint="@color/error50"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical" />
+                    android:padding="16dp"
+                    android:elevation="20sp"
+                    app:tint="@color/error700"
+                    android:background="@android:color/transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                </androidx.cardview.widget.CardView>
 
 
 

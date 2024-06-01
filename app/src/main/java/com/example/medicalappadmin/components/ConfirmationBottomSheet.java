@@ -42,4 +42,9 @@ public class ConfirmationBottomSheet {
         showConfirmationBottomSheet(context, "Log out", "Are you sure you want to Log out?",
                 "No", "Yes", null, onLogoutConfirm);
     }
+
+    public static void confirmPenDisconnect(Context context, View.OnClickListener onDisconnectConfirm){
+        showConfirmationBottomSheet(context, "Disconnect Pen", "You are about to disconnect the pen from app",
+                "No", "Disconnect", null, onDisconnectConfirm);
+    }
 }

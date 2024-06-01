@@ -317,7 +317,7 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         paperSize.height = 7014;
         paperSize.width = 4962;
         paperSize.pageFrom = 0;
-        paperSize.pageTo = 100;
+        paperSize.pageTo = 1000;
         paperSize.bookNum = 1;
         paperSizes.add(paperSize);
         iPenCtrl.SetPaperSize(paperSizes);

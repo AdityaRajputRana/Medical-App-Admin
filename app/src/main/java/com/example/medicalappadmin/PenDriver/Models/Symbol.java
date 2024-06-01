@@ -14,8 +14,9 @@ public class Symbol {
     }
 
     public boolean isApplicable(float x, float y, float scaleFactor){
-        x *= scaleFactor;
-        y *= scaleFactor;
+        float deflationFactor = 0.9618171021f;
+        x *= scaleFactor/deflationFactor;
+        y *= scaleFactor/deflationFactor;
         return (xmin <= x && x <= xmax && ymin <= y && y <= ymax);
     }
 

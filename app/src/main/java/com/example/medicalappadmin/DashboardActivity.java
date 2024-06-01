@@ -433,6 +433,8 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
     @Override
     public void onPenIconClicked() {
         changeFragment(1);
+        profileFragment.startConnectionProcedureFromExternalClick();
+        binding.bottomNavigationView.setSelectedItemId(R.id.profile);
     }
 
 

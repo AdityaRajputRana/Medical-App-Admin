@@ -51,5 +51,7 @@
     <color name="primary50">#DEF2FF</color>
     <color name="natural200">#E2E8F0</color>
 
+    <color name="shadeWhite">#FEFEFE</color>
+
 
 </resources>
