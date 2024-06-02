@@ -8,6 +8,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +66,15 @@ public class ProfileFragment extends Fragment {
             loadUI();
             setListeners();
         }
+        observeChanges();
         return binding.getRoot();
+    }
+
+    private void observeChanges() {
+        PenStatusLiveData.getPenStatusLiveData().getIsConnected()
+                .observe(getViewLifecycleOwner(), isConnected->{
+                    updatePenConnectionStatus();
+                });
     }
 
     private void loadData() {
@@ -77,10 +86,6 @@ public class ProfileFragment extends Fragment {
 
     private void setListeners() {
         binding.logOutBtn.setOnClickListener(view -> confirmLogout());
-        PenStatusLiveData.getPenStatusLiveData().getIsConnected()
-                .observe(getViewLifecycleOwner(), isConnected->{
-                    updatePenConnectionStatus();
-                });
 
         binding.penActionBgCard.setOnClickListener(view->{
             if (Boolean.TRUE.equals(PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue()))

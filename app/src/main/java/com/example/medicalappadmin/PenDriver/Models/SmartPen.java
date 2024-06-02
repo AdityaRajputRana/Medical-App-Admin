@@ -1,5 +1,7 @@
 package com.example.medicalappadmin.PenDriver.Models;
 
+import android.util.Log;
+
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 
 

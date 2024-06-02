@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.example.medicalappadmin.PenDriver.ConnectionsHandler;
 import com.example.medicalappadmin.PenDriver.LiveData.DrawLiveDataBuffer;
+import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.PenDriver.Models.SmartPen;
 import com.example.medicalappadmin.PenDriver.SmartPenDriver;
 import com.example.medicalappadmin.PenDriver.SmartPenListener;
@@ -198,13 +199,11 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         SmartPenDriver.observeSmartPens(dialog, new Observer<ArrayList<SmartPen>>() {
             @Override
             public void onChanged(ArrayList<SmartPen> mPens) {
-                Log.i("PenConnectionFlow", "on Smart Pens Changed");
                 for (SmartPen smartPen: mPens){
                     if (smartPens == null) {
                         smartPens = new ArrayList<>();
                     }
                     dialogPenBinding.actionBtn.setOnClickListener(view->{
-                        Log.i("PenConnectionFlow", "onAction Button Clicked");
                         isPenSearchRunning = false;
                         connectToSmartPen(selectedPen);
                     });
@@ -437,9 +436,11 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
     @Override
     public void onPenIconClicked() {
-        changeFragment(1);
-        profileFragment.startConnectionProcedureFromExternalClick();
-        binding.bottomNavigationView.setSelectedItemId(R.id.profile);
+        if (Boolean.TRUE.equals(PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue())) {
+            binding.bottomNavigationView.setSelectedItemId(R.id.profile);
+        } else {
+            initialisePenConnectionControls();
+        }
     }
 
 
