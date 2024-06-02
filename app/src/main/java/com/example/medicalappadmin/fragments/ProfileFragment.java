@@ -33,7 +33,6 @@ public class ProfileFragment extends Fragment {
 
     User user;
     FragmentProfileBinding binding;
-    Boolean isPenConnected = false;
 
     public interface CallBacksListener{
         void startConnectionRoutine();
@@ -43,7 +42,7 @@ public class ProfileFragment extends Fragment {
     private CallBacksListener listener;
 
     public void startConnectionProcedureFromExternalClick(){
-        if (!isPenConnected){
+        if (Boolean.FALSE.equals(PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue())){
             listener.startConnectionRoutine();
         }
     }
@@ -80,12 +79,11 @@ public class ProfileFragment extends Fragment {
         binding.logOutBtn.setOnClickListener(view -> confirmLogout());
         PenStatusLiveData.getPenStatusLiveData().getIsConnected()
                 .observe(getViewLifecycleOwner(), isConnected->{
-                    isPenConnected = isConnected;
                     updatePenConnectionStatus();
                 });
 
-        binding.penActionBtn.setOnClickListener(view->{
-            if (isPenConnected)
+        binding.penActionBgCard.setOnClickListener(view->{
+            if (Boolean.TRUE.equals(PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue()))
                 ConfirmationBottomSheet.confirmPenDisconnect(getActivity(), x->listener.disconnectFromPen());
             else
                 listener.startConnectionRoutine();
@@ -97,6 +95,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updatePenConnectionStatus() {
+        boolean isPenConnected = Boolean.TRUE.equals(PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue());
         isPenConnected = PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue();
         int colorId = isPenConnected ? R.color.shadeWhite : R.color.error700;
         int bgColor = isPenConnected ? R.color.success500 : R.color.error50;

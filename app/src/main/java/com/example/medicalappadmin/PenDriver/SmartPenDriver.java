@@ -355,9 +355,10 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
 
     boolean connectToPenAfterPermission = false;
 
-    public void connectToPen(SmartPen smartPen){
+    public boolean connectToPen(SmartPen smartPen){
         if (iPenCtrl.getConnectedDevice() != null){
             smartPenListener.message("Event", "Already Connected");
+            return false;
         }
         if (!PermissionsHelper.haveRequiredPermissions(activity)){
             PermissionsHelper.requestPermission(activity, isPermitted -> {
@@ -373,7 +374,7 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
 
         //NEO Code
         String mac_address = smartPen.getMacAddress();
-        iPenCtrl.connect(smartPen.getMacAddress());
+        return iPenCtrl.connect(smartPen.getMacAddress());
     }
 
 

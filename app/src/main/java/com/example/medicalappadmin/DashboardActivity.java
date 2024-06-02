@@ -198,14 +198,16 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         SmartPenDriver.observeSmartPens(dialog, new Observer<ArrayList<SmartPen>>() {
             @Override
             public void onChanged(ArrayList<SmartPen> mPens) {
+                Log.i("PenConnectionFlow", "on Smart Pens Changed");
                 for (SmartPen smartPen: mPens){
                     if (smartPens == null) {
                         smartPens = new ArrayList<>();
-                        dialogPenBinding.actionBtn.setOnClickListener(view->{
-                            isPenSearchRunning = false;
-                            connectToSmartPen(selectedPen);
-                        });
                     }
+                    dialogPenBinding.actionBtn.setOnClickListener(view->{
+                        Log.i("PenConnectionFlow", "onAction Button Clicked");
+                        isPenSearchRunning = false;
+                        connectToSmartPen(selectedPen);
+                    });
                     dialogPenBinding.radioSelector.setVisibility(View.VISIBLE);
                     dialogPenBinding.actionBtn.setVisibility(View.VISIBLE);
                     RadioButton button = new RadioButton(DashboardActivity.this);
@@ -238,9 +240,12 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         dialogPenBinding.titleTxt.setText("Connecting to selected pen");
         dialogPenBinding.bodyTxt.setText("Please wait");
 
-        driver.connectToPen(selectedPen);
-
-
+        boolean success = driver.connectToPen(selectedPen);
+        if (success){
+            Toast.makeText(this, "Pen Connected!", Toast.LENGTH_SHORT).show();
+        } else {
+            showError("Connection failed", null);
+        }
     }
 
 

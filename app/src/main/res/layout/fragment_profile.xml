@@ -67,6 +67,8 @@
                 </LinearLayout>
 
                 <androidx.cardview.widget.CardView
+                    android:clickable="true"
+                    android:focusable="true"
                     android:id="@+id/penActionBgCard"
                     app:cardCornerRadius="50dp"
                     app:cardElevation="5dp"
@@ -78,6 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                 <ImageButton
+                    android:clickable="false"
                     android:id="@+id/penActionBtn"
                     android:src="@drawable/ic_pen"
                     android:padding="16dp"
