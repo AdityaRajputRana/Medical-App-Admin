@@ -12,10 +12,7 @@ import androidx.lifecycle.Observer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.Path;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -85,6 +82,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
                 if (establised) {
                     dialog.dismiss();
                     dialogPenBinding = null;
+                    dialog = null;
                     Toast.makeText(DashboardActivity.this, "Pen Connected", Toast.LENGTH_SHORT).show();
                 } else {
                     showError("Connection failed", null);
@@ -165,7 +163,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
 
     private void searchPens() {
-
+        Log.i("PenConnectionRoutine", "Dash: Searching Pens");
         dialogPenBinding.progressBar.setVisibility(View.VISIBLE);
         dialogPenBinding.bodyTxt.setVisibility(View.VISIBLE);
         dialogPenBinding.titleTxt.setVisibility(View.VISIBLE);
@@ -174,6 +172,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         dialogPenBinding.titleTxt.setText("Searching for pens");
 
         isPenSearchRunning = true;
+        smartPens = new ArrayList<>();
         driver.getSmartPenList(new ConnectionsHandler.PenConnectionsListener() {
             @Override
             public void onSmartPens(ArrayList<SmartPen> smartPens) {
@@ -199,6 +198,8 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
         SmartPenDriver.observeSmartPens(dialog, new Observer<ArrayList<SmartPen>>() {
             @Override
             public void onChanged(ArrayList<SmartPen> mPens) {
+                Log.i("PenConnectionRoutine", "Dash: Change in list observed: " + mPens.size());
+                dialogPenBinding.radioSelector.removeAllViews();
                 for (SmartPen smartPen: mPens){
                     if (smartPens == null) {
                         smartPens = new ArrayList<>();
@@ -272,6 +273,11 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
     }
 
     private void initialisePenConnectionControls() {
+        if (dialog != null || dialogPenBinding != null){
+            dialog.dismiss();
+            dialog = null;
+            dialogPenBinding = null;
+        }
         driver.setListener(smartPenListener);
         dialogPenBinding = DialogPenBinding.inflate(getLayoutInflater());
         dialog = new AlertDialog.Builder(this)
@@ -312,6 +318,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
 
     private void searchPensInBg() {
         driver.setListener(smartPenListener);
+        smartPens = new ArrayList<>();
         Log.i("ConnHandlerRes", String.valueOf(driver.initialize()));
         driver.getSmartPenList(new ConnectionsHandler.PenConnectionsListener() {
             @Override
@@ -328,6 +335,7 @@ public class DashboardActivity extends AppCompatActivity implements HomeFragment
             public void onChanged(ArrayList<SmartPen> smartPens) {
                 for (SmartPen smartPen: smartPens){
                     if (smartPen.getMacAddress().equals(autoConnMacAdd)){
+                        SmartPenDriver.removeSmartPensObserver(this);
                         driver.connectToPen(smartPen);
                         break;
                     }

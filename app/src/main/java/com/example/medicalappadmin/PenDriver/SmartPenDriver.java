@@ -39,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -75,49 +76,21 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
 
     private static MutableLiveData<ArrayList<SmartPen>> smartPensLiveData = new MutableLiveData<>(new ArrayList<>());
     public static void observeSmartPens(@NonNull LifecycleOwner owner, @NonNull Observer<ArrayList<SmartPen>> observer){
-        Log.i("GetSmartPens", "observer added");
+        Log.i("PenConnectionRoutine", "Observing Smart Pens");
         smartPensLiveData.observe(owner, observer);
     }
-
-
-
-    @SuppressLint("MissingPermission")
-    public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener, int count){
-
-        Log.i("GetSmartPens", "getSmartPenList called");
-
-        if (smartPens != null){
-            for (SmartPen smartPen: smartPens){
-                connectionsListener.onSmartPen(smartPen);
-            }
-        }
-
-        Context context = activity;
-
-        //Check if bluetooth is not enabled then enable it
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            ((AppCompatActivity) context).startActivityForResult(enableBtIntent, 1);
-        }
-
-        try {
-            int code = iPenCtrl.btStartForPeripheralsList(context);
-            Log.i("GetSmartPens", "started search: " + code);
-        } catch (Exception e){
-            Toast.makeText(context, "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
+    public static void removeSmartPensObserver(@NonNull Observer<ArrayList<SmartPen>> observer){
+        Log.i("GetSmartPens", "Stop Observing Smart Pens");
+        smartPensLiveData.removeObserver(observer);
     }
+
+
     @SuppressLint("MissingPermission")
     public void getSmartPenList(ConnectionsHandler.PenConnectionsListener connectionsListener){
-        getSmartPenList(connectionsListener,0);
-
-        if (smartPens != null){
-            for (SmartPen smartPen: smartPens){
-                connectionsListener.onSmartPen(smartPen);
-            }
-        }
+        Log.i("PenConnectionRoutine", "Get Smart Pen List called");
+        smartPens = new ArrayList<>();
+        searchedPens = new HashSet<>();
+        smartPensLiveData.setValue(smartPens);
 
         Context context = activity;
 
@@ -129,7 +102,9 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
         }
 
         try {
+            Log.i("PenConnectionRoutine", "Starting search");
             iPenCtrl.btStartForPeripheralsList(context);
+            Log.i("PenConnectionRoutine", "Started Search");
         } catch (Exception e){
             Toast.makeText(context, "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
@@ -205,9 +180,12 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
     }
 
     private void addSmartPenToList(SmartPen smartPen) {
+        Log.i("PenConnectionRoutine", "Found Pen");
         if (searchedPens.contains(smartPen.getMacAddress())){
+            Log.i("PenConnectionRoutine", "Pen present in list");
             return;
         }
+        Log.i("PenConnectionRoutine", "Pen added in list");
         searchedPens.add(smartPen.getMacAddress());
         smartPens.add(smartPen);
         smartPensLiveData.setValue(smartPens);

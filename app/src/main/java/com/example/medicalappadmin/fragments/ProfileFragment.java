@@ -42,12 +42,6 @@ public class ProfileFragment extends Fragment {
 
     private CallBacksListener listener;
 
-    public void startConnectionProcedureFromExternalClick(){
-        if (Boolean.FALSE.equals(PenStatusLiveData.getPenStatusLiveData().getIsConnected().getValue())){
-            listener.startConnectionRoutine();
-        }
-    }
-
 
     public ProfileFragment() {
     }
