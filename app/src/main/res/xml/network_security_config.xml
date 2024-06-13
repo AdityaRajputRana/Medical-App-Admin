@@ -3,5 +3,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.0.2.2</domain>
         <domain includeSubdomains="true">res.cloudinary.com</domain>
+        <domain includeSubdomains="true">ciniquil-dev.ap-south-1.elasticbeanstalk.com</domain>
     </domain-config>
 </network-security-config>

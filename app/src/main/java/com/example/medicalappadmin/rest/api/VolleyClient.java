@@ -8,8 +8,9 @@ public class VolleyClient {
     public static String suffix = "";
 
     static String localUrl = "http://10.0.2.2:8080/";
-    static String devUrl = "https://medicalappmangal.onrender.com/";
+    static String devUrl = "http://ciniquil-dev.ap-south-1.elasticbeanstalk.com/";
     static String prodUrl = "";
+    static String betaUrl = "";
 
     static boolean useProd = false;
     static boolean useDev = false;
