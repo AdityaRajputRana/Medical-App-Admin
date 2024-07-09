@@ -1,9 +1,18 @@
 package com.example.medicalappadmin.PenDriver;
 
 import android.util.Log;
+import android.widget.Toast;
 
+import com.example.medicalappadmin.PenDriver.Models.PageConfig;
 import com.example.medicalappadmin.PenDriver.Models.Symbol;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class SymbolController {
@@ -59,11 +68,23 @@ public class SymbolController {
         s.add(new Symbol(101, "LINK_FROM", 43, 124, 46, 127 ));
         s.add(new Symbol(102, "LINK_PAGE", 47, 124, 50, 127 ));
 
-
-
-
-
         return s;
+    }
+
+    public void parseSymbolConfig(File file){
+        try  {
+            Gson gson = new Gson();
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String json = br.readLine();
+            PageConfig pageConfig = gson.fromJson(json, PageConfig.class);
+            ArrayList<Symbol> parsedSymbols = new ArrayList<>();
+            for (PageConfig.PageConfigSymbol s: pageConfig.symbols){
+                parsedSymbols.add(new Symbol(s.id, s.name, s.bounds.xmin, s.bounds.ymin, s.bounds.xmax, s.bounds.ymax));
+            }
+            symbols = parsedSymbols;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Symbol getApplicableSymbol(float x, float y){

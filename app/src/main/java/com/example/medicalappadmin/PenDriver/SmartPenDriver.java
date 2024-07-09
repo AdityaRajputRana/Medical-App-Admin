@@ -40,6 +40,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.reflect.Array;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -286,7 +287,12 @@ public class SmartPenDriver implements IAFPenMsgListener, IAFPenDotListener, IAF
             return CONNECT_MESSAGE.CONFIG_ERROR;
         }
 
+        File symbolConfigFile = new File(activity.getFilesDir(), "pageConfig.json");
         symbolController = new SymbolController();
+
+        if (symbolConfigFile.exists()){
+            symbolController.parseSymbolConfig(symbolConfigFile);
+        }
 
 
         iPenCtrl = DPenCtrl.getInstance();
