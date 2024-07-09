@@ -28,6 +28,9 @@ public class EndPoints {
     public static String homePage = "api/home";
     public static String uploadAdditional = "api/page/additional/upload";
 
+    public static String getPageConfigMetadata = "api/doctor/getPageConfigMetadata";
+
+
 
 
 

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/natural50"
+    tools:context=".PageConfigActivity">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/appBar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        app:cardElevation="10dp"
+        app:cardBackgroundColor="@color/white">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivBackBtnVideos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:paddingTop="4dp"
+                android:text="Configure Page Layout"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimTxt"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/appBar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/configTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:textSize="18sp"
+                android:textColor="@color/natural700"
+                android:text="Configuration Details"
+                />
+
+            <TextView
+                android:id="@+id/configDetailsBodyTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_medium"
+                android:textSize="16sp"
+                android:textColor="@color/natural600"
+                android:text="Doctor Id: lsdjflafladf\nConfig Id: lfjdsaldjsaldjf\nConfig Version: 1.0.0\nLast Update: 12/12/2021"
+                />
+
+            <ProgressBar
+                android:visibility="gone"
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp" />
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/activeProcessTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Checking for Updates..."
+                android:textColor="@color/natural800"
+                android:fontFamily="@font/inter_bold"
+                android:textSize="18sp"
+                android:textAlignment="center" />
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/activeProcessBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Please wait while we ping our servers"
+                android:fontFamily="@font/inter"
+                android:textColor="@color/natural500"
+                android:textSize="16sp"
+                android:textAlignment="center" />
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/actionBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Check for updates"
+        app:icon="@drawable/baseline_sync_24"
+        android:textColor="@color/primary700"
+        android:backgroundTint="@color/primary50"
+        app:iconTint="@color/primary700"
+        android:elevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:clipToOutline="false"
+        android:layout_marginBottom="36dp"
+        app:shapeAppearance="@style/ShapeAppearance.MaterialComponents.Large.Component"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -208,6 +208,25 @@
                 android:drawableTint="@color/primary700"
                 android:textColor="@color/natural800"
                 android:text="Care Guides" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/pageConfigBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                app:iconPadding="16dp"
+                android:backgroundTint="@android:color/transparent"
+                app:cornerRadius="0dp"
+                app:iconTint="@color/primary700"
+                android:drawableLeft="@drawable/baseline_pages_24"
+                android:fontFamily="@font/inter_bold"
+                android:textSize="18sp"
+                android:drawablePadding="2dp"
+                android:textAlignment="viewStart"
+                android:drawableTint="@color/primary700"
+                android:textColor="@color/natural800"
+                android:text="Page Settings" />
+
+
 
 
 

@@ -41,6 +41,7 @@ import com.example.medicalappadmin.rest.response.InitialisePageRP;
 import com.example.medicalappadmin.rest.response.LinkGuideRP;
 import com.example.medicalappadmin.rest.response.LinkPageRP;
 import com.example.medicalappadmin.rest.response.LoginRP;
+import com.example.medicalappadmin.rest.response.PageConfigMetadataRP;
 import com.example.medicalappadmin.rest.response.PatientListRP;
 import com.example.medicalappadmin.rest.response.SetGuidePosRP;
 import com.example.medicalappadmin.rest.response.SignupRP;
@@ -198,6 +199,10 @@ public class APIMethods {
 
     public static void addNewPatient(Context context, Patient patient, APIResponseListener<ViewPatientRP> listener){
         API.postData(listener, patient, EndPoints.addNewPatient, ViewPatientRP.class, context);
+    }
+
+    public static void getPageConfigMetadata(Context context, APIResponseListener<PageConfigMetadataRP> listener){
+        API.postData(listener, new EmptyReq(), EndPoints.getPageConfigMetadata, PageConfigMetadataRP.class, context);
     }
 
 

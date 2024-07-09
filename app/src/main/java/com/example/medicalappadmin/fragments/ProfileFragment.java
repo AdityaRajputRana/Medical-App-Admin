@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.medicalappadmin.LoginActivity;
 import com.example.medicalappadmin.Models.User;
+import com.example.medicalappadmin.PageConfigActivity;
 import com.example.medicalappadmin.PenDriver.LiveData.PenStatusLiveData;
 import com.example.medicalappadmin.R;
 import com.example.medicalappadmin.Tools.CacheUtils;
@@ -90,6 +91,10 @@ public class ProfileFragment extends Fragment {
 
         binding.videoSettingsBtn.setOnClickListener(view -> {
             startActivity(new Intent(getActivity(), VideoSettingsActivity.class));
+        });
+
+        binding.pageConfigBtn.setOnClickListener(view -> {
+            startActivity(new Intent(getActivity(), PageConfigActivity.class));
         });
     }
 
