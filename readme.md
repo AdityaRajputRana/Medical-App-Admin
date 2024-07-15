@@ -32,10 +32,27 @@ This project provides a robust solution to digitize handwritten notes and forms 
 
 ## Screenshots
 
-![Onboarding Screen](images/onboard.jpeg) | ![Login](images/login.jpeg) | ![Home](images/home.jpeg)
-![Case History](images/case_history.jpeg) | ![Case Details](images/case_details.jpeg) | ![Case Attachments](images/case_attachments.jpeg)
-![Patient History](images/patient_history.jpeg) | ![Patient Details](images/patient_details.jpeg)
-![Settings](images/settings.jpeg) | |
+<table>
+    <tr>
+        <td><img src="images/onboard.jpeg" alt="Onboarding Screen" width="200"></td>
+        <td><img src="images/login.jpeg" alt="Login" width="200"></td>
+        <td><img src="images/home.jpeg" alt="Home" width="200"></td>
+    </tr>
+    <tr>
+        <td><img src="images/case_history.jpeg" alt="Case History" width="200"></td>
+        <td><img src="images/case_details.jpeg" alt="Case Details" width="200"></td>
+        <td><img src="images/case_attachments.jpeg" alt="Case Attachments" width="200"></td>
+    </tr>
+    <tr>
+        <td><img src="images/patient_history.jpeg" alt="Patient History" width="200"></td>
+        <td><img src="images/patient_details.jpeg" alt="Patient Details" width="200"></td>
+        <td><img src="images/settings.jpeg" alt="Settings" width="200"></td>
+    </tr>
+    <tr>
+        <td><img src="images/settings.jpeg" alt="Settings"> </td>
+    </tr>
+</table>
+
 
 ## Repository Links
 
