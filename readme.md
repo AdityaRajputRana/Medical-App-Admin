@@ -32,10 +32,10 @@ This project provides a robust solution to digitize handwritten notes and forms 
 
 ## Screenshots
 
-![Onboarding Screen](images/onboard.jpeg) ![Login](images/login.jpeg) ![Home](images/home.jpeg)
-![Case History](images/case_history.jpeg) ![Case Details](images/case_details.jpeg) ![Case Attachments](images/case_attachments.jpeg)
-![Patient History](images/patient_history.jpeg) ![Patient Details](images/patient_details.jpeg)
-![Settings](images/settings.jpeg)
+![Onboarding Screen](images/onboard.jpeg) | ![Login](images/login.jpeg) | ![Home](images/home.jpeg)
+![Case History](images/case_history.jpeg) | ![Case Details](images/case_details.jpeg) | ![Case Attachments](images/case_attachments.jpeg)
+![Patient History](images/patient_history.jpeg) | ![Patient Details](images/patient_details.jpeg)
+![Settings](images/settings.jpeg) | |
 
 ## Repository Links
 
