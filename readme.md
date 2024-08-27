@@ -8,6 +8,29 @@ Medical professionals often rely heavily on handwritten notes and forms. This tr
 
 This project provides a robust solution to digitize handwritten notes and forms using an IR-enabled pen and binary encoded paper. The system captures handwriting in real-time, processes it, and integrates it into a digital format that can be easily accessed and managed. The solution includes features such as image caching, real-time data processing, and a comprehensive backend system to handle and store data efficiently.
 
+## Screenshots
+
+<table>
+    <tr>
+        <td><img src="images/onboard.jpeg" alt="Onboarding Screen" width="300"></td>
+        <td><img src="images/login.jpeg" alt="Login" width="300"></td>
+        <td><img src="images/home.jpeg" alt="Home" width="300"></td>
+    </tr>
+    <tr>
+        <td><img src="images/case_history.jpeg" alt="Case History" width="300"></td>
+        <td><img src="images/case_details.jpeg" alt="Case Details" width="300"></td>
+        <td><img src="images/case_attachments.jpeg" alt="Case Attachments" width="300"></td>
+    </tr>
+    <tr>
+        <td><img src="images/patient_history.jpeg" alt="Patient History" width="300"></td>
+        <td><img src="images/patient_details.jpeg" alt="Patient Details" width="300"></td>
+        <td><img src="images/settings.jpeg" alt="Settings" width="300"></td>
+    </tr>
+    <tr>
+        <td><img src="images/settings.jpeg" alt="Settings" width = "300"> </td>
+    </tr>
+</table>
+
 ## Features
 
 - **Real-time Digitization**: Converts handwritten notes into digital format in real-time.
@@ -29,29 +52,6 @@ This project provides a robust solution to digitize handwritten notes and forms 
 - **Caching and Message Broking**: Redis
 - **Deployment**: AWS
 - **Libraries**: Gson, Volley, Picasso
-
-## Screenshots
-
-<table>
-    <tr>
-        <td><img src="images/onboard.jpeg" alt="Onboarding Screen" width="200"></td>
-        <td><img src="images/login.jpeg" alt="Login" width="200"></td>
-        <td><img src="images/home.jpeg" alt="Home" width="200"></td>
-    </tr>
-    <tr>
-        <td><img src="images/case_history.jpeg" alt="Case History" width="200"></td>
-        <td><img src="images/case_details.jpeg" alt="Case Details" width="200"></td>
-        <td><img src="images/case_attachments.jpeg" alt="Case Attachments" width="200"></td>
-    </tr>
-    <tr>
-        <td><img src="images/patient_history.jpeg" alt="Patient History" width="200"></td>
-        <td><img src="images/patient_details.jpeg" alt="Patient Details" width="200"></td>
-        <td><img src="images/settings.jpeg" alt="Settings" width="200"></td>
-    </tr>
-    <tr>
-        <td><img src="images/settings.jpeg" alt="Settings"> </td>
-    </tr>
-</table>
 
 
 ## Repository Links
